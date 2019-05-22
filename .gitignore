@@ -1,0 +1,9 @@
+.stack-work
+.stack-profile
+.HTF
+./result
+dist
+./fornt/static/js/all.js
+TAGS
+.ghc.environment*
+dist-newstyle/
