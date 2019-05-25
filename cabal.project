@@ -1,4 +1,6 @@
 packages:
   surbgirq-types
   surbgirq-service
+  surbgirq-api
+  common
   surbgirq

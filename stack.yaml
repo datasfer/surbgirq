@@ -1,8 +1,10 @@
-resolver: lts-12.22
+resolver: lts-13.19
 
 packages:
 - surbgirq-types
 - surbgirq-service
+- surbgirq-api
+- common
 - surbgirq
 
 extra-deps:
@@ -12,8 +14,10 @@ extra-deps:
   - katip-elasticsearch-0.5.1.0
   - bloodhound-0.16.0.0
   - guid-0.1.0
+  - serialise-0.2.1.0
 nix:
   enable: true
+#  shell-file: shell.nix
   pure: false
   packages:
     - gmp
