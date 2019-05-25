@@ -1,12 +1,10 @@
 resolver: lts-12.22
 
 packages:
-- surbgirq-common
 - surbgirq-types
-- surbgirq-state
-- surbgirq-api
 - surbgirq-service
 - surbgirq
+
 extra-deps:
   - wai-middleware-prometheus-1.0.0
   - wai-middleware-static-embedded-0.1.0.0
@@ -15,7 +13,7 @@ extra-deps:
   - bloodhound-0.16.0.0
   - guid-0.1.0
 nix:
-  enable: false
+  enable: true
   pure: false
   packages:
     - gmp

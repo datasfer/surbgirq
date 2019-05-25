@@ -7,3 +7,4 @@ dist
 TAGS
 .ghc.environment*
 dist-newstyle/
+./fornt/girq-front/result*

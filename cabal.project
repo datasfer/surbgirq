@@ -1,2 +1,4 @@
 packages:
+  surbgirq-types
+  surbgirq-service
   surbgirq
