@@ -4,7 +4,7 @@ module Surbgirq.Types ( module X
 
 
 import Surbgirq.Types.ApiInfo          as X
-
+import Surbgirq.Types.Entities as X
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
