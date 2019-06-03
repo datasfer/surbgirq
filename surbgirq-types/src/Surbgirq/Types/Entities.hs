@@ -11,6 +11,7 @@ import Data.Text  (Text)
 
 import Common.Aeson
 
+import Surbgirq.Types.Girq    
 -------------------------------------------------------------------------------
 --
 
@@ -53,6 +54,7 @@ data Book = Book
   } deriving (Show)
 
 
+{-
 books :: [Book]
 books  = [ Book Genesis 1 50 Old ""
          , Book Exodus  2 40 Old ""
@@ -62,13 +64,14 @@ books  = [ Book Genesis 1 50 Old ""
          , Book Joshua 6 24 Old ""
          , Book Judges 7 21 Old ""
          , Book Ruth 8 4 Old ""
-         , Book Samuel1 9 31  Old ""
-         , Book Samuel2 10 24 Old ""
          , Book Kings1 11 22 Old ""
          , Book Kings2 12 25 Old ""
+         , Book Kings3 11 22 Old ""
+         , Book Kings4 12 25 Old ""
          , Book Chronicles1 13 29 Old ""
          , Book Chronicles2 14 36 Old ""
-         , Book Ezra 15 10 Old ""
+         , Book Ezra1 15 10 Old ""
+         , Book Ezra2 15 10 Old ""
          , Book Nehemiah 16 13 Old ""
          , Book Esther 17 10 Old ""
          , Book Job  18 42 Old ""
@@ -98,17 +101,9 @@ books  = [ Book Genesis 1 50 Old ""
          , Book Luke 42 24 New ""
          , Book John 43 21 New ""
          ]
-data Girq = Genesis | Exodus | Leviticus | Numbers | Deuteronomy | Joshua | Judges | Ruth | Samuel1
-          | Samuel2 | Kings1 | Kings2 | Chronicles1 | Chronicles2 | Ezra | Nehemiah
-          | Esther | Job | Psalms | Proverbs | Ecclesiastes | SongofSolomon | Isaiah
-          | Jeremiah | Lamentations | Ezekiel | Daniel | Hosea | Joel | Amos | Obadiah
-          | Jonah | Micah | Nahum | Habakkuk | Zephaniah | Haggai | Zechariah | Malachi
-          | Matthew | Mark | Luke | John | Acts | Romens 
-            deriving(Show)
-
+-}
 $(deriveJSON dropPrefixOptions ''Testament)
 $(deriveJSON dropPrefixOptions ''Group)
-$(deriveJSON dropPrefixOptions ''Girq)
 $(deriveJSON dropPrefixOptions ''Book)
 
 {-                      
