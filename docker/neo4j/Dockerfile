@@ -1,0 +1,3 @@
+FROM neo4j:3.5
+
+ENV NEO4J_AUTH neo4j/CHANGE_ME
