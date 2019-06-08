@@ -3,5 +3,6 @@ packages:
   surbgirq-service
   surbgirq-api
   surbgirq-shell
+  surbgirq-db
   common
   surbgirq
