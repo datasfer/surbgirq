@@ -3,7 +3,12 @@
 
 
 module Surbgirq.Types.Entities (
- Scripture(..)
+   Scripture(..)
+ , Book(..)
+ , Chapter (..)
+ , Section(..)
+ , Paragraph(..)
+ , Verse(..)
  ) where
 
 import Data.Aeson (Value)
@@ -35,23 +40,90 @@ data Group = Pentateuch
               -- ^ Թղթեր
               deriving (Show)
 
+
+-- | Book -> Scripture -> Chapter -> Section -> Paragraph -> Verse -> Words
+
+
+data TYear = T1994
+           | T1969
+           | T1805
+           | T1895
+             deriving (Show)
+                  
+data Language = Grabar 
+              | Ashxarhabar
+              deriving (Show)
+
+
+data Chapter = Chapeter
+    { chapter'book     :: Book
+    , chapter'number   :: Int
+    , chapter'title    :: Int
+    , chapter'language :: Language
+    , chapter'sections :: [Section]
+  } deriving (Show)
+
+
+data Section = Section
+    { section'title  :: Text
+    , section'number :: Int
+    , section'paragraphs :: [Paragraph]
+  } deriving (Show)
+
+
+data Paragraph = Paragraph
+    { paragraph'number :: Int
+    , paragraph'verses :: [Verse]
+  } deriving (Show)
+
+
+data Verse = Verse
+  { verse'verse     :: Int
+  , verse'content   :: Text
+--   , verse'grabar    :: Text
+  , verse'ref       :: Text
+  } deriving (Show)
+
+data Ban = Ban
+    { word'number  :: Int
+    , word'content :: Text
+    , word'ref     :: Footnote 
+    } deriving (Show)
+
+data Footnote = Footnote
+    { footnote'number :: Int
+    , footnote'text :: Text
+    } deriving (Show)
+
 data Scripture = Scripture
-    { scripture'book    :: Book
-    , scripture'chapter :: Int
-    , scripture'verse   :: Int
-    , scripture'section :: Text
-    -- ^ title of section/paragraph
-    , scripture'content :: Text            
-    }
+    { scripture'book     :: Book
+    , scripture'chapters :: [Chapter]
+    } deriving (Show)
 
 -- | 
 data Book = Book
   { book'book         :: Girq
   , book'number       :: Int
   , book'chapters     :: Int
-  , book''testament   :: Testament
-  , book'transalation :: Text
+  , book'testament    :: Testament
+  , book'translation  :: Text
   } deriving (Show)
+
+
+$(deriveJSON dropPrefixOptions ''Testament)
+$(deriveJSON dropPrefixOptions ''Group)
+$(deriveJSON dropPrefixOptions ''Book)
+$(deriveJSON dropPrefixOptions ''Scripture)
+$(deriveJSON dropPrefixOptions ''Chapter)
+$(deriveJSON dropPrefixOptions ''Section)
+$(deriveJSON dropPrefixOptions ''Paragraph)
+$(deriveJSON dropPrefixOptions ''Verse)
+$(deriveJSON dropPrefixOptions ''Footnote)
+$(deriveJSON dropPrefixOptions ''Ban)
+
+$(deriveJSON dropPrefixOptions ''Language)
+$(deriveJSON dropPrefixOptions ''TYear)
+
 
 
 {-
@@ -102,9 +174,6 @@ books  = [ Book Genesis 1 50 Old ""
          , Book John 43 21 New ""
          ]
 -}
-$(deriveJSON dropPrefixOptions ''Testament)
-$(deriveJSON dropPrefixOptions ''Group)
-$(deriveJSON dropPrefixOptions ''Book)
 
 {-                      
   "Acts": {

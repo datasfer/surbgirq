@@ -2,5 +2,6 @@ packages:
   surbgirq-types
   surbgirq-service
   surbgirq-api
+  surbgirq-shell
   common
   surbgirq
