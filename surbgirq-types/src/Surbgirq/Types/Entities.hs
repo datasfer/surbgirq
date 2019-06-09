@@ -107,6 +107,10 @@ data Book = Book
   , book'chapters     :: Int
   , book'testament    :: Testament
   , book'translation  :: Text
+  , book'input        :: Maybe Text
+    -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
+  , book'output       :: Maybe Text
+  -- ^ the path to store processed result
   } deriving (Show)
 
 

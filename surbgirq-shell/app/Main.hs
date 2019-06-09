@@ -1,28 +1,36 @@
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE QuasiQuotes         #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Main where
 
-import Common.Yaml
-import Data.Text (pack, Text)
-import qualified Data.Text as T
-import Data.Aeson 
-import System.IO
-import qualified Data.Text.Encoding as TE
-import Data.Text.Lazy.Encoding as TLE
-import qualified Data.Text.IO as TIO
-import qualified Data.Text.Lazy as TL
+
+import Control.Exception    (bracket)
+import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+
+import Data.Aeson
+import Data.Char
+import Data.Maybe (fromMaybe)
+import Data.Text  (Text, pack)
+
+import qualified Data.Text               as T
+import qualified Data.Text.Encoding      as TE
+import qualified Data.Text.IO            as TIO
+import qualified Data.Text.Lazy          as TL
+import           Data.Text.Lazy.Encoding as TLE
+
 import Options.Applicative
 import System.Directory
+import System.FilePath.Posix         (takeBaseName)
+import System.IO
 import Text.InterpolatedString.Perl6 (qc)
-import System.FilePath.Posix (takeBaseName)
 
-    
-import           Control.Monad
-import           System.FilePath
-import           Data.List
+import Control.Monad
+import Data.List
+import System.FilePath
 
-    
+import Common.Yaml
 import Surbgirq.Shell.Commands
 import Surbgirq.Types
 
@@ -34,7 +42,7 @@ main1 = do
   ch <- readChapter "./data/yaml/matthew/1.yaml"
 --  mapM_  (\Section{..} -> )chapter'sections
   hSetEncoding stdout utf8
-  let res = (TL.toStrict . TLE.decodeUtf8 $ encode ch)               
+  let res = (TL.toStrict . TLE.decodeUtf8 $ encode ch)
   TIO.writeFile "file.txt" res
   TIO.putStrLn res
   TIO.putStrLn "Գիրք ծննդեան"
@@ -52,7 +60,7 @@ main = do
     Command{..} -> do
              ch <- readChapter prmChapterFile
              let res = (TL.toStrict . TLE.decodeUtf8 $ encode ch)
-             generateInitCypher "./data/yaml"
+             generateInitCypher "./data/yaml" "./data/cypher"
              TIO.writeFile "file.txt" res
              TIO.putStrLn res
 
@@ -94,77 +102,89 @@ class NodeName t where
 instance NodeName Book where
     node _ = "Book"
 
-generateInitCypher :: FilePath -> IO ()
-generateInitCypher path = do
-    names <- listDirectory path
-    forM_ names $ \name -> when (isDir name) $ do
-      let bookDir = path </> name
-          outFile = path </> [qc|{name}.cypher|]           
-      txtFiles <- listDirectory bookDir
-      outh <- openFile outFile WriteMode
-      TIO.hPutStrLn outh "CREATE"
-      TIO.hPutStrLn outh [qc|  ({name}:Matthew:New:Book \{title: '{name}'}),|]
+generateInitCypher :: FilePath -> FilePath -> IO ()
+generateInitCypher path outPath = do
+   let del = "_";
 
-      let del = "_";
-      -- a file == a chapter   
-      forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
-        ch@Chapeter{..} <- readChapter (bookDir </> file)
-                             
-        let chName = concat [name, del, "ch", takeBaseName file]
-            chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}'}),|]
-            chRel  = [qc|  ({name})-[:HAS_CH]->({chName}),|]
+   books :: [Book] <- readYaml $ path </> "books.yaml"
+   forM_ books $ \Book{..} -> do
+     let inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
+         bookDir = path </> (T.unpack inPath)
+         outFile = outPath </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
+         bookLabel = show book'book
+         bookTestament = show book'testament
+         bookName = T.toLower . T.pack $ show book'book
 
-        TIO.hPutStrLn outh chNode
-        TIO.hPutStrLn outh chRel
 
-        -- Sections   
-        forM_ chapter'sections $ \Section{..} -> do
-          let secName = concat [chName, del, "sec", show section'number ]
-              secNode = [qc|  ({secName}:Section \{title: '{section'title}'}),|]
-              secRel  = [qc|  ({chName})-[:HAS_SEC]->({secName}),|]
+     exists <- doesDirectoryExist bookDir
+     -- check if books input directory exists
+     when exists $ do
+       -- here no need to error check
+       txtFiles <- listDirectory bookDir `catchError` \_ -> do
+                                      liftIO $ putStrLn (concat [bookDir, " doesnot exist."])
+                                      return []
 
-          TIO.hPutStrLn outh secNode
-          TIO.hPutStrLn outh secRel
+       bracket (openFile outFile WriteMode) hClose $ \outh -> do
 
-           -- Paragraphs
-          forM_ section'paragraphs $ \Paragraph{..} -> do
-            let prghName = concat [secName, del, "prgh", show paragraph'number]
-                prghNode = [qc|  ({prghName}:Paragraph \{title: ''}),|]
-                prghRel  = [qc|  ({secName})-[:HAS_PRGH]->({prghName}),|]
+         TIO.hPutStrLn outh "CREATE"
+         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book \{title: '{bookName}'}),|]
 
-            TIO.hPutStrLn outh prghNode
-            TIO.hPutStrLn outh prghRel
+         -- a file == a chapter
+         forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
+           ch@Chapeter{..} <- readChapter (bookDir </> file)
 
-            -- Verses
-            forM_ paragraph'verses $ \Verse{..} -> do
-              let verseName = concat [prghName , del, "verse", show verse'verse]
-                  verseNode = [qc|  ({verseName}:Verse \{book: '{name}', content: '{verse'content}', verse: {verse'verse}, section: {section'number}, paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
-                  verseRel  = [qc|  ({prghName})-[:HAS_VERSE]->({verseName}),|]
-              TIO.hPutStrLn outh verseNode
-              TIO.hPutStrLn outh verseRel
+           let chName = concat [T.unpack bookName, del, "ch", takeBaseName file]
+               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: {chapter'book}}),|]
+               chRel  = [qc|  ({bookName})-[:HAS_CH]->({chName}),|]
 
-              let ws = T.splitOn " " verse'content
-              -- add each word as node
-              forM_ (zip ws [1..] ) $ \(word, index) -> do
-                let wordName = concat [verseName, del, "word", show index]
-                    wordNode = [qc|  ({wordName}:Word \{word: '{word}', index: {index}}),|]
-                    wordRel  = [qc|  ({verseName})-[:HAS_WORD]->({wordName}),|]
-                TIO.hPutStrLn outh wordNode
-                TIO.hPutStrLn outh wordRel
-              -- add [NEEXT] relationshipp between words
-              forM_ (zip (zip ws (tail' ws)) [1..] ) $ \((w1, w2), index) -> do
-                let w1Name = concat [verseName, del, "word", show index]
-                    w2Name = concat [verseName, del, "word", show $ index + 1]
-                    nextRel  = [qc|  ({w1Name})-[:NEXT]->({w2Name}),|]
-                TIO.hPutStrLn outh nextRel
+           TIO.hPutStrLn outh chNode
+           TIO.hPutStrLn outh chRel
 
-                 
+           -- Sections
+           forM_ chapter'sections $ \Section{..} -> do
+             let secName = concat [chName, del, "sec", show section'number ]
+                 secNode = [qc|  ({secName}:Section \{title: '{section'title}'}),|]
+                 secRel  = [qc|  ({chName})-[:HAS_SEC]->({secName}),|]
 
---          let res = (TL.toStrict . TLE.decodeUtf8 $ encode ch)
-      hClose outh
+             TIO.hPutStrLn outh secNode
+             TIO.hPutStrLn outh secRel
+
+              -- Paragraphs
+             forM_ section'paragraphs $ \Paragraph{..} -> do
+               let prghName = concat [secName, del, "prgh", show paragraph'number]
+                   prghNode = [qc|  ({prghName}:Paragraph \{title: ''}),|]
+                   prghRel  = [qc|  ({secName})-[:HAS_PRGH]->({prghName}),|]
+
+               TIO.hPutStrLn outh prghNode
+               TIO.hPutStrLn outh prghRel
+
+               -- Verses
+               forM_ paragraph'verses $ \Verse{..} -> do
+                 let verseName = concat [prghName , del, "verse", show verse'verse]
+                     verseNode = [qc|  ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', verse: {verse'verse}, section: {section'number}, paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
+                     verseRel  = [qc|  ({prghName})-[:HAS_VERSE]->({verseName}),|]
+                 TIO.hPutStrLn outh verseNode
+                 TIO.hPutStrLn outh verseRel
+
+                 let ws = T.splitOn " " verse'content
+                 -- add each word as node
+                 forM_ (zip ws [1..] ) $ \(word, index) -> do
+                   let wordName = concat [verseName, del, "word", show index]
+                       wordNode = [qc|  ({wordName}:Word \{word: '{word}', index: {index}}),|]
+                       wordRel  = [qc|  ({verseName})-[:HAS_WORD]->({wordName}),|]
+                   TIO.hPutStrLn outh wordNode
+                   TIO.hPutStrLn outh wordRel
+                 -- add [NEEXT] relationshipp between words
+                 forM_ (zip (zip ws (tail' ws)) [1..] ) $ \((w1, w2), index) -> do
+                   let w1Name = concat [verseName, del, "word", show index]
+                       w2Name = concat [verseName, del, "word", show $ index + 1]
+                       nextRel  = [qc|  ({w1Name})-[:NEXT]->({w2Name}),|]
+                   TIO.hPutStrLn outh nextRel
+
+
   where
     tail' :: [a] -> [a]
-    tail' [] = []
+    tail' []     = []
     tail' (x:xs) = xs
     doesFilenameMatch :: FilePath -> Bool
     doesFilenameMatch path = takeExtension path `elem` [ ".yaml", ".yml"]
