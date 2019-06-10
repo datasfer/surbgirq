@@ -47,22 +47,27 @@ main1 = do
   TIO.putStrLn res
   TIO.putStrLn "Գիրք ծննդեան"
 
-
+-- | stack exec -- surbgirq-shell --bible --book ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher
 main :: IO ()
 main = do
   cmd <- customExecParser (prefs showHelpOnError) $
          info (helper <*> parser) $
          fullDesc <> progDesc "Format Scriptures to convenient formats."
                   <> header   "Surbgirq text formatter."
-                  <> footer   ("the generated json or neo4j sypther will be used to populate db")
+                  <> footer   ("the generated json or neo4j cypther will be used to populate db")
 
   case cmd of
     Command{..} -> do
-             ch <- readChapter prmChapterFile
-             let res = (TL.toStrict . TLE.decodeUtf8 $ encode ch)
-             generateInitCypher "./data/yaml" "./data/cypher"
-             TIO.writeFile "file.txt" res
-             TIO.putStrLn res
+--             ch <- readChapter prmChapterFile
+--             let res = (TL.toStrict . TLE.decodeUtf8 $ encode ch)
+             case cmd'book of
+               Bible -> do
+                 TIO.putStrLn "Start genererating Bible scriptures for neo4j input..."
+                 generateInitCypher cmd'config cmd'inPath cmd'outPath --  "./data/yaml" "./data/cypher"
+                 TIO.putStrLn "Bible scriptures generation success!"
+               Narek -> do
+                 TIO.putStrLn "Narek scriptures generation not ready yet!"
+
 
 readBooks :: FilePath -> IO [Book]
 readBooks file = do
@@ -102,13 +107,15 @@ class NodeName t where
 instance NodeName Book where
     node _ = "Book"
 
-generateInitCypher :: FilePath -> FilePath -> IO ()
-generateInitCypher path outPath = do
+
+
+generateInitCypher :: FilePath -> FilePath -> FilePath -> IO ()
+generateInitCypher bookFile path outPath = do
    let del = "_";
 
-   books :: [Book] <- readYaml $ path </> "books.yaml"
+   books :: [Book] <- readYaml bookFile -- $ path </> "books.yaml"
 
-   -- Books
+   -- Booksx
    forM_ books $ \Book{..} -> do
 
      let inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
@@ -130,10 +137,8 @@ generateInitCypher path outPath = do
        bracket (openFile outFile WriteMode) hClose $ \outh -> do
 
          TIO.hPutStrLn outh "CREATE"
-         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book
-                                  \{book: '{bookName}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
+         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book \{book: '{bookName}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
                              |]
-
 
          -- a file == a chapter
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do

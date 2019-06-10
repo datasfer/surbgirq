@@ -1,45 +1,71 @@
-{-# LANGUAGE TemplateHaskell              #-}
-{-# LANGUAGE OverloadedStrings              #-}
-{-# LANGUAGE ApplicativeDo   #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ApplicativeDo     #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module Surbgirq.Shell.Commands where
 
-import Data.Monoid                      ((<>))
+import Data.Monoid         ((<>))
 import Options.Applicative
 
 import Common.Aeson
 import Common.Yaml
-    
+
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
 
 data Command = Command
-    { prmChapterFile   :: FilePath
-    , prmScriptureFile :: FilePath
-    , prmConfigPath    :: FilePath
+    { cmd'book    :: BookKind
+    , cmd'config  :: FilePath
+    , cmd'inPath  :: FilePath
+    , cmd'outPath :: FilePath
     }
 
 
+data BookKind = Bible
+              | Narek
+
+
+bibleInput :: Parser BookKind
+bibleInput = flag' Bible
+  (  long "bible"
+  <> short 'b'
+  <> help "Bible Scriptures processing" )
+
+narekInput :: Parser BookKind
+narekInput = flag' Narek
+  (  long "narek"
+  <> short 'n'
+  <> help "Narek Scriptures processing" )
+
+bookInput :: Parser BookKind
+bookInput = bibleInput <|> narekInput
+
 parser :: Parser Command
 parser = do
-  prmChapterFile <- strOption
-    (  long "path-to-chapter"
-    <> help "Path to chapter file"
-    <> value "data/yaml/matthew/01.yaml"
-    <> showDefault
-    )
-  prmScriptureFile <- strOption
-    (  long "path-to-scripture"
-    <> help "Path to scripture file"
-    <> value "data/yaml/matthew/01.yaml"
-    <> showDefault
-    )
-  prmConfigPath <- strOption
+  cmd'book <- bookInput
+  cmd'config <- strOption
     (  metavar "PATH"
-    <> help "Path to configuration"
+    <> long "config"
+    <> short 'c'
+    <> help "Config file, list of books and etc..x"
+    <> value "data/yaml/config.yaml"
+    <> showDefault
+    )
+  cmd'inPath <- strOption
+    (  metavar "PATH"
+    <> long "input"
+    <> short 'i'
+    <> help "Path to scripture folder"
+    <> value "data/yaml"
+    <> showDefault
+    )
+  cmd'outPath <- strOption
+    (  metavar "PATH"
+    <> long "output"
+    <> short 'o'
+    <> help "Path to store results"
     <> value ""
     )
   return Command{..}
