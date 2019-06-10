@@ -1,5 +1,5 @@
-{-# LANGUAGE TemplateHaskell              #-}
-{-# LANGUAGE OverloadedStrings              #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 
 module Surbgirq.Types.Girq (
@@ -13,7 +13,7 @@ import Common.Aeson
 
 data Girq =
           -- * Հնգամատյան (Tora - օրենք)
-          
+
           Genesis
           -- ^ 1. Ծննդոց
           | Exodus
@@ -25,7 +25,7 @@ data Girq =
           | Deuteronomium
           -- ^ 5. Երկրորդ օրենք (Երկրորդումն օրինաց)
 
-          -- * 
+          -- *
           | Joshua
           -- ^ 6. Հեսու Նավե (Հեսուի գիրք)
           | Judges
@@ -114,8 +114,8 @@ data Girq =
           -- ^ 47. Դանիելի Մարգարեություն
           | Ezekiel
           -- ^ 48. Եզեկիելի Մարգարեություն
-            
-            
+
+
           -- * Նոր Կտակարան
           | Matthew
           -- ^ 1. Ավետարան ըստ Մատթեոսի
@@ -127,7 +127,7 @@ data Girq =
           -- ^ 4. Ավետարան ըստ Հովհաննեսի
           | Acts
           -- ^ 5. Գործք առաքելոց
-            deriving(Show)
+            deriving(Show, Read)
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին
 -- ^ Պողոս առաքյալի առաջին նամակը Կորնթացիներին (Ա Կորնթացիներ)
@@ -151,6 +151,6 @@ data Girq =
 -- ^ Հովհաննես Առաքյալի երրորդ ընդհանրական նամակը (Գ Հովհաննես)
 -- ^ Հուդայի ընդհանրական նամակը
 -- ^ Հայտնություն Հովհաննեսի
-    
+
 
 $(deriveJSON dropPrefixOptions ''Girq)

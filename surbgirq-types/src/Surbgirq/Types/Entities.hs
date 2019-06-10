@@ -1,5 +1,5 @@
-{-# LANGUAGE TemplateHaskell              #-}
-{-# LANGUAGE OverloadedStrings              #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 
 module Surbgirq.Types.Entities (
@@ -9,6 +9,7 @@ module Surbgirq.Types.Entities (
  , Section(..)
  , Paragraph(..)
  , Verse(..)
+ , Testament (..)
  ) where
 
 import Data.Aeson (Value)
@@ -16,14 +17,11 @@ import Data.Text  (Text)
 
 import Common.Aeson
 
-import Surbgirq.Types.Girq    
+import Surbgirq.Types.Girq
 -------------------------------------------------------------------------------
 --
 
 
-data Testament = Old
-               | New
-                 deriving (Show)
 
 data Group = Pentateuch
             -- ^ Մովսեսի հնգամատյանը
@@ -43,16 +41,19 @@ data Group = Pentateuch
 
 -- | Book -> Scripture -> Chapter -> Section -> Paragraph -> Verse -> Words
 
+data Testament = Old
+               | New
+                 deriving (Show, Read)
 
 data TYear = T1994
            | T1969
            | T1805
            | T1895
              deriving (Show)
-                  
-data Language = Grabar 
+
+data Language = Grabar
               | Ashxarhabar
-              deriving (Show)
+              deriving (Show, Read)
 
 
 data Chapter = Chapeter
@@ -65,8 +66,8 @@ data Chapter = Chapeter
 
 
 data Section = Section
-    { section'title  :: Text
-    , section'number :: Int
+    { section'title      :: Text
+    , section'number     :: Int
     , section'paragraphs :: [Paragraph]
   } deriving (Show)
 
@@ -78,21 +79,21 @@ data Paragraph = Paragraph
 
 
 data Verse = Verse
-  { verse'verse     :: Int
-  , verse'content   :: Text
+  { verse'verse   :: Int
+  , verse'content :: Text
 --   , verse'grabar    :: Text
-  , verse'ref       :: Text
+  , verse'ref     :: Text
   } deriving (Show)
 
 data Ban = Ban
     { word'number  :: Int
     , word'content :: Text
-    , word'ref     :: Footnote 
+    , word'ref     :: Footnote
     } deriving (Show)
 
 data Footnote = Footnote
     { footnote'number :: Int
-    , footnote'text :: Text
+    , footnote'text   :: Text
     } deriving (Show)
 
 data Scripture = Scripture
@@ -100,16 +101,17 @@ data Scripture = Scripture
     , scripture'chapters :: [Chapter]
     } deriving (Show)
 
--- | 
+-- |
 data Book = Book
-  { book'book         :: Girq
-  , book'number       :: Int
-  , book'chapters     :: Int
-  , book'testament    :: Testament
-  , book'translation  :: Text
-  , book'input        :: Maybe Text
+  { book'book        :: Girq
+  , book'title       :: Text
+  , book'number      :: Int
+  , book'chapters    :: Int
+  , book'testament   :: Testament
+  , book'translation :: Text
+  , book'input       :: Maybe Text
     -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
-  , book'output       :: Maybe Text
+  , book'output      :: Maybe Text
   -- ^ the path to store processed result
   } deriving (Show)
 
@@ -179,7 +181,7 @@ books  = [ Book Genesis 1 50 Old ""
          ]
 -}
 
-{-                      
+{-
   "Acts": {
     "number": 44,
     "id": 44000000,
@@ -341,5 +343,5 @@ books  = [ Book Genesis 1 50 Old ""
     "testament": "new",
     "url": "revelation"
   }
-}          
+}
 -}
