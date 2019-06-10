@@ -15,7 +15,7 @@ steps:
   - language_pragmas:
       style: vertical
       align: true
-      remove_redundant: true
+      remove_redundant: false
       spaces: 4
   - trailing_whitespace: {}
 columns: 98
@@ -27,9 +27,7 @@ language_extensions:
   - ExplicitForAll
   - FlexibleContexts
   - MultiParamTypeClasses
-  - ImplicitParams
-  - BangPatterns
-  - TypeFamilies
-  - TypeOperators
-  - DataKinds
   - TemplateHaskell
+  - DataKinds
+  - TypeOperators
+  - RecordWildCards

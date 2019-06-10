@@ -8,12 +8,17 @@ import Data.Int    (Int64)
 import Servant.API
 
 import Surbgirq.API.Types
+import Servant.API.Generic
+import Surbgirq.Types
 
 ------------------------------------------------------------
 -- Bex API endpoints
 ------------------------------------------------------------
 type GetApiInfoEndpoint = "info" :> Summary "Get Api Information"
     :> Get '[JSON] GetApiInfoResponse
+
+
+type GetBooksEndpoint = "books" :> Summary "Get Blooks" :> Get '[JSON] [Book]
 
 {-       
 type GetBlockEndpoint = "block" :> Summary "Get Block of level :height"
@@ -40,4 +45,7 @@ type InitBlocksPageEndpoint = "initblocks" :> Summary "Get first page Blocks lis
     :> Post '[JSON] PostBlockListResponse
 
 -}
-type BexRestAPI = "api" :> GetApiInfoEndpoint
+type SurbgirqRestAPI = "api" :> (
+            GetApiInfoEndpoint
+       :<|> GetBooksEndpoint
+      )

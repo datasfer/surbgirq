@@ -6,6 +6,7 @@
 
 module Surbgirq.Back.Server.Rest(
    getApiInfoHandler
+ , getBooksHandler
  ) where
 
 
@@ -33,3 +34,7 @@ import Surbgirq.Types
 
 getApiInfoHandler :: AppM GetApiInfoResponse
 getApiInfoHandler = return $ GetApiInfoResponse getApiInfo
+
+
+getBooksHandler :: AppM [Book]
+getBooksHandler = undefined
