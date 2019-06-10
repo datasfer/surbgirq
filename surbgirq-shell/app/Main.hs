@@ -107,7 +107,10 @@ generateInitCypher path outPath = do
    let del = "_";
 
    books :: [Book] <- readYaml $ path </> "books.yaml"
+
+   -- Books
    forM_ books $ \Book{..} -> do
+
      let inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
          bookDir = path </> (T.unpack inPath)
          outFile = outPath </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
@@ -121,20 +124,23 @@ generateInitCypher path outPath = do
      when exists $ do
        -- here no need to error check
        txtFiles <- listDirectory bookDir `catchError` \_ -> do
-                                      liftIO $ putStrLn (concat [bookDir, " doesnot exist."])
+                                      liftIO $ putStrLn (concat [bookDir, " does not exist."])
                                       return []
 
        bracket (openFile outFile WriteMode) hClose $ \outh -> do
 
          TIO.hPutStrLn outh "CREATE"
-         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book \{title: '{bookName}'}),|]
+         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book
+                                  \{book: '{bookName}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: {book'testament}, translation: {book'translation} } ),
+                             |]
+
 
          -- a file == a chapter
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
-           ch@Chapeter{..} <- readChapter (bookDir </> file)
+           ch@Chapeter{chapter'book=Book{..}, ..} <- readChapter (bookDir </> file)
 
            let chName = concat [T.unpack bookName, del, "ch", takeBaseName file]
-               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: {chapter'book}}),|]
+               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: {show book'book} }),|]
                chRel  = [qc|  ({bookName})-[:HAS_CH]->({chName}),|]
 
            TIO.hPutStrLn outh chNode
