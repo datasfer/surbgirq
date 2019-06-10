@@ -123,7 +123,7 @@ generateInitCypher bookFile path outPath = do
          outFile = outPath </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
          bookLabel = show book'book
          bookTestament = show book'testament
-         bookName = show book'book
+         bookName = T.toLower . T.pack  $ show book'book
 
 
      exists <- doesDirectoryExist bookDir
@@ -137,14 +137,14 @@ generateInitCypher bookFile path outPath = do
        bracket (openFile outFile WriteMode) hClose $ \outh -> do
 
          TIO.hPutStrLn outh "CREATE"
-         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book \{book: '{bookName}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
+         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
                              |]
 
          -- a file == a chapter
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
            ch@Chapeter{chapter'book=Book{..}, ..} <- readChapter (bookDir </> file)
 
-           let chName = concat [bookName, del, "ch", takeBaseName file]
+           let chName = concat [T.unpack bookName, del, "ch", show chapter'number]
                chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}' }),|]
                chRel  = [qc|  ({bookName})-[:HAS_CH]->({chName}),|]
 
@@ -170,12 +170,13 @@ generateInitCypher bookFile path outPath = do
                TIO.hPutStrLn outh prghRel
 
                -- Verses
-               forM_ paragraph'verses $ \Verse{..} -> do
+               forM_ paragraph'verses $ \v@Verse{..} -> do
                  let verseName = concat [prghName , del, "verse", show verse'verse]
                      verseNode = [qc|  ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', verse: {verse'verse}, section: {section'number}, paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
                      verseRel  = [qc|  ({prghName})-[:HAS_VERSE]->({verseName}),|]
                  TIO.hPutStrLn outh verseNode
                  TIO.hPutStrLn outh verseRel
+
 
                  let ws = T.splitOn " " verse'content
                  -- add each word as node
@@ -191,6 +192,24 @@ generateInitCypher bookFile path outPath = do
                        w2Name = concat [verseName, del, "word", show $ index + 1]
                        nextRel  = [qc|  ({w1Name})-[:NEXT]->({w2Name}),|]
                    TIO.hPutStrLn outh nextRel
+
+
+                 -- verse ref processing
+                 case verse'ref of
+                   Nothing -> return ()
+                   Just Ref{..} -> do
+                     case ref'type of
+                       RefText txt -> do
+                         let wordN = concat [verseName, del, "word", show ref'index]
+                             footnoteName = concat [wordN, del, "footnote", show ref'index]
+                             footnoteNode = [qc|  ({footnoteName}:Footnote \{text: '{txt}', index: {ref'index}}),|]
+                             footnoteRel  = [qc|  ({wordN})-[:REF_FOOTNOTE]->({footnoteName}),|]
+                         TIO.hPutStrLn outh footnoteNode
+                         TIO.hPutStrLn outh footnoteRel
+                       _ -> return ()
+
+
+
 
 
   where
