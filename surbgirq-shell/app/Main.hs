@@ -116,7 +116,7 @@ generateInitCypher path outPath = do
          outFile = outPath </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
          bookLabel = show book'book
          bookTestament = show book'testament
-         bookName = T.toLower . T.pack $ show book'book
+         bookName = show book'book
 
 
      exists <- doesDirectoryExist bookDir
@@ -131,7 +131,7 @@ generateInitCypher path outPath = do
 
          TIO.hPutStrLn outh "CREATE"
          TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book
-                                  \{book: '{bookName}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: {book'testament}, translation: {book'translation} } ),
+                                  \{book: '{bookName}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
                              |]
 
 
@@ -139,8 +139,8 @@ generateInitCypher path outPath = do
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
            ch@Chapeter{chapter'book=Book{..}, ..} <- readChapter (bookDir </> file)
 
-           let chName = concat [T.unpack bookName, del, "ch", takeBaseName file]
-               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: {show book'book} }),|]
+           let chName = concat [bookName, del, "ch", takeBaseName file]
+               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}' }),|]
                chRel  = [qc|  ({bookName})-[:HAS_CH]->({chName}),|]
 
            TIO.hPutStrLn outh chNode
