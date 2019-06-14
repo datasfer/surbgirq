@@ -32,7 +32,7 @@ cat sample.cypher | cypher-shell -u neo4j -p CHANGE_ME
 
 
 ### Connect to docker terminal and run cypher-shell
-    docker exec -i -t 665b4a1e17b6
+    docker exec -i -t 665b4a1e17b6 /bin/bash
 
 ### Share folder with docker container    
     -v ~/haskell/surbgirq/data:/data 

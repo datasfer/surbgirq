@@ -12,8 +12,9 @@ import Network.Wai.Handler.Warp (HostPreference)
 
 import qualified Data.Text as T
 
-import Surbgirq.Service
 import Common.Aeson
+import Surbgirq.Neo4j
+import Surbgirq.Service
 import Types.Logger
 -------------------------------------------------------------------------------
 --
@@ -43,18 +44,24 @@ data ServerSettings = ServerSettings
   } deriving (Eq, Show)
 
 
-data SqliteStore = SqliteStore {
-      sqliteStore'dbName :: String
-    }
- deriving (Show)
+data SqliteConfig = SqliteConfig
+    { sqliteConfig'dbName :: String
+    } deriving (Show)
 
 data StoreSpec = StoreSpec
-  { storeSpec'sqlite :: SqliteStore
+  {
+    storeSpec'neo4j  :: Neo4jConfig
+  -- ^ Neo4j store settings
+  , storeSpec'sqlite :: SqliteConfig
     -- ^ Sqlite Store settings
-  }
-  deriving(Show)
+  } deriving(Show)
 
 
+
+data Neo4jConfig = Neo4jConfig
+    { neo4jConfig'user :: Text
+    , neo4jConfig'pass :: Text
+    } deriving(Show)
 
 
 -- | Specification of logging
@@ -65,23 +72,23 @@ data LogSpec = LogSpec
     -- ^ Suffix to append to host name in logs.
   , logSpec'clusterId      :: Maybe Text
     -- ^ Cluster ID will written to @env@ field of logs
-  }
-  deriving(Show)
+  } deriving(Show)
 
 
 
 -- | the block explorer front and thundermint node settings
 data SurbgirqSettings = SurbgirqSettings
-  { surbgirq'server   :: !ServerSettings
+  { surbgirq'server :: !ServerSettings
   -- ^ the server front settings, port ...
-  , surbgirq'logs     :: !LogSpec
+  , surbgirq'logs   :: !LogSpec
   -- ^ the logs settings
-  , surbgirq'stores   :: !StoreSpec
+  , surbgirq'stores :: !StoreSpec
   -- ^ the storage settings
   } deriving (Show)
 
 $(deriveFromJSON dropPrefixOptions ''SurbgirqSettings)
 $(deriveJSON dropPrefixOptions     ''LogSpec)
 $(deriveFromJSON dropPrefixOptions ''ServerSettings)
-$(deriveJSON dropPrefixOptions     ''SqliteStore)
+$(deriveJSON dropPrefixOptions     ''SqliteConfig)
+$(deriveJSON dropPrefixOptions     ''Neo4jConfig)
 $(deriveJSON dropPrefixOptions     ''StoreSpec)

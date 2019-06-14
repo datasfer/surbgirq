@@ -7,7 +7,9 @@
 module Surbgirq.Back.Server.Rest(
    getApiInfoHandler
  , getBooksHandler
+ , getChapterHandler
  ) where
+
 
 
 import Control.Monad.Reader
@@ -27,6 +29,7 @@ import Surbgirq.API
 import Surbgirq.Back.App.Env
 import Surbgirq.Back.Server.ApiInfo
 
+import Surbgirq.Neo4j
 import Surbgirq.Types
 
 -----------------------------------------------------------------
@@ -38,3 +41,7 @@ getApiInfoHandler = return $ GetApiInfoResponse getApiInfo
 
 getBooksHandler :: AppM [Book]
 getBooksHandler = undefined
+
+
+getChapterHandler :: Girq -> Int -> AppM Chapter
+getChapterHandler girq ch_num = undefined -- getChapterNode girq ch_num

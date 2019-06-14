@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds   #-}
-{-# LANGUAGE TypeOperators   #-}
+{-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE TypeOperators #-}
 
 
 module Surbgirq.API.Rest where
@@ -7,8 +7,8 @@ module Surbgirq.API.Rest where
 import Data.Int    (Int64)
 import Servant.API
 
-import Surbgirq.API.Types
 import Servant.API.Generic
+import Surbgirq.API.Types
 import Surbgirq.Types
 
 ------------------------------------------------------------
@@ -18,9 +18,23 @@ type GetApiInfoEndpoint = "info" :> Summary "Get Api Information"
     :> Get '[JSON] GetApiInfoResponse
 
 
-type GetBooksEndpoint = "books" :> Summary "Get Blooks" :> Get '[JSON] [Book]
+type GetBooksListEndpoint = "books" :> Summary "Get Available Books" :> Get '[JSON] [Book]
 
-{-       
+type GetChapterEndpoint = "chapter"   :> Summary "Get Chapter"
+    :> Capture "girq" Girq
+    :> Capture "ch" Int
+    :> Get '[JSON] Chapter
+
+type GetSectionEndpoint = "section"   :> Summary "Get Section"
+    :> Capture "girq" Girq
+    :> Capture "ch" Int
+    :> Capture "sec" Int
+    :> Get '[JSON] Section
+
+type GetParagraphEndpoint = "paragraph" :> Summary "Get Paragraph" :> Get '[JSON] Paragraph
+type GetVerseEndpoint = "verse"     :> Summary "Get Verse"     :> Get '[JSON] Verse
+
+{-
 type GetBlockEndpoint = "block" :> Summary "Get Block of level :height"
     :> Capture ":height" Int64
     :> Get '[JSON] GetBlockInfoResponse
@@ -47,5 +61,6 @@ type InitBlocksPageEndpoint = "initblocks" :> Summary "Get first page Blocks lis
 -}
 type SurbgirqRestAPI = "api" :> (
             GetApiInfoEndpoint
-       :<|> GetBooksEndpoint
+       :<|> GetBooksListEndpoint
+       :<|> GetChapterEndpoint
       )

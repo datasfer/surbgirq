@@ -10,7 +10,8 @@ module Surbgirq.Types.Entities (
  , Paragraph(..)
  , Verse(..)
  , Testament (..)
- , Ref(..)
+ , BookRef(..)
+ , VerseRef(..)
  , RefType(..)
  ) where
 
@@ -57,7 +58,7 @@ data Language = Grabar
               | Ashxarhabar
               deriving (Show, Read)
 
-data RefType = RefBook    Text
+data RefType = RefBooks   [Text]
              | RefChapter Text
              | RefVerse   Text
              | RefWord    Text
@@ -90,7 +91,7 @@ data Verse = Verse
   { verse'verse   :: Int
   , verse'content :: Text
 --   , verse'grabar    :: Text
-  , verse'ref     :: Maybe Ref
+  , verse'ref     :: Maybe VerseRef
   } deriving (Show)
 
 
@@ -98,13 +99,20 @@ data Verse = Verse
 data Ban = Ban
     { ban'index :: Int
     , ban'word  :: Text
-    , ban'ref   :: Ref
+    , ban'ref   :: VerseRef
     } deriving (Show)
 
-data Ref = Ref
-    { ref'index :: Int
-    , ref'type  :: RefType
+data VerseRef = VerseRef
+    { verseRef'index :: Int
+    , verseRef'type  :: RefType
     } deriving (Show, Read)
+
+
+data BookRef =  BookRef
+    {
+      bookRef'book :: Book
+    , bookRef'ref  :: RefType
+    }
 
 data Scripture = Scripture
     { scripture'book     :: Book
@@ -135,7 +143,8 @@ $(deriveJSON dropPrefixOptions ''Section)
 $(deriveJSON dropPrefixOptions ''Paragraph)
 $(deriveJSON dropPrefixOptions ''Verse)
 $(deriveJSON dropPrefixOptions ''RefType)
-$(deriveJSON dropPrefixOptions ''Ref)
+$(deriveJSON dropPrefixOptions ''VerseRef)
+$(deriveJSON dropPrefixOptions ''BookRef)
 $(deriveJSON dropPrefixOptions ''Ban)
 
 $(deriveJSON dropPrefixOptions ''Language)

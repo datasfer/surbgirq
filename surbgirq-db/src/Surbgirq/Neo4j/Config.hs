@@ -1,10 +1,16 @@
-{-# LANGUAGE TemplateHaskell              #-}
-{-# LANGUAGE OverloadedStrings              #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module Surbgirq.Neo4j.Config where
 
-import           Database.Bolt
-import           Data.Default
+import Data.Text (Text)
+
+import Data.Default
+import Database.Bolt
+
 
 localCfg :: BoltCfg
 localCfg = def { user = "neo4j", password = "CHANGE_ME" }
+
+
+

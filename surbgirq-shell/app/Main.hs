@@ -47,7 +47,7 @@ main1 = do
   TIO.putStrLn res
   TIO.putStrLn "Գիրք ծննդեան"
 
--- | stack exec -- surbgirq-shell --bible --book ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher
+-- | etack exec -- surbgirq-shell --bible --book ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher
 main :: IO ()
 main = do
   cmd <- customExecParser (prefs showHelpOnError) $
@@ -145,8 +145,8 @@ generateInitCypher bookFile path outPath = do
            ch@Chapeter{chapter'book=Book{..}, ..} <- readChapter (bookDir </> file)
 
            let chName = concat [T.unpack bookName, del, "ch", show chapter'number]
-               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}' }),|]
-               chRel  = [qc|  ({bookName})-[:HAS_CH]->({chName}),|]
+               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}', number: {chapter'number} }),|]
+               chRel  = [qc|  ({bookName})-[:HAS_CH \{num: {chapter'number}}]->({chName}),|]
 
            TIO.hPutStrLn outh chNode
            TIO.hPutStrLn outh chRel
@@ -197,12 +197,12 @@ generateInitCypher bookFile path outPath = do
                  -- verse ref processing
                  case verse'ref of
                    Nothing -> return ()
-                   Just Ref{..} -> do
-                     case ref'type of
+                   Just VerseRef{..} -> do
+                     case verseRef'type of
                        RefText txt -> do
-                         let wordN = concat [verseName, del, "word", show ref'index]
-                             footnoteName = concat [wordN, del, "footnote", show ref'index]
-                             footnoteNode = [qc|  ({footnoteName}:Footnote \{text: '{txt}', index: {ref'index}}),|]
+                         let wordN = concat [verseName, del, "word", show verseRef'index]
+                             footnoteName = concat [wordN, del, "footnote", show verseRef'index]
+                             footnoteNode = [qc|  ({footnoteName}:Footnote \{text: '{txt}', index: {verseRef'index}}),|]
                              footnoteRel  = [qc|  ({wordN})-[:REF_FOOTNOTE]->({footnoteName}),|]
                          TIO.hPutStrLn outh footnoteNode
                          TIO.hPutStrLn outh footnoteRel

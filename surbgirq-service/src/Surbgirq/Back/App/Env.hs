@@ -11,8 +11,9 @@ import Control.Monad.Reader
 
 import qualified Database.SQLite.Simple as SQL
 
-import Servant                                 (Handler)
-
+import Data.Pool     (Pool, createPool)
+import Database.Bolt
+import Servant       (Handler)
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
@@ -22,9 +23,11 @@ newtype AppM a = AppM { unAppM :: ReaderT ServerEnv  (LoggingT Handler) a
 
 
 data ServerEnv = ServerEnv
-  { 
-  env'externalStore :: ExternalStore
+  { pool              :: Pool Pipe
+  -- ^ Neo4j db pool
+  , env'externalStore :: ExternalStore
   -- ^ the external store, mostly will be used to hold derived data on block commit event.
+
   }
 
 -- | External store data type

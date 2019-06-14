@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators   #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Surbgirq.Back.Server where
 
@@ -14,5 +14,5 @@ import Surbgirq.Back.Server.WebSocket
 ------------------------------------------------------------
 
 server :: ServerT BexAPI AppM
-server =  (getApiInfoHandler :<|> getBooksHandler)
+server =  (getApiInfoHandler :<|> getBooksHandler :<|> getChapterHandler)
           :<|> notifyNewBlock

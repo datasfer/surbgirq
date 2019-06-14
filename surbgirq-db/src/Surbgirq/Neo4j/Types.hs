@@ -1,4 +1,4 @@
- {-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 
@@ -10,11 +10,17 @@ import qualified Data.Text as T
 -- import           Database.Bolt.Extras.Template
 import Database.Bolt
 
+import Common.Aeson
 import Surbgirq.Types
 
 data HAS_CH = HAS_CH
 data HAS_VERSE = HAS_VERSE
 
+
+
+-------------------------------------------------------------------------------
+-- Book Node
+-------------------------------------------------------------------------------
 
 
 -- fromList [("b",S (Structure {signature = 78, fields = [I 0,L [T "Book"],M (fromList [("title",T "matthew")])]}))]
@@ -68,3 +74,30 @@ instance RecordValue Testament where
     exact x       = fail $ show x ++ " is not a Testament"
 
 -- \{book: '{bookName}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: {book'testament}, translation: {book'translation} } ),
+
+
+-------------------------------------------------------------------------------
+-- Chapter Node
+-------------------------------------------------------------------------------
+
+data ChapterNode = ChapterNode
+    {
+      chapterNode'id     :: Int
+    , chapterNode'book   :: Girq
+    , chapterNode'number :: Int
+    , chapterNode'title  :: Text
+    } deriving (Show)
+
+
+instance RecordValue ChapterNode where
+    exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Chapter") labels =
+        do
+            title <- exact =<< props `at` "title"
+            number <- exact =<< props `at` "number"
+            girq :: Girq <-  exact =<< props `at` "book"
+
+            return $ ChapterNode i girq number title
+    exact x = fail $ show x ++ " is not a Chapter Node"
+
+$(deriveJSON dropPrefixOptions ''ChapterNode)
+$(deriveJSON dropPrefixOptions ''BookNode)
