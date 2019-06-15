@@ -23,7 +23,7 @@ type GetBooksListEndpoint = "books" :> Summary "Get Available Books" :> Get '[JS
 type GetChapterEndpoint = "chapter"   :> Summary "Get Chapter"
     :> Capture "girq" Girq
     :> Capture "ch" Int
-    :> Get '[JSON] Chapter
+    :> Get '[JSON] [Chapter]
 
 type GetSectionEndpoint = "section"   :> Summary "Get Section"
     :> Capture "girq" Girq

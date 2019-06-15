@@ -1,13 +1,17 @@
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
 
 module Surbgirq.Types.Girq (
- Girq(..)
+   Girq(..)
+ , Testament(..)
+ , Language(..)
  ) where
 
-import Data.Aeson (Value)
-import Data.Text  (Text)
+import Data.Aeson   (Value)
+import Data.Text    (Text)
+import GHC.Generics
 
 import Common.Aeson
 
@@ -127,7 +131,7 @@ data Girq =
           -- ^ 4. Ավետարան ըստ Հովհաննեսի
           | Acts
           -- ^ 5. Գործք առաքելոց
-            deriving(Show, Read)
+            deriving(Show, Read, Generic)
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին
 -- ^ Պողոս առաքյալի առաջին նամակը Կորնթացիներին (Ա Կորնթացիներ)
@@ -152,5 +156,40 @@ data Girq =
 -- ^ Հուդայի ընդհանրական նամակը
 -- ^ Հայտնություն Հովհաննեսի
 
+data Group = Pentateuch
+            -- ^ Մովսեսի հնգամատյանը
+            | Historical
+            -- ^ Պատմական
+            | Sermon
+            -- ^ Ուսուցողական
+            | Prophet
+            -- ^ Մարգարեություն
+            | Evangelie
+            -- ^ Ավետարան
+            | OtherBook
+              -- ^ Պողոս առաքյալի թղթերը
+              -- ^ Թղթեր
+              deriving (Show)
+
+
+-- | Book -> Scripture -> Chapter -> Section -> Paragraph -> Verse -> Words
+
+data Testament = Old
+               | New
+                 deriving (Show, Read, Generic)
+
+data TYear = T1994
+           | T1969
+           | T1805
+           | T1895
+             deriving (Show)
+
+data Language = Grabar
+              | Ashxarhabar
+              deriving (Show, Read, Generic)
+
+$(deriveJSON dropPrefixOptions ''Testament)
+$(deriveJSON dropPrefixOptions ''Language)
+$(deriveJSON dropPrefixOptions ''TYear)
 
 $(deriveJSON dropPrefixOptions ''Girq)

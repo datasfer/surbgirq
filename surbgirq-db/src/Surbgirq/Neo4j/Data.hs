@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 
-module Surbgirq.Neo4j.Book where
+module Surbgirq.Neo4j.Data where
 
 import Data.Map.Strict (fromList)
 
@@ -13,14 +13,17 @@ import Surbgirq.Neo4j.Types
 import Surbgirq.Types
 
 
-getBooks :: BoltActionT IO [Record]
-getBooks = do
+-------------------------------------------------------------------------------
+-- for debig
+
+boltBooks :: BoltActionT IO [Record]
+boltBooks = do
         resp <- query "MATCH (book:Book) RETURN book;"
         return resp
 
 
-getBookNodes :: BoltActionT IO [BookNode]
-getBookNodes = do
+queryBooks :: BoltActionT IO [Book]
+queryBooks = do
         rs <- query "MATCH (book:Book) RETURN book;"
         nodes <- traverse (`at` "book") rs
         bs <- traverse exact nodes
@@ -29,8 +32,8 @@ getBookNodes = do
 
 -- match (b:Book {book: "Matthew"})-[:HAS_CH {num: 1}]->(ch) return ch;
 -- match (b:Book {book: "Matthew"})-[:HAS_CH]->(ch:Chapter) where ch.number = 1 return ch;
-getChapterNode :: Girq -> Int -> BoltActionT IO [ChapterNode]
-getChapterNode girq ch_num = do
+queryChapter :: Girq -> Int -> BoltActionT IO [Chapter]
+queryChapter girq ch_num = do
         rs <- queryP cypherQ params
         nodes <- traverse (`at` "ch") rs
         bs <- traverse exact nodes

@@ -18,10 +18,13 @@ import Network.Wai.Middleware.RequestLogger (logStdoutDev)
 
 import qualified Surbgirq.Back.App.Env as Env
 
+import Servant.Swagger.UI
+import Servant.Swagger.UI.JensOleG
+
 import Surbgirq.Back.Api
 import Surbgirq.Back.App.Env
 import Surbgirq.Back.Server
-
+import Surbgirq.Back.Swagger.Doc
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
@@ -33,4 +36,7 @@ nt e = runStdoutLoggingT . flip runReaderT e . unAppM
 
 app :: ServerEnv -> Application
 app env = simpleCors $ logStdoutDev $
-          serve api $ hoistServer api (nt env) server
+          serve (Proxy :: Proxy BexSwaggerAPI) $
+          -- jensolegSwaggerSchemaUIServer swaggerDoc
+          swaggerSchemaUIServer swaggerDoc
+        :<|> (hoistServer api (nt env) server)

@@ -22,17 +22,16 @@ main = do
     hSetEncoding stdout utf8
 
     bracket (connect localCfg) close $ \pipe -> run pipe $ do
-        rs <- getBooks
+        rs <- boltBooks
         nodes <- traverse (`at` "book") rs
         (liftIO . print) nodes
-        books <- getBookNodes
 
+        books <- queryBooks
         let booksRes = (TL.toStrict . TLE.decodeUtf8 $ encode books)
         (liftIO . TIO.putStrLn) booksRes
 
-        chs <- getChapterNode Matthew 2
+        chs <- queryChapter Matthew 2
         let res = (TL.toStrict . TLE.decodeUtf8 $ encode chs)
-
         (liftIO . TIO.putStrLn) res
 
         liftIO $ TIO.writeFile "file.txt" res

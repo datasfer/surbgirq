@@ -1,154 +1,66 @@
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
 
 module Surbgirq.Types.Entities (
-   Scripture(..)
- , Book(..)
+   Book(..)
  , Chapter (..)
  , Section(..)
  , Paragraph(..)
  , Verse(..)
- , Testament (..)
- , BookRef(..)
- , VerseRef(..)
- , RefType(..)
  ) where
 
 import Data.Aeson (Value)
 import Data.Text  (Text)
 
+import GHC.Generics
+
 import Common.Aeson
 
 import Surbgirq.Types.Girq
--------------------------------------------------------------------------------
---
 
 
+data Book = Book
+    {
+      book'id          :: Int
+    , book'labels      :: [Text]
+    , book'book        :: Girq
+    , book'title       :: Text
+    , book'number      :: Int
+    , book'chapters    :: Int
+    , book'testament   :: Testament
+    , book'translation :: Text
+    } deriving (Show, Generic)
 
-data Group = Pentateuch
-            -- ^ Մովսեսի հնգամատյանը
-            | Historical
-            -- ^ Պատմական
-            | Sermon
-            -- ^ Ուսուցողական
-            | Prophet
-            -- ^ Մարգարեություն
-            | Evangelie
-            -- ^ Ավետարան
-            | OtherBook
-              -- ^ Պողոս առաքյալի թղթերը
-              -- ^ Թղթեր
-              deriving (Show)
-
-
--- | Book -> Scripture -> Chapter -> Section -> Paragraph -> Verse -> Words
-
-data Testament = Old
-               | New
-                 deriving (Show, Read)
-
-data TYear = T1994
-           | T1969
-           | T1805
-           | T1895
-             deriving (Show)
-
-data Language = Grabar
-              | Ashxarhabar
-              deriving (Show, Read)
-
-data RefType = RefBooks   [Text]
-             | RefChapter Text
-             | RefVerse   Text
-             | RefWord    Text
-             | RefText    Text
-               deriving (Show, Read)
-
-data Chapter = Chapeter
-    { chapter'book     :: Book
-    , chapter'number   :: Int
-    , chapter'title    :: Int
-    , chapter'language :: Language
-    , chapter'sections :: [Section]
-  } deriving (Show)
+data Chapter = Chapter
+    {
+      chapter'id     :: Int
+    , chapter'book   :: Girq
+    , chapter'number :: Int
+    , chapter'title  :: Text
+    } deriving (Show, Generic)
 
 
 data Section = Section
-    { section'title      :: Text
-    , section'number     :: Int
-    , section'paragraphs :: [Paragraph]
-  } deriving (Show)
+    {
+      section'title  :: Text
+    } deriving (Show)
 
 
 data Paragraph = Paragraph
-    { paragraph'number :: Int
-    , paragraph'verses :: [Verse]
-  } deriving (Show)
-
+    {
+      paragraph'title  :: Text
+    } deriving (Show)
 
 data Verse = Verse
-  { verse'verse   :: Int
-  , verse'content :: Text
---   , verse'grabar    :: Text
-  , verse'ref     :: Maybe VerseRef
-  } deriving (Show)
-
-
--- word
-data Ban = Ban
-    { ban'index :: Int
-    , ban'word  :: Text
-    , ban'ref   :: VerseRef
-    } deriving (Show)
-
-data VerseRef = VerseRef
-    { verseRef'index :: Int
-    , verseRef'type  :: RefType
-    } deriving (Show, Read)
-
-
-data BookRef =  BookRef
     {
-      bookRef'book :: Book
-    , bookRef'ref  :: RefType
-    }
-
-data Scripture = Scripture
-    { scripture'book     :: Book
-    , scripture'chapters :: [Chapter]
+      verse'title  :: Text
     } deriving (Show)
 
--- |
-data Book = Book
-  { book'book        :: Girq
-  , book'title       :: Text
-  , book'number      :: Int
-  , book'chapters    :: Int
-  , book'testament   :: Testament
-  , book'translation :: Text
-  , book'input       :: Maybe Text
-    -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
-  , book'output      :: Maybe Text
-  -- ^ the path to store processed result
-  } deriving (Show)
-
-
-$(deriveJSON dropPrefixOptions ''Testament)
-$(deriveJSON dropPrefixOptions ''Group)
 $(deriveJSON dropPrefixOptions ''Book)
-$(deriveJSON dropPrefixOptions ''Scripture)
 $(deriveJSON dropPrefixOptions ''Chapter)
 $(deriveJSON dropPrefixOptions ''Section)
 $(deriveJSON dropPrefixOptions ''Paragraph)
 $(deriveJSON dropPrefixOptions ''Verse)
-$(deriveJSON dropPrefixOptions ''RefType)
-$(deriveJSON dropPrefixOptions ''VerseRef)
-$(deriveJSON dropPrefixOptions ''BookRef)
-$(deriveJSON dropPrefixOptions ''Ban)
-
-$(deriveJSON dropPrefixOptions ''Language)
-$(deriveJSON dropPrefixOptions ''TYear)
-
-
 

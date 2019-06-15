@@ -35,6 +35,7 @@ import Surbgirq.API
 #define SUMMARY(d) Summary d :>
 
 
+
 type BexAPI = SurbgirqRestAPI :<|> BexWebSocketAPI
 
 type SwaggerApi = SwaggerSchemaUI "docs" "swagger.json"
@@ -42,7 +43,7 @@ type SwaggerApi = SwaggerSchemaUI "docs" "swagger.json"
 type BexSwaggerAPI = SwaggerApi :<|> BexAPI
 
 
-api :: Proxy  BexAPI
+api :: Proxy BexAPI
 api = Proxy
 
 
@@ -69,5 +70,5 @@ type GirqAPI = ToServantApi GirqRestAPI :<|> ToServantApi GirqWebSocketAPI
 
 girqServer :: ServerT GirqAPI ServerM
 girqServer = toServant girqRestServer :<|> toServant girqWebSocketServer
-                 
+
 -}

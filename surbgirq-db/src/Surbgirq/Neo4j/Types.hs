@@ -35,20 +35,9 @@ data HAS_VERSE = HAS_VERSE
 -- fields = [I 0,L [T "Book"],M (fromList [("title",T "matthew")])]}),
 -- S (Structure {signature = 78, fields = [I 41,L [T "Book"],M (fromList [("title",T "matthew")])]}),S (Structure {signature = 78, fields = [I 640,L [T "Book",T "Matthew",T "New"],M (fromList [("title",T "Matthew")])]})]
 
-data BookNode = BookNode
-    {
-      bookNode'id          :: Int
-    , bookNode'labels      :: [Text]
-    , bookNode'book        :: Girq
-    , bookNode'title       :: Text
-    , bookNode'number      :: Int
-    , bookNode'chapters    :: Int
-    , bookNode'testament   :: Testament
-    , bookNode'translation :: Text
-    } deriving (Show)
 
 
-instance RecordValue BookNode where
+instance RecordValue Book where
     exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Book") labels =
         do
             title <- exact =<< props `at` "title"
@@ -59,7 +48,7 @@ instance RecordValue BookNode where
             girq :: Girq <-  exact =<< props `at` "book"
             tes :: Testament <-  exact =<< props `at` "testament"
 
-            return $ BookNode i lbs girq title number numOfChatpters tes translation
+            return $ Book i lbs girq title number numOfChatpters tes translation
     exact x = fail $ show x ++ " is not a Book"
 
 
@@ -80,24 +69,14 @@ instance RecordValue Testament where
 -- Chapter Node
 -------------------------------------------------------------------------------
 
-data ChapterNode = ChapterNode
-    {
-      chapterNode'id     :: Int
-    , chapterNode'book   :: Girq
-    , chapterNode'number :: Int
-    , chapterNode'title  :: Text
-    } deriving (Show)
 
-
-instance RecordValue ChapterNode where
+instance RecordValue Chapter where
     exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Chapter") labels =
         do
             title <- exact =<< props `at` "title"
             number <- exact =<< props `at` "number"
             girq :: Girq <-  exact =<< props `at` "book"
 
-            return $ ChapterNode i girq number title
+            return $ Chapter i girq number title
     exact x = fail $ show x ++ " is not a Chapter Node"
 
-$(deriveJSON dropPrefixOptions ''ChapterNode)
-$(deriveJSON dropPrefixOptions ''BookNode)

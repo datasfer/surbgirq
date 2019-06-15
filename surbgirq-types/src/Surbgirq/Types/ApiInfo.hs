@@ -1,14 +1,15 @@
-{-# LANGUAGE TemplateHaskell              #-}
+{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 
 module Surbgirq.Types.ApiInfo (
  ApiInfo(..)
  ) where
 
-import Data.Aeson (Value)
-import Data.Text  (Text)
-
 import Common.Aeson
+import Data.Aeson   (Value)
+import Data.Text    (Text)
+import GHC.Generics
 
 -------------------------------------------------------------------------------
 --
@@ -19,6 +20,6 @@ data ApiInfo = ApiInfo
   , apiinfo'changeset :: Text
   , apiinfo'branch    :: Text
   , apiinfo'git       :: Value
-  } deriving (Show)
+  } deriving (Show, Generic)
 
 $(deriveJSON dropPrefixOptions ''ApiInfo)

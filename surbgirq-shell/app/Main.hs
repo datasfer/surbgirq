@@ -32,7 +32,8 @@ import System.FilePath
 
 import Common.Yaml
 import Surbgirq.Shell.Commands
-import Surbgirq.Types
+import Surbgirq.Shell.Types
+import Surbgirq.Types.Girq
 
 main1 :: IO ()
 main1 = do
