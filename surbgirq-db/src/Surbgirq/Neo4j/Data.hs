@@ -32,8 +32,8 @@ queryBooks = do
 
 -- match (b:Book {book: "Matthew"})-[:HAS_CH {num: 1}]->(ch) return ch;
 -- match (b:Book {book: "Matthew"})-[:HAS_CH]->(ch:Chapter) where ch.number = 1 return ch;
-queryChapter :: Girq -> Int -> BoltActionT IO [Chapter]
-queryChapter girq ch_num = do
+queryChapter :: Girq -> ChapterNum -> BoltActionT IO [Chapter]
+queryChapter girq (ChapterNum ch_num) = do
         rs <- queryP cypherQ params
         nodes <- traverse (`at` "ch") rs
         bs <- traverse exact nodes
@@ -41,6 +41,9 @@ queryChapter girq ch_num = do
    where cypherQ = "match (Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]->(ch) RETURN ch;"
          params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num)]
 
+
+queryVerse :: Girq -> ChapterNum -> Int -> BoltActionT IO [Verse]
+queryVerse girq ch_num = undefined
 
 
 

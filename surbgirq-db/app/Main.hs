@@ -30,7 +30,7 @@ main = do
         let booksRes = (TL.toStrict . TLE.decodeUtf8 $ encode books)
         (liftIO . TIO.putStrLn) booksRes
 
-        chs <- queryChapter Matthew 2
+        chs <- queryChapter Matthew (ChapterNum 2)
         let res = (TL.toStrict . TLE.decodeUtf8 $ encode chs)
         (liftIO . TIO.putStrLn) res
 

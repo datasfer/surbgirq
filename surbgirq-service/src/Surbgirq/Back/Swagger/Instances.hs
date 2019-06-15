@@ -26,6 +26,8 @@ instance ToSchema Testament
 instance ToParamSchema Language
 instance ToSchema Language
 
+instance ToParamSchema ChapterNum
+
 
 instance ToSchema Value where
     declareNamedSchema = genericDeclareNamedSchemaUnrestricted $ stripPrefixOption "aeson-value'"

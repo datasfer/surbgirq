@@ -50,6 +50,6 @@ getBooksHandler :: AppM [Book]
 getBooksHandler = runQ $ queryBooks
 
 
-getChapterHandler :: Girq -> Int -> AppM [Chapter]
+getChapterHandler :: Girq -> ChapterNum -> AppM [Chapter]
 getChapterHandler girq ch_num = runQ $ queryChapter girq ch_num
 --    getChapterNode girq ch_num

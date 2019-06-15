@@ -9,6 +9,7 @@ module Surbgirq.Types.Entities (
  , Section(..)
  , Paragraph(..)
  , Verse(..)
+ , ChapterNum (..)
  ) where
 
 import Data.Aeson (Value)
@@ -20,6 +21,10 @@ import Common.Aeson
 
 import Surbgirq.Types.Girq
 
+
+
+newtype ChapterNum = ChapterNum Int
+  deriving (Show, Eq, Ord, Generic)
 
 data Book = Book
     {
