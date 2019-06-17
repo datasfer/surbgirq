@@ -4,7 +4,9 @@
 
 module Surbgirq.API.Rest where
 
-import Data.Int    (Int64)
+import Data.Int  (Int64)
+import Data.Text (Text)
+
 import Servant.API
 
 import Servant.API.Generic
@@ -41,11 +43,17 @@ type GetVerseEndpoint = "verse"   :> Summary "Get Verse by number"
     :> Capture "verse" VerseNum
     :> Get '[JSON] [Verse]
 
-type GetVerseIntervalEndpoint = "verses" :> Summary "Get Verse interval"
+type GetVerseFromToEndpoint = "verses" :> Summary "Get Verse interval"
     :> Capture "girq" Girq
     :> Capture "ch" ChapterNum
     :> Capture "verseFrom" VerseNum
     :> Capture "verseTo" VerseNum
+    :> Get '[JSON] [Verse]
+
+type GetVerseIntervalEndpoint = "verses" :> Summary "Get Verse interval"
+    :> Capture "girq" Girq
+    :> Capture "ch" ChapterNum
+    :> Capture "verse" Text
     :> Get '[JSON] [Verse]
 
 type GetSectionEndpoint = "section"   :> Summary "Get Section"
@@ -62,5 +70,6 @@ type SurbgirqRestAPI = "api" :> (
        :<|> GetChapterEndpoint
        :<|> GetChapterSectionsEndpoint
        :<|> GetVerseEndpoint
+       :<|> GetVerseFromToEndpoint
        :<|> GetVerseIntervalEndpoint
       )
