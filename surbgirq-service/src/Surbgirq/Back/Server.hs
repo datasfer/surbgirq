@@ -19,5 +19,6 @@ server =  ( getApiInfoHandler
           :<|> getChapterHandler
           :<|> getChapterSectionsHandler
           :<|> getVerseHandler
+          :<|> getVerseIntervalHandler
           )
           :<|> notifyNewBlock

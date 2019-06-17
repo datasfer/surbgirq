@@ -10,6 +10,7 @@ module Surbgirq.Back.Server.Rest(
  , getChapterHandler
  , getChapterSectionsHandler
  , getVerseHandler
+ , getVerseIntervalHandler
  ) where
 
 import Control.Monad.Reader
@@ -63,3 +64,6 @@ getChapterSectionsHandler = undefined
 getVerseHandler :: Girq -> ChapterNum -> VerseNum -> AppM [Verse]
 getVerseHandler g c v = runQ $ queryVerse g c v
 
+
+getVerseIntervalHandler :: Girq -> ChapterNum -> VerseNum -> VerseNum -> AppM [Verse]
+getVerseIntervalHandler g c v1 v2 = runQ $ queryVerseInterval g c v1 v2

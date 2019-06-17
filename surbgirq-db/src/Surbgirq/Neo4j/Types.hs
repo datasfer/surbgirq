@@ -94,7 +94,7 @@ instance RecordValue Verse where
             chNum <- exact =<< props `at` "chapter"
             secNum <- exact =<< props `at` "section"
             prgNum <- exact =<< props `at` "paragraph"
-            verseNum <- exact =<< props `at` "paragraph"
+            verseNum <- exact =<< props `at` "verse"
             content <- exact =<< props `at` "content"
 
             girq :: Girq <-  exact =<< props `at` "book"

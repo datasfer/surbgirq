@@ -41,6 +41,13 @@ type GetVerseEndpoint = "verse"   :> Summary "Get Verse by number"
     :> Capture "verse" VerseNum
     :> Get '[JSON] [Verse]
 
+type GetVerseIntervalEndpoint = "verses" :> Summary "Get Verse interval"
+    :> Capture "girq" Girq
+    :> Capture "ch" ChapterNum
+    :> Capture "verseFrom" VerseNum
+    :> Capture "verseTo" VerseNum
+    :> Get '[JSON] [Verse]
+
 type GetSectionEndpoint = "section"   :> Summary "Get Section"
     :> Capture "girq" Girq
     :> Capture "ch"   ChapterNum
@@ -55,5 +62,5 @@ type SurbgirqRestAPI = "api" :> (
        :<|> GetChapterEndpoint
        :<|> GetChapterSectionsEndpoint
        :<|> GetVerseEndpoint
-
+       :<|> GetVerseIntervalEndpoint
       )
