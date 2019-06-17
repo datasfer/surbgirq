@@ -42,8 +42,16 @@ queryChapter girq (ChapterNum ch_num) = do
          params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num)]
 
 
-queryVerse :: Girq -> ChapterNum -> Int -> BoltActionT IO [Verse]
-queryVerse girq ch_num = undefined
+-- |
+-- if remove `b:` then will ignore chapter filter, strange behaviour
+queryVerse :: Girq -> ChapterNum -> VerseNum -> BoltActionT IO [Verse]
+queryVerse girq (ChapterNum ch_num) (VerseNum verse_num) = do
+        rs <- queryP cypherQ params
+        nodes <- traverse (`at` "v") rs
+        bs <- traverse exact nodes
+        return bs
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(v:Verse{verse: {verse_num}}) return v;"
+         params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num), ("verse_num", I verse_num)]
 
 
 

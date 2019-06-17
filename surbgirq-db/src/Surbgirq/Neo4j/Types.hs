@@ -80,3 +80,27 @@ instance RecordValue Chapter where
             return $ Chapter i girq number title
     exact x = fail $ show x ++ " is not a Chapter Node"
 
+
+
+
+-------------------------------------------------------------------------------
+-- Verse Node
+-------------------------------------------------------------------------------
+
+
+instance RecordValue Verse where
+    exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Verse") labels =
+        do
+            chNum <- exact =<< props `at` "chapter"
+            secNum <- exact =<< props `at` "section"
+            prgNum <- exact =<< props `at` "paragraph"
+            verseNum <- exact =<< props `at` "paragraph"
+            content <- exact =<< props `at` "content"
+
+            girq :: Girq <-  exact =<< props `at` "book"
+
+            return $ Verse i girq chNum secNum prgNum verseNum content
+    exact x = fail $ show x ++ " is not a Verse Node"
+
+
+

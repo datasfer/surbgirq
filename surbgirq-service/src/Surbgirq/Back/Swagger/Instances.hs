@@ -27,6 +27,8 @@ instance ToParamSchema Language
 instance ToSchema Language
 
 instance ToParamSchema ChapterNum
+instance ToParamSchema SectionNum
+instance ToParamSchema VerseNum
 
 
 instance ToSchema Value where
@@ -37,13 +39,19 @@ instance ToSchema Value where
 instance ToSchema Chapter where
     declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "chapter'"
 
+instance ToSchema Section where
+    declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "section'"
+
+instance ToSchema Verse where
+    declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "verse'"
+
 
 instance ToSchema Book where
     declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "book'"
 
 
 instance ToSchema GetApiInfoResponse where
-    declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "apiinfo response'"
+    declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "apiInfoResponse'"
 
 
 instance ToSchema ApiInfo where

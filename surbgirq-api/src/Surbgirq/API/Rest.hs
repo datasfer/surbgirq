@@ -25,42 +25,35 @@ type GetChapterEndpoint = "chapter"   :> Summary "Get Chapter"
     :> Capture "ch" ChapterNum
     :> Get '[JSON] [Chapter]
 
+type GetChapterSectionsEndpoint = "sections"   :> Summary "Get Sections of Chapter"
+    :> Capture "girq" Girq
+    :> Capture "ch" ChapterNum
+    :> Get '[JSON] [Section]
+
+type GetChapterVersesEndpoint = "verse"   :> Summary "Get all Verses of Chapter"
+    :> Capture "girq" Girq
+    :> Capture "ch" ChapterNum
+    :> Get '[JSON] [Verse]
+
+type GetVerseEndpoint = "verse"   :> Summary "Get Verse by number"
+    :> Capture "girq" Girq
+    :> Capture "ch" ChapterNum
+    :> Capture "verse" VerseNum
+    :> Get '[JSON] [Verse]
+
 type GetSectionEndpoint = "section"   :> Summary "Get Section"
     :> Capture "girq" Girq
-    :> Capture "ch" Int
-    :> Capture "sec" Int
+    :> Capture "ch"   ChapterNum
+    :> Capture "sec"  SectionNum
     :> Get '[JSON] Section
 
 type GetParagraphEndpoint = "paragraph" :> Summary "Get Paragraph" :> Get '[JSON] Paragraph
-type GetVerseEndpoint = "verse"     :> Summary "Get Verse"     :> Get '[JSON] Verse
 
-{-
-type GetBlockEndpoint = "block" :> Summary "Get Block of level :height"
-    :> Capture ":height" Int64
-    :> Get '[JSON] GetBlockInfoResponse
-
-type GetBlockchainStatusEndpoint = "blockchain"
-    :> "status"
-    :> Summary "Blockchain status"
-    :> Get '[JSON]  GetBChainStatusResponse
-
-type PostBlockListEndpoint = "blocks" :> Summary "Get Blocks list"
-    :> ReqBody '[JSON] PostBlockListRequest
-    :> Post '[JSON] PostBlockListResponse
-
-
-type PostSearchByHashEndpoint = "blocks" :> "search" :> Summary "Search by hash"
-    :> ReqBody '[JSON] PostSearchByHashRequest
-    :> Post '[JSON] PostSearchByHashResponse
-
-
-type InitBlocksPageEndpoint = "initblocks" :> Summary "Get first page Blocks list if any and information to render the pagination buttons"
-    :> ReqBody '[JSON] InitBlocksPageRequest
-    :> Post '[JSON] PostBlockListResponse
-
--}
 type SurbgirqRestAPI = "api" :> (
             GetApiInfoEndpoint
        :<|> GetBooksListEndpoint
        :<|> GetChapterEndpoint
+       :<|> GetChapterSectionsEndpoint
+       :<|> GetVerseEndpoint
+
       )

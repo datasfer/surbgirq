@@ -10,6 +10,8 @@ module Surbgirq.Types.Entities (
  , Paragraph(..)
  , Verse(..)
  , ChapterNum (..)
+ , SectionNum(..)
+ , VerseNum(..)
  ) where
 
 import Data.Aeson (Value)
@@ -26,9 +28,15 @@ import Surbgirq.Types.Girq
 newtype ChapterNum = ChapterNum Int
   deriving (Show, Eq, Ord, Generic)
 
+newtype SectionNum = SectionNum Int
+  deriving (Show, Eq, Ord, Generic)
+
+newtype VerseNum = VerseNum Int
+  deriving (Show, Eq, Ord, Generic)
+
+
 data Book = Book
-    {
-      book'id          :: Int
+    { book'id          :: Int
     , book'labels      :: [Text]
     , book'book        :: Girq
     , book'title       :: Text
@@ -39,8 +47,7 @@ data Book = Book
     } deriving (Show, Generic)
 
 data Chapter = Chapter
-    {
-      chapter'id     :: Int
+    { chapter'id     :: Int
     , chapter'book   :: Girq
     , chapter'number :: Int
     , chapter'title  :: Text
@@ -48,20 +55,23 @@ data Chapter = Chapter
 
 
 data Section = Section
-    {
-      section'title  :: Text
-    } deriving (Show)
+    { section'title  :: Text
+    } deriving (Show, Generic)
 
 
 data Paragraph = Paragraph
-    {
-      paragraph'title  :: Text
-    } deriving (Show)
+    { paragraph'title  :: Text
+    } deriving (Show, Generic)
 
 data Verse = Verse
-    {
-      verse'title  :: Text
-    } deriving (Show)
+    { verse'id        :: Int
+    , verse'book      :: Girq
+    , verse'chapter   :: Int
+    , verse'section   :: Int
+    , verse'paragraph :: Int
+    , verse'verse     :: Int
+    , verse'content   :: Text
+    } deriving (Show, Generic)
 
 $(deriveJSON dropPrefixOptions ''Book)
 $(deriveJSON dropPrefixOptions ''Chapter)

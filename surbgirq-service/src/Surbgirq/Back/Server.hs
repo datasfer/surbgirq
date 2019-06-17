@@ -14,5 +14,10 @@ import Surbgirq.Back.Server.WebSocket
 ------------------------------------------------------------
 
 server :: ServerT BexAPI AppM
-server =  (getApiInfoHandler :<|> getBooksHandler :<|> getChapterHandler)
+server =  ( getApiInfoHandler
+          :<|> getBooksHandler
+          :<|> getChapterHandler
+          :<|> getChapterSectionsHandler
+          :<|> getVerseHandler
+          )
           :<|> notifyNewBlock
