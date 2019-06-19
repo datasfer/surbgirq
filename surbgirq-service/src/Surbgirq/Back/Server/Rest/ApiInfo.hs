@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
-module Surbgirq.Back.Server.ApiInfo(
- getApiInfo
+module Surbgirq.Back.Server.Rest.ApiInfo(
+ getApiInfoHandler
  ) where
 
 import Data.Aeson
@@ -13,11 +13,16 @@ import Data.Version (showVersion)
 
 import qualified Paths_surbgirq_service as Cabal (version)
 
+import Surbgirq.API
+import Surbgirq.Back.App.Env
 import Surbgirq.Types
 
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
+
+getApiInfoHandler :: AppM GetApiInfoResponse
+getApiInfoHandler = return $ GetApiInfoResponse getApiInfo
 
 
 
