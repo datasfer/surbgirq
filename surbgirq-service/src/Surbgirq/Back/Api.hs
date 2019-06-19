@@ -28,7 +28,7 @@ import GHC.Generics (D1, Meta(..), Rep)
 import GHC.TypeLits (AppendSymbol, Symbol)
 
 import Surbgirq.API
-
+import Surbgirq.Back.App.Env
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
@@ -36,14 +36,17 @@ import Surbgirq.API
 
 
 
-type BexAPI = SurbgirqRestAPI :<|> BexWebSocketAPI
+-- type SurbgirqAPI = FullBexAPI -- SurbgirqRestAPI :<|> BexWebSocketAPI
 
-type SwaggerApi = SwaggerSchemaUI "docs" "swagger.json"
+type SwaggerAPI = SwaggerSchemaUI "docs" "swagger.json"
 
-type BexSwaggerAPI = SwaggerApi :<|> BexAPI
+type SurbgirqAPI = ToServantApi BookAPI -- :<|> "socket" :> ToServantApi BexSocketAPI
+
+type SurbgirqAPISwagger = SwaggerAPI :<|> SurbgirqAPI
 
 
-api :: Proxy BexAPI
+
+api :: Proxy SurbgirqAPI
 api = Proxy
 
 

@@ -94,3 +94,8 @@ getVerseIntervalHandler g c verseRange =  do
                _      -> error "could not parse verse number"
 
         _ -> error "invalid verse interval text param"
+
+
+
+
+

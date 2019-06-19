@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds     #-}
-
 {-# LANGUAGE TypeOperators #-}
+
 module Surbgirq.Back.App (
    app
  , module Env
@@ -25,6 +25,8 @@ import Surbgirq.Back.Api
 import Surbgirq.Back.App.Env
 import Surbgirq.Back.Server
 import Surbgirq.Back.Swagger.Doc
+
+
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
@@ -36,7 +38,9 @@ nt e = runStdoutLoggingT . flip runReaderT e . unAppM
 
 app :: ServerEnv -> Application
 app env = simpleCors $ logStdoutDev $
-          serve (Proxy :: Proxy BexSwaggerAPI) $
+          serve (Proxy :: Proxy SurbgirqAPISwagger) $
           -- jensolegSwaggerSchemaUIServer swaggerDoc
           swaggerSchemaUIServer swaggerDoc
-        :<|> (hoistServer api (nt env) server)
+        :<|> (hoistServer api (nt env) surbgirqServer)
+
+

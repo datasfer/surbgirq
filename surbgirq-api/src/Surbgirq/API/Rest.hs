@@ -1,28 +1,52 @@
 {-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 
 
 module Surbgirq.API.Rest where
 
-import Data.Int  (Int64)
-import Data.Text (Text)
+import Data.Int     (Int64)
+import Data.Text    (Text)
+import GHC.Generics (Generic)
 
 import Servant.API
-
 import Servant.API.Generic
+
 import Surbgirq.API.Types
 import Surbgirq.Types
 
 ------------------------------------------------------------
--- Bex API endpoints
+-- Surbgirq API endpoints
 ------------------------------------------------------------
+
+
+-- |
+-- Book descriptive and quantitive info
+data BookAPI route = BookAPI {
+  booksListEndpoint :: route :- "books" :> Summary "Get Available Books" :> Get '[JSON] [Book]
+} deriving (Generic)
+
+
+
+-- |
+-- Scriptures info
+data ScriptureAPI route = ScriptureAPI {
+  scripturesVerseEndpoint :: route :- "verse" :> Summary "Get Verse by number"
+                            :> Capture "girq" Girq
+                            :> Capture "ch" ChapterNum
+                            :> Capture "verse" VerseNum
+                            :> Get '[JSON] [Verse]
+
+} deriving (Generic)
+
+
 type GetApiInfoEndpoint = "info" :> Summary "Get Api Information"
     :> Get '[JSON] GetApiInfoResponse
 
 
 type GetBooksListEndpoint = "books" :> Summary "Get Available Books" :> Get '[JSON] [Book]
 
-type GetChapterEndpoint = "chapter"   :> Summary "Get Chapter"
+type GetChapterEndpoint = "chapter" :> Summary "Get Chapter"
     :> Capture "girq" Girq
     :> Capture "ch" ChapterNum
     :> Get '[JSON] [Chapter]
