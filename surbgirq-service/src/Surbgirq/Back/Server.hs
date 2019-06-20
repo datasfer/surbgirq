@@ -43,5 +43,9 @@ surbgirqServer = toServant bookServer
 bookServer :: BookAPI (AsServerT AppM)
 bookServer =  BookAPI
               { booksListEndpoint = getBooksHandler
+              , bookChapterNumsEndpoint = bookChapterNums
+              , bookChapterSectionNumsEndpoint = bookChapterSectionNums
+              , bookChapterVerseNumsEndpoint = bookChapterVerseNums
+
               }
 

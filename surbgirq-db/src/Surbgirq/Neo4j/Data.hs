@@ -1,5 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
-
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Surbgirq.Neo4j.Data where
 
@@ -22,6 +22,10 @@ boltBooks = do
         return resp
 
 
+-------------------------------------------------------------------------------
+-- Book descriptive query
+-------------------------------------------------------------------------------
+
 queryBooks :: BoltActionT IO [Book]
 queryBooks = do
         rs <- query "MATCH (book:Book) RETURN book;"
@@ -29,6 +33,45 @@ queryBooks = do
         bs <- traverse exact nodes
         return bs
 
+-- match (b:Book {book: 'Matthew'})-[r:HAS_CH]->(ch:Chapter) return ch.number;
+queryChapterNums :: Girq -> BoltActionT IO [(Int,Text)]
+queryChapterNums girq = do
+        rs <- queryP cypherQ params
+        numProps <- traverse (`at` "ch.num") rs
+        titleProps <- traverse (`at` "ch.title") rs
+        nums <- traverse exact numProps
+        ts <- traverse exact titleProps
+        return $ zip nums ts
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH]->(ch:Chapter) RETURN ch.num, ch.title order by ch.num;"
+         params = fromList [("girq", T . pack $ show girq)]
+
+querySectionNums :: Girq -> ChapterNum -> BoltActionT IO [(Int,Text)]
+querySectionNums girq (ChapterNum ch_num) = do
+        -- fromList [("s.num",I 1),("s.title",T "Title 1")]
+        rs <- queryP cypherQ params
+        numProps <- traverse (`at` "s.num") rs
+        titleProps <- traverse (`at` "s.title") rs
+        nums <- traverse exact numProps
+        ts <- traverse exact titleProps
+        return $ zip nums ts
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(s:Section) return s.num, s.title order by s.num;"
+         params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num)]
+
+
+queryChapterVerseNums :: Girq -> ChapterNum -> BoltActionT IO [Int]
+queryChapterVerseNums girq (ChapterNum ch_num) = do
+        rs <- queryP cypherQ params
+        nodes <- traverse (`at` "v.num") rs
+        bs <- traverse exact nodes
+        return bs
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(v:Verse) return v.num order by v.num;"
+         params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num)]
+
+
+
+-------------------------------------------------------------------------------
+-- Scriptures Data
+-------------------------------------------------------------------------------
 
 -- match (b:Book {book: "Matthew"})-[:HAS_CH {num: 1}]->(ch) return ch;
 -- match (b:Book {book: "Matthew"})-[:HAS_CH]->(ch:Chapter) where ch.number = 1 return ch;

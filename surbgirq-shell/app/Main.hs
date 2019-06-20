@@ -55,7 +55,9 @@ main = do
          info (helper <*> parser) $
          fullDesc <> progDesc "Format Scriptures to convenient formats."
                   <> header   "Surbgirq text formatter."
-                  <> footer   ("the generated json or neo4j cypther will be used to populate db")
+                  <> footer   ("the generated json or neo4j cypther will be used to populate db"
+                              <> "e.g. surbgirq-shell --bible -c ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher"
+                              )
 
   case cmd of
     Command{..} -> do
@@ -138,7 +140,7 @@ generateInitCypher bookFile path outPath = do
        bracket (openFile outFile WriteMode) hClose $ \outh -> do
 
          TIO.hPutStrLn outh "CREATE"
-         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
+         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', num: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
                              |]
 
          -- a file == a chapter
@@ -146,7 +148,7 @@ generateInitCypher bookFile path outPath = do
            ch@Chapeter{chapter'book=Book{..}, ..} <- readChapter (bookDir </> file)
 
            let chName = concat [T.unpack bookName, del, "ch", show chapter'number]
-               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}', number: {chapter'number} }),|]
+               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}', num: {chapter'number} }),|]
                chRel  = [qc|  ({bookName})-[:HAS_CH \{num: {chapter'number}}]->({chName}),|]
 
            TIO.hPutStrLn outh chNode
@@ -155,8 +157,8 @@ generateInitCypher bookFile path outPath = do
            -- Sections
            forM_ chapter'sections $ \Section{..} -> do
              let secName = concat [chName, del, "sec", show section'number ]
-                 secNode = [qc|  ({secName}:Section \{title: '{section'title}'}),|]
-                 secRel  = [qc|  ({chName})-[:HAS_SEC]->({secName}),|]
+                 secNode = [qc|  ({secName}:Section \{title: '{section'title}', num: {section'number}}),|]
+                 secRel  = [qc|  ({chName})-[:HAS_SEC \{num: {section'number}} ]->({secName}),|]
 
              TIO.hPutStrLn outh secNode
              TIO.hPutStrLn outh secRel
@@ -173,8 +175,8 @@ generateInitCypher bookFile path outPath = do
                -- Verses
                forM_ paragraph'verses $ \v@Verse{..} -> do
                  let verseName = concat [prghName , del, "verse", show verse'verse]
-                     verseNode = [qc|  ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', verse: {verse'verse}, section: {section'number}, paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
-                     verseRel  = [qc|  ({prghName})-[:HAS_VERSE]->({verseName}),|]
+                     verseNode = [qc|  ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', num: {verse'verse}, section: {section'number}, paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
+                     verseRel  = [qc|  ({prghName})-[:HAS_VERSE \{num: {verse'verse}}]->({verseName}),|]
                  TIO.hPutStrLn outh verseNode
                  TIO.hPutStrLn outh verseRel
 
@@ -184,7 +186,7 @@ generateInitCypher bookFile path outPath = do
                  forM_ (zip ws [1..] ) $ \(word, index) -> do
                    let wordName = concat [verseName, del, "word", show index]
                        wordNode = [qc|  ({wordName}:Word \{word: '{word}', index: {index}}),|]
-                       wordRel  = [qc|  ({verseName})-[:HAS_WORD]->({wordName}),|]
+                       wordRel  = [qc|  ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
                    TIO.hPutStrLn outh wordNode
                    TIO.hPutStrLn outh wordRel
                  -- add [NEEXT] relationshipp between words
