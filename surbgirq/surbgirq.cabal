@@ -1,0 +1,43 @@
+cabal-version: 1.12
+
+name:           surbgirq
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/surbgirq#readme>
+homepage:       https://github.com/githubuser/surbgirq#readme
+bug-reports:    https://github.com/githubuser/surbgirq/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2019 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+executable surbgirq
+  main-is:             Main.hs
+  other-modules:       Settings
+                       Sigterm
+                       Types.Settings
+                       Types.Logger
+                       Types
+  build-depends:       base >=4.11 && <5
+                     , common
+                     , surbgirq-service
+                     , surbgirq-db
+                     , hasbolt
+                     , resource-pool
+                     , warp
+                     , katip
+                     , katip-elasticsearch
+                     , wai
+                     , aeson
+                     , text
+                     , unix
+                     , wai-middleware-static  >= 0.7.0.1
+                     , optparse-applicative   >= 0.14
+                     , stm
+                     , data-default
+  hs-source-dirs:      app, src
+  default-language:    Haskell2010

@@ -1,0 +1,104 @@
+cabal-version: 1.12
+
+name:           surbgirq-service
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/arthurvard/surbgirq-service#readme>
+homepage:       https://github.com/arthurvard/surbgirq#readme
+bug-reports:    https://github.com/arthurvard/surbgirq/issues
+author:         Arthur Vardanyan
+maintainer:     arthur@datasfer.com
+copyright:      2019
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/arthurvard/surbgirq-service
+
+library
+  exposed-modules:     Surbgirq.Service
+  other-modules:       Paths_surbgirq_service
+                       Surbgirq.Back.Api
+
+                       Surbgirq.Back.App
+                       Surbgirq.Back.App.Env
+                       Surbgirq.Back.App.Settings
+
+                       Surbgirq.Back.Server
+                       Surbgirq.Back.Server.Rest
+                       Surbgirq.Back.Server.Rest.ApiInfo
+                       Surbgirq.Back.Server.Rest.Book
+                       Surbgirq.Back.Server.Rest.Scripture
+
+                       Surbgirq.Back.Server.WebSocket
+                       
+                       Surbgirq.Back.Swagger.Doc
+                       Surbgirq.Back.Swagger.Instances
+  hs-source-dirs: src
+  build-depends: base >=4.7 && <5
+               , surbgirq-api
+               , surbgirq-types
+               , surbgirq-db
+               , servant
+               , servant-websockets
+               , servant-server
+               , servant-swagger
+               , swagger2
+               , servant-swagger-ui
+               , servant-swagger-ui-core
+               , servant-swagger-ui-jensoleg
+               , servant-client
+               , http-client
+               , http-client-tls
+               , aeson
+               , text
+               , gitrev >= 1.3.1
+               , wai
+               , wai-extra
+               , wai-cors
+               , websockets
+               , sqlite-simple
+               , exceptions
+               , transformers      >=0.5
+               , mtl
+               , monad-logger
+               , stm
+               , random
+               , containers
+               , data-default
+               , directory
+               , split
+               , time
+               , filepath
+               , bytestring
+               , wreq >= 0.5
+               , lens >= 4.13
+               , interpolatedstring-perl6
+               , exceptions        >=0.8.3
+               , serialise         >=0.2
+               , resource-pool
+               , hasbolt
+  default-language: Haskell2010
+
+executable surbgirq-service-exe
+  main-is: Main.hs
+  other-modules: Paths_surbgirq_service
+  hs-source-dirs: app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-service
+  default-language: Haskell2010
+
+test-suite surbgirq-service-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules: Paths_surbgirq_service
+  hs-source-dirs: test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-service
+  default-language: Haskell2010

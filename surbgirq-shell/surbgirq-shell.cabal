@@ -1,0 +1,63 @@
+cabal-version: 1.12
+
+name:           surbgirq-shell
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/arthurvard/surbgirq-shell#readme>
+homepage:       https://github.com/arthurvard/surbgirq-shell#readme
+bug-reports:    https://github.com/arthurvard/surbgirq-shell/issues
+author:         Arthur Vardanyan
+maintainer:     arthur@datasfer.com
+copyright:      2019
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files: README.md
+                    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/arthurvard/surbgirq-shell
+
+library
+  exposed-modules: Surbgirq.Shell.Commands
+                   Surbgirq.Shell.Types
+  other-modules: Paths_surbgirq_shell
+                 Surbgirq.Shell.Types.Entities
+  hs-source-dirs: src
+  build-depends: base >=4.7 && <5
+               , surbgirq-types
+               , text
+               , aeson
+               , common
+               , optparse-applicative
+               , directory
+               , interpolatedstring-perl6
+  default-language: Haskell2010
+
+executable surbgirq-shell
+  main-is: Main.hs
+  other-modules: Paths_surbgirq_shell
+  hs-source-dirs: app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-shell
+               , surbgirq-types
+               , common
+               , text
+               , aeson
+               , optparse-applicative
+               , directory
+               , interpolatedstring-perl6
+               , filepath
+               , mtl
+  default-language: Haskell2010
+
+test-suite surbgirq-shell-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules: Paths_surbgirq_shell
+  hs-source-dirs: test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-shell
+  default-language: Haskell2010
