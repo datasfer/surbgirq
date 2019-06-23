@@ -55,22 +55,27 @@ data Chapter = Chapter
 
 
 data Section = Section
-    { section'title  :: Text
+    { section'id     :: Int
+--    , section'book  :: Girq
+    , section'number :: Int
+    , section'title  :: Text
     } deriving (Show, Generic)
 
 
 data Paragraph = Paragraph
     { paragraph'title  :: Text
+    , paragraph'number :: Int
     } deriving (Show, Generic)
 
 data Verse = Verse
-    { verse'id        :: Int
-    , verse'book      :: Girq
-    , verse'chapter   :: Int
-    , verse'section   :: Int
-    , verse'paragraph :: Int
-    , verse'verse     :: Int
-    , verse'content   :: Text
+    { verse'id            :: Int
+    , verse'book          :: Girq
+    , verse'chapter       :: Int
+    , verse'sectionNumber :: Int
+    , verse'sectionTitle  :: Text
+    , verse'paragraph     :: Int
+    , verse'verse         :: Int
+    , verse'content       :: Text
     } deriving (Show, Generic)
 
 $(deriveJSON dropPrefixOptions ''Book)

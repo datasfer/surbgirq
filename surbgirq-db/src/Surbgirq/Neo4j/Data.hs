@@ -75,6 +75,8 @@ queryChapterVerseNums girq (ChapterNum ch_num) = do
 
 -- match (b:Book {book: "Matthew"})-[:HAS_CH {num: 1}]->(ch) return ch;
 -- match (b:Book {book: "Matthew"})-[:HAS_CH]->(ch:Chapter) where ch.number = 1 return ch;
+-- |
+-- return chapter
 queryChapter :: Girq -> ChapterNum -> BoltActionT IO [Chapter]
 queryChapter girq (ChapterNum ch_num) = do
         rs <- queryP cypherQ params
@@ -85,6 +87,29 @@ queryChapter girq (ChapterNum ch_num) = do
          params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num)]
 
 
+
+-- |
+-- return all sections of chapter
+queryAllSections :: Girq -> ChapterNum -> BoltActionT IO [Section]
+queryAllSections girq (ChapterNum ch_num) = do
+        rs <- queryP cypherQ params
+        nodes <- traverse (`at` "s") rs
+        bs <- traverse exact nodes
+        return bs
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(s:Section) return s order by s.num;"
+         params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num)]
+
+-- |
+-- return the section of chapter
+querySection :: Girq -> ChapterNum -> SectionNum -> BoltActionT IO [Section]
+querySection girq (ChapterNum ch_num) (SectionNum sec_num)= do
+        rs <- queryP cypherQ params
+        nodes <- traverse (`at` "s") rs
+        bs <- traverse exact nodes
+        return bs
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(s:Section {num: {sec_num}}) return s order by s.num;"
+         params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num), ("sec_num", I sec_num)]
+
 -- |
 -- return verse
 -- ?? if remove `b:` then will ignore chapter filter, strange behaviour
@@ -94,19 +119,31 @@ queryVerse girq (ChapterNum ch_num) (VerseNum verse_num) = do
         nodes <- traverse (`at` "v") rs
         bs <- traverse exact nodes
         return bs
-   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(v:Verse{verse: {verse_num}}) return v;"
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(v:Verse{num: {verse_num}}) return v;"
          params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num), ("verse_num", I verse_num)]
 
 
 -- |
--- return verse interval
+-- return all verses of chapter
+queryAllVerses :: Girq -> ChapterNum -> BoltActionT IO [Verse]
+queryAllVerses girq (ChapterNum ch_num) = do
+        rs <- queryP cypherQ params
+        nodes <- traverse (`at` "v") rs
+        bs <- traverse exact nodes
+        return bs
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(v:Verse) return v order by v.num;"
+         params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num)]
+
+
+-- |
+-- return verse interval of chapter
 queryVerseInterval :: Girq -> ChapterNum -> VerseNum -> VerseNum -> BoltActionT IO [Verse]
 queryVerseInterval girq (ChapterNum ch_num) (VerseNum verse_from) (VerseNum verse_to) = do
         rs <- queryP cypherQ params
         nodes <- traverse (`at` "v") rs
         bs <- traverse exact nodes
         return bs
-   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(v:Verse) WHERE v.verse >= {verse_from} AND v.verse <= {verse_to} return v order by v.verse;"
+   where cypherQ = "match (b:Book {book: {girq}})-[:HAS_CH {num: {ch_num}}]-()-[*]->(v:Verse) WHERE v.num >= {verse_from} AND v.num <= {verse_to} return v order by v.num;"
          params = fromList [("girq", T . pack $ show girq), ("ch_num", I ch_num), ("verse_from", I verse_from), ("verse_to", I verse_to)]
 
 

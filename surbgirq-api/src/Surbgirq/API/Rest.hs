@@ -19,11 +19,19 @@ import Surbgirq.Types
 -- Surbgirq API endpoints
 ------------------------------------------------------------
 
+-- |
+-- info related to api
+data MetaAPI route = MetaAPI {
+      apiInfoEndpoint :: route :- "info" :> Summary "Get Api Information"
+                         :> Get '[JSON] GetApiInfoResponse
+}
 
 -- |
 -- Book descriptive and quantitive info
 data BookAPI route = BookAPI {
-      booksListEndpoint :: route :- "list" :> Summary "Get Available Books" :> Get '[JSON] [Book]
+      booksListEndpoint :: route :- "list" :> Summary "Get Available Books"
+                           :> Get '[JSON] [Book]
+
     , bookChapterNumsEndpoint :: route :- "chapters" :> Summary "Get chapter nums"
                                  :> Capture "girq" Girq
                                  :> Get '[JSON] [(Int, Text)]
@@ -45,48 +53,60 @@ data BookAPI route = BookAPI {
 -- |
 -- Scriptures info
 data ScriptureAPI route = ScriptureAPI {
-  scripturesVerseEndpoint :: route :- "verse" :> Summary "Get Verse by number"
-                            :> Capture "girq" Girq
-                            :> Capture "ch" ChapterNum
-                            :> Capture "verse" VerseNum
-                            :> Get '[JSON] [Verse]
+
+      scriptureChapterEndpoint :: route :- "chapter" :> Summary "Get Chapter"
+                                  :> Capture "girq" Girq
+                                  :> Capture "ch" ChapterNum
+                                  :> Get '[JSON] [Chapter]
+
+    , scriptureChapterAllSectionsEndpoint :: route :- "chapter" :> "sections"   :> Summary "Get Sections of Chapter"
+                                       :> Capture "girq" Girq
+                                       :> Capture "ch" ChapterNum
+                                       :> Get '[JSON] [Section]
+
+    , scriptureChapterSectionEndpoint :: route :- "section"   :> Summary "Get the Section"
+                                  :> Capture "girq" Girq
+                                  :> Capture "ch"   ChapterNum
+                                  :> Capture "sec"  SectionNum
+                                  :> Get '[JSON] [Section]
+
+
+    -- * Verses
+    , scriptureChapterAllVersesEndpoint :: route :- "chapter" :> "verses" :> Summary "Get all Verses of Chapter"
+                                        :> Capture "girq" Girq
+                                        :> Capture "ch" ChapterNum
+                                        :> Get '[JSON] [Verse]
+
+    , scriptureVerseEndpoint :: route :- "chapter" :> "verse"   :> Summary "Get Verse by chapter and verse number"
+                                :> Capture "girq" Girq
+                                :> Capture "ch" ChapterNum
+                                :> Capture "verse" VerseNum
+                                :> Get '[JSON] [Verse]
+
+    , scriptureVerseFromToEndpoint :: route :- "chapter" :> "verse" :> Summary "Get Verse by verse numver [From, Tp]"
+                                      :> Capture "girq" Girq
+                                      :> Capture "ch" ChapterNum
+                                      :> Capture "verseFrom" VerseNum
+                                      :> Capture "verseTo" VerseNum
+                                      :> Get '[JSON] [Verse]
+
+    , scriptureVerseByRefTextEndpoint :: route :- "verse" :> Summary "Get Verse by ref text 'Book chnum.v1-v2' "
+                                      :> Capture "girq" Girq
+                                      :> Capture "ch" ChapterNum
+                                      :> Capture "verseRef" Text
+                                      :> Get '[JSON] [Verse]
 
 } deriving (Generic)
 
 
-type GetApiInfoEndpoint = "info" :> Summary "Get Api Information"
-    :> Get '[JSON] GetApiInfoResponse
 
-
-type GetBooksListEndpoint = "books" :> Summary "Get Available Books" :> Get '[JSON] [Book]
-
-type GetChapterEndpoint = "chapter" :> Summary "Get Chapter"
-    :> Capture "girq" Girq
-    :> Capture "ch" ChapterNum
-    :> Get '[JSON] [Chapter]
-
-type GetChapterSectionsEndpoint = "sections"   :> Summary "Get Sections of Chapter"
-    :> Capture "girq" Girq
-    :> Capture "ch" ChapterNum
-    :> Get '[JSON] [Section]
 
 type GetChapterVersesEndpoint = "verse"   :> Summary "Get all Verses of Chapter"
     :> Capture "girq" Girq
     :> Capture "ch" ChapterNum
     :> Get '[JSON] [Verse]
 
-type GetVerseEndpoint = "verse"   :> Summary "Get Verse by number"
-    :> Capture "girq" Girq
-    :> Capture "ch" ChapterNum
-    :> Capture "verse" VerseNum
-    :> Get '[JSON] [Verse]
 
-type GetVerseFromToEndpoint = "verses" :> Summary "Get Verse interval"
-    :> Capture "girq" Girq
-    :> Capture "ch" ChapterNum
-    :> Capture "verseFrom" VerseNum
-    :> Capture "verseTo" VerseNum
-    :> Get '[JSON] [Verse]
 
 type GetVerseIntervalEndpoint = "verses" :> Summary "Get Verse interval"
     :> Capture "girq" Girq
@@ -102,6 +122,7 @@ type GetSectionEndpoint = "section"   :> Summary "Get Section"
 
 type GetParagraphEndpoint = "paragraph" :> Summary "Get Paragraph" :> Get '[JSON] Paragraph
 
+{-
 type SurbgirqRestAPI = "api" :> (
             GetApiInfoEndpoint
        :<|> GetBooksListEndpoint
@@ -111,3 +132,4 @@ type SurbgirqRestAPI = "api" :> (
        :<|> GetVerseFromToEndpoint
        :<|> GetVerseIntervalEndpoint
       )
+-}

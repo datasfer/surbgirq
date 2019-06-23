@@ -42,7 +42,7 @@ instance RecordValue Book where
         do
             title <- exact =<< props `at` "title"
             lbs   <- traverse exact labels
-            number <- exact =<< props `at` "number"
+            number <- exact =<< props `at` "num"
             numOfChatpters <- exact =<< props `at` "chapters"
             translation <- exact =<< props `at` "translation"
             girq :: Girq <-  exact =<< props `at` "book"
@@ -74,11 +74,27 @@ instance RecordValue Chapter where
     exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Chapter") labels =
         do
             title <- exact =<< props `at` "title"
-            number <- exact =<< props `at` "number"
+            number <- exact =<< props `at` "num"
             girq :: Girq <-  exact =<< props `at` "book"
 
             return $ Chapter i girq number title
     exact x = fail $ show x ++ " is not a Chapter Node"
+
+
+-------------------------------------------------------------------------------
+-- Section Node
+-------------------------------------------------------------------------------
+
+
+instance RecordValue Section where
+    exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Section") labels =
+        do
+            title <- exact =<< props `at` "title"
+            number <- exact =<< props `at` "num"
+--            girq :: Girq <-  exact =<< props `at` "book"
+
+            return $ Section i number title
+    exact x = fail $ show x ++ " is not a Section Node"
 
 
 
@@ -87,20 +103,22 @@ instance RecordValue Chapter where
 -- Verse Node
 -------------------------------------------------------------------------------
 
-
 instance RecordValue Verse where
     exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Verse") labels =
         do
             chNum <- exact =<< props `at` "chapter"
             secNum <- exact =<< props `at` "section"
+            secTitle <- exact =<< props `at` "section_title"
             prgNum <- exact =<< props `at` "paragraph"
-            verseNum <- exact =<< props `at` "verse"
+            verseNum <- exact =<< props `at` "num"
             content <- exact =<< props `at` "content"
 
             girq :: Girq <-  exact =<< props `at` "book"
 
-            return $ Verse i girq chNum secNum prgNum verseNum content
+            return $ Verse i girq chNum secNum secTitle prgNum verseNum content
     exact x = fail $ show x ++ " is not a Verse Node"
+
+
 
 
 

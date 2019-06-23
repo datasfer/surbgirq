@@ -166,8 +166,8 @@ generateInitCypher bookFile path outPath = do
               -- Paragraphs
              forM_ section'paragraphs $ \Paragraph{..} -> do
                let prghName = concat [secName, del, "prgh", show paragraph'number]
-                   prghNode = [qc|  ({prghName}:Paragraph \{title: ''}),|]
-                   prghRel  = [qc|  ({secName})-[:HAS_PRGH]->({prghName}),|]
+                   prghNode = [qc|  ({prghName}:Paragraph \{num: {paragraph'number}}),|]
+                   prghRel  = [qc|  ({secName})-[:HAS_PRGH \{num: {paragraph'number}} ]->({prghName}),|]
 
                TIO.hPutStrLn outh prghNode
                TIO.hPutStrLn outh prghRel
@@ -175,7 +175,7 @@ generateInitCypher bookFile path outPath = do
                -- Verses
                forM_ paragraph'verses $ \v@Verse{..} -> do
                  let verseName = concat [prghName , del, "verse", show verse'verse]
-                     verseNode = [qc|  ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', num: {verse'verse}, section: {section'number}, paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
+                     verseNode = [qc|  ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', num: {verse'verse}, section: {section'number}, section_title: '{section'title}', paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
                      verseRel  = [qc|  ({prghName})-[:HAS_VERSE \{num: {verse'verse}}]->({verseName}),|]
                  TIO.hPutStrLn outh verseNode
                  TIO.hPutStrLn outh verseRel

@@ -5,11 +5,15 @@
 {-# LANGUAGE RecordWildCards   #-}
 
 module Surbgirq.Back.Server.Rest.Scripture(
-   getChapterHandler
- , getChapterSectionsHandler
- , getVerseHandler
- , getVerseFromToHandler
- , getVerseIntervalHandler
+   scriptureChapter
+ , scriptureChapterAllSections
+ , scriptureChapterSection
+
+ -- * Verses
+ , scriptureChapterAllVerses
+ , scriptureVerse
+ , scriptureVerseFromTo
+ , scriptureVerseByRefText
  ) where
 
 import Control.Monad.Reader
@@ -47,28 +51,28 @@ runQ act = do env <- ask
               liftIO $ withResource (env'pool env) (`run` act)
 
 
-getBooksHandler :: AppM [Book]
-getBooksHandler = runQ $ queryBooks
+scriptureChapter :: Girq -> ChapterNum -> AppM [Chapter]
+scriptureChapter girq ch_num = runQ $ queryChapter girq ch_num
 
 
-getChapterHandler :: Girq -> ChapterNum -> AppM [Chapter]
-getChapterHandler girq ch_num = runQ $ queryChapter girq ch_num
---    getChapterNode girq ch_num
+scriptureChapterAllSections :: Girq -> ChapterNum -> AppM [Section]
+scriptureChapterAllSections girq ch_num = runQ $ queryAllSections girq ch_num
 
-getChapterSectionsHandler :: Girq -> ChapterNum -> AppM [Section]
-getChapterSectionsHandler  = undefined
-
--- get chapter verse
-getVerseHandler :: Girq -> ChapterNum -> VerseNum -> AppM [Verse]
-getVerseHandler g c v = runQ $ queryVerse g c v
+scriptureChapterSection :: Girq -> ChapterNum -> SectionNum -> AppM [Section]
+scriptureChapterSection girq ch_num sec_num = runQ $ querySection girq ch_num sec_num
 
 
-getVerseFromToHandler :: Girq -> ChapterNum -> VerseNum -> VerseNum -> AppM [Verse]
-getVerseFromToHandler g c v1 v2 = runQ $ queryVerseInterval g c v1 v2
+scriptureChapterAllVerses :: Girq -> ChapterNum -> AppM [Verse]
+scriptureChapterAllVerses girq ch_num = runQ $ queryAllVerses girq ch_num
 
+scriptureVerse :: Girq -> ChapterNum -> VerseNum -> AppM [Verse]
+scriptureVerse g c v = runQ $ queryVerse g c v
 
-getVerseIntervalHandler :: Girq -> ChapterNum -> Text -> AppM [Verse]
-getVerseIntervalHandler g c verseRange =  do
+scriptureVerseFromTo :: Girq -> ChapterNum -> VerseNum -> VerseNum -> AppM [Verse]
+scriptureVerseFromTo g c v1 v2 = runQ $ queryVerseInterval g c v1 v2
+
+scriptureVerseByRefText :: Girq -> ChapterNum -> Text -> AppM [Verse]
+scriptureVerseByRefText g c verseRange =  do
       let vs = T.split (=='-') verseRange
       liftIO $ print verseRange
       liftIO $ print vs

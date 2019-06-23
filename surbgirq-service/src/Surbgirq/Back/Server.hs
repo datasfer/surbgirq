@@ -2,7 +2,7 @@
 
 module Surbgirq.Back.Server where
 
-
+import Servant.API
 import Servant.API.Generic
 import Servant.Server
 import Servant.Server.Generic
@@ -35,7 +35,7 @@ server =  ( getApiInfoHandler
 
 
 surbgirqServer :: ServerT SurbgirqAPI AppM
-surbgirqServer = toServant bookServer
+surbgirqServer = toServant bookServer :<|> toServant scriptureServer
 
 
 
@@ -46,6 +46,19 @@ bookServer =  BookAPI
               , bookChapterNumsEndpoint = bookChapterNums
               , bookChapterSectionNumsEndpoint = bookChapterSectionNums
               , bookChapterVerseNumsEndpoint = bookChapterVerseNums
-
               }
+
+
+scriptureServer :: ScriptureAPI (AsServerT AppM)
+scriptureServer =  ScriptureAPI
+              { scriptureChapterEndpoint = scriptureChapter
+              , scriptureChapterAllSectionsEndpoint = scriptureChapterAllSections
+              , scriptureChapterSectionEndpoint = scriptureChapterSection
+              -- * Verses
+              , scriptureChapterAllVersesEndpoint = scriptureChapterAllVerses
+              , scriptureVerseEndpoint = scriptureVerse
+              , scriptureVerseFromToEndpoint = scriptureVerseFromTo
+              , scriptureVerseByRefTextEndpoint = scriptureVerseByRefText
+              }
+
 
