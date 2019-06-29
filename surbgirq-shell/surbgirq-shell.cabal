@@ -21,8 +21,10 @@ source-repository head
 library
   exposed-modules: Surbgirq.Shell.Commands
                    Surbgirq.Shell.Types
+                   Surbgirq.Shell.Store.SQLite.Selda
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Entities
+                 Surbgirq.Shell.Store.Types
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
                , surbgirq-types
@@ -32,6 +34,8 @@ library
                , optparse-applicative
                , directory
                , interpolatedstring-perl6
+               , selda
+               , selda-sqlite
   default-language: Haskell2010
 
 executable surbgirq-shell
@@ -50,6 +54,28 @@ executable surbgirq-shell
                , interpolatedstring-perl6
                , filepath
                , mtl
+  default-language: Haskell2010
+
+
+executable surbgirq-sqlite
+  main-is: Main.hs
+  other-modules: Paths_surbgirq_shell
+  hs-source-dirs: app/SQLite
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-shell
+               , surbgirq-types
+               , common
+               , text
+               , aeson
+               , optparse-applicative
+               , directory
+               , interpolatedstring-perl6
+               , filepath
+               , mtl
+               , selda
+               , selda-sqlite
+
   default-language: Haskell2010
 
 test-suite surbgirq-shell-test
