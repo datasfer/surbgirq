@@ -16,7 +16,7 @@ import GHC.Generics
 import Common.Aeson
 
 data Girq =
-          -- * Հնգամատյան (Tora - օրենք)
+          -- Հնգամատյան (Tora - օրենք)
 
           Genesis
           -- ^ 1. Ծննդոց
@@ -29,7 +29,7 @@ data Girq =
           | Deuteronomium
           -- ^ 5. Երկրորդ օրենք (Երկրորդումն օրինաց)
 
-          -- *
+          --
           | Joshua
           -- ^ 6. Հեսու Նավե (Հեսուի գիրք)
           | Judges
@@ -120,7 +120,7 @@ data Girq =
           -- ^ 48. Եզեկիելի Մարգարեություն
 
 
-          -- * Նոր Կտակարան
+          -- Նոր Կտակարան
           | Matthew
           -- ^ 1. Ավետարան ըստ Մատթեոսի
           | Mark
@@ -187,6 +187,12 @@ data TYear = T1994
 data Language = Grabar
               | Ashxarhabar
               deriving (Show, Read, Generic)
+
+
+data Lang = AM
+          | RU
+          | EN
+            deriving (Show, Read, Generic)
 
 $(deriveJSON dropPrefixOptions ''Testament)
 $(deriveJSON dropPrefixOptions ''Language)
