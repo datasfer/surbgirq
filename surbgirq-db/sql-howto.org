@@ -1,0 +1,9 @@
+
+* find duplicate by column
+select form, count(*)
+  from wordform
+  group by form
+  having count(*) > 1
+
+  select count(distinct(armat)) from wordform where tags = 'prop.';
+

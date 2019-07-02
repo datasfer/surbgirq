@@ -26,7 +26,7 @@ import Types
 main :: IO ()
 main = do
   installSigtermHandler
-  SurbgirqSettings{..} <- getSurbgirqSettigns
+  SurbgirqSettings{..} <- getSurbgirqSettings
   let port = serverPort surbgirq'server
       staticPath = serverStaticDir surbgirq'server
       newsPath = serverNewsDir surbgirq'server
@@ -45,10 +45,10 @@ boltCfg :: Neo4jConfig -> BoltCfg
 boltCfg Neo4jConfig {..} = def { user = neo4jConfig'user, password = neo4jConfig'pass }
 
 
-getSurbgirqSettigns :: IO SurbgirqSettings
-getSurbgirqSettigns =
+getSurbgirqSettings :: IO SurbgirqSettings
+getSurbgirqSettings =
   getSettings "Surbgirq "
-                  (\s logs -> s { surbgirq'logs =
-                                  let q1 = surbgirq'logs s
-                                  in  q1 { logSpec'logFiles = logSpec'logFiles q1 ++ logs }
-                              })
+    (\s logs -> s { surbgirq'logs =
+                        let q1 = surbgirq'logs s
+                        in  q1 { logSpec'logFiles = logSpec'logFiles q1 ++ logs }
+                  })

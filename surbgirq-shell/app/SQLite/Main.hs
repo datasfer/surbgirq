@@ -42,6 +42,7 @@ import Surbgirq.Shell.Commands
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
 
+import Surbgirq.Shell.Store.ParseFile
 import Surbgirq.Shell.Store.SQLite.Selda
 
 main :: IO ()
@@ -57,38 +58,6 @@ main = --  liftIO $ createDirectoryIfMissing True $ "db"
     insert_ wordFrom ys
 
     return ()
-
-parseLemmaFile :: FilePath -> IO [EngLemma]
-parseLemmaFile file = do
-  bracket (openFile file ReadMode) hClose $ \handle -> do
-    _ <- TIO.hGetLine handle -- read header
-    content <- TIO.hGetContents handle     -- read the rest of file
-
-    return $ catMaybes $ map lineToEntity (splitOn "\r\n" content)
-  where
-    lineToEntity :: Text -> Maybe EngLemma
-    lineToEntity line =
-        let ws = T.words (T.strip line)
-        in  case ws of
-              (w1:w2) -> Just $ EngLemma w1 (T.unwords w2)
-              _       -> Nothing
-
-
-parseWordFormFile :: FilePath -> IO [WordForm]
-parseWordFormFile file = do
-  bracket (openFile file ReadMode) hClose $ \handle -> do
-    _ <- TIO.hGetLine handle -- read header
-    content <- TIO.hGetContents handle     -- read the rest of file
-
-    return $ catMaybes $ map lineToEntity (splitOn "\r\n" content)
-  where
-    lineToEntity :: Text -> Maybe WordForm
-    lineToEntity line =
-        let ws = T.words (T.strip line)
-        in  case ws of
-              (w1:w2:w3) -> Just $ WordForm w1 w2 (T.unwords w3)
-              _          -> Nothing
-
 
 
 {-

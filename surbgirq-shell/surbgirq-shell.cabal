@@ -22,6 +22,8 @@ library
   exposed-modules: Surbgirq.Shell.Commands
                    Surbgirq.Shell.Types
                    Surbgirq.Shell.Store.SQLite.Selda
+                   Surbgirq.Shell.Store.ParseFile
+                   Surbgirq.Shell.Store.Neo4j
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Entities
                  Surbgirq.Shell.Store.Types
@@ -36,6 +38,9 @@ library
                , interpolatedstring-perl6
                , selda
                , selda-sqlite
+               , filepath
+               , containers
+               , unordered-containers
   default-language: Haskell2010
 
 executable surbgirq-shell

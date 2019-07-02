@@ -32,6 +32,7 @@ import System.FilePath
 
 import Common.Yaml
 import Surbgirq.Shell.Commands
+import Surbgirq.Shell.Store.Neo4j
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
 
@@ -70,6 +71,7 @@ main = do
                  TIO.putStrLn "Bible scriptures generation success!"
                Narek -> do
                  TIO.putStrLn "Narek scriptures generation not ready yet!"
+                 wordFormsCypher "./data/txt/wordForms.txt" "./data/cypher"
 
 
 readBooks :: FilePath -> IO [Book]
@@ -223,3 +225,6 @@ generateInitCypher bookFile path outPath = do
     doesFilenameMatch path = takeExtension path `elem` [ ".yaml", ".yml"]
     isDir :: FilePath -> Bool
     isDir path = takeExtension path == ""
+
+
+
