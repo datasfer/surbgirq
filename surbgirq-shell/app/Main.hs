@@ -71,7 +71,7 @@ main = do
                  TIO.putStrLn "Bible scriptures generation success!"
                Narek -> do
                  TIO.putStrLn "Narek scriptures generation not ready yet!"
-                 wordFormsCypher "./data/txt/wordForms.txt" "./data/cypher"
+                 wordFormsCypher "./data/txt/wordForms.txt" "./data/cypher/words"
 
 
 readBooks :: FilePath -> IO [Book]

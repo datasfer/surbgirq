@@ -7,3 +7,12 @@ select form, count(*)
 
   select count(distinct(armat)) from wordform where tags = 'prop.';
 
+  create table armat as select distinct(armat) from wordform  where tags = 'prop.';
+
+
+* bash for
+ for i in $(ls *.cypher);do
+  cat $i | cypher-shell -u neo4j -p CHANGE_ME
+ done
+
+
