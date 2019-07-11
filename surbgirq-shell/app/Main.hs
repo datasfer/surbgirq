@@ -49,7 +49,7 @@ main1 = do
   TIO.putStrLn res
   TIO.putStrLn "Գիրք ծննդեան"
 
--- | etack exec -- surbgirq-shell --bible --book ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher
+-- |  stack exec -- surbgirq-shell --bible -c ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher
 main :: IO ()
 main = do
   cmd <- customExecParser (prefs showHelpOnError) $
@@ -183,19 +183,27 @@ generateInitCypher bookFile path outPath = do
                  TIO.hPutStrLn outh verseRel
 
 
-                 let ws = T.splitOn " " verse'content
+                 let ws = filter ((>0) . T.length) $ T.splitOn " " verse'content
                  -- add each word as node
                  forM_ (zip ws [1..] ) $ \(word, index) -> do
                    let wordName = concat [verseName, del, "word", show index]
-                       wordNode = [qc|  ({wordName}:Word \{word: '{word}', index: {index}}),|]
-                       wordRel  = [qc|  ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
+
+                       wordNode = if isLower $ T.head word
+                                  then [qc|  ({wordName}:Word \{word: '{word}', index: {index}}),|]
+                                  else [qc|  ({wordName}:Capitalized:Word \{word: '{word}', index: {index}}),|]
+
+                       wordRel  = if index == 1
+                                  then [qc|  ({verseName})-[:FIRST_WORD]->({wordName}), ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
+                                  else [qc|  ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
+
                    TIO.hPutStrLn outh wordNode
                    TIO.hPutStrLn outh wordRel
                  -- add [NEEXT] relationshipp between words
                  forM_ (zip (zip ws (tail' ws)) [1..] ) $ \((w1, w2), index) -> do
                    let w1Name = concat [verseName, del, "word", show index]
                        w2Name = concat [verseName, del, "word", show $ index + 1]
-                       nextRel  = [qc|  ({w1Name})-[:NEXT]->({w2Name}),|]
+                       nextRel = [qc|  ({w1Name})-[:NEXT]->({w2Name}),|]
+
                    TIO.hPutStrLn outh nextRel
 
 
