@@ -131,7 +131,7 @@ data Girq =
           -- ^ 4. Ավետարան ըստ Հովհաննեսի
           | Acts
           -- ^ 5. Գործք առաքելոց
-            deriving(Show, Read, Generic)
+            deriving(Show, Eq, Read, Generic)
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին
 -- ^ Պողոս առաքյալի առաջին նամակը Կորնթացիներին (Ա Կորնթացիներ)
@@ -169,30 +169,30 @@ data Group = Pentateuch
             | OtherBook
               -- ^ Պողոս առաքյալի թղթերը
               -- ^ Թղթեր
-              deriving (Show)
+              deriving (Show, Eq)
 
 
 -- | Book -> Scripture -> Chapter -> Section -> Paragraph -> Verse -> Words
 
 data Testament = Old
                | New
-                 deriving (Show, Read, Generic)
+                 deriving (Show, Eq,  Read, Generic)
 
 data TYear = T1994
            | T1969
            | T1805
            | T1895
-             deriving (Show)
+             deriving (Show, Eq)
 
 data Language = Grabar
               | Ashxarhabar
-              deriving (Show, Read, Generic)
+              deriving (Show, Eq, Read, Generic)
 
 
 data Lang = AM
           | RU
           | EN
-            deriving (Show, Read, Generic)
+            deriving (Show, Eq, Read, Generic)
 
 $(deriveJSON dropPrefixOptions ''Testament)
 $(deriveJSON dropPrefixOptions ''Language)

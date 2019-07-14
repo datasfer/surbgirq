@@ -44,14 +44,14 @@ data Book = Book
     , book'chapters    :: Int
     , book'testament   :: Testament
     , book'translation :: Text
-    } deriving (Show, Generic)
+    } deriving (Show, Eq, Generic)
 
 data Chapter = Chapter
     { chapter'id     :: Int
     , chapter'book   :: Girq
     , chapter'number :: Int
     , chapter'title  :: Text
-    } deriving (Show, Generic)
+    } deriving (Show, Eq, Generic)
 
 
 data Section = Section
@@ -59,13 +59,13 @@ data Section = Section
 --    , section'book  :: Girq
     , section'number :: Int
     , section'title  :: Text
-    } deriving (Show, Generic)
+    } deriving (Show, Eq, Generic)
 
 
 data Paragraph = Paragraph
     { paragraph'title  :: Text
     , paragraph'number :: Int
-    } deriving (Show, Generic)
+    } deriving (Show, Eq, Generic)
 
 data Verse = Verse
     { verse'id            :: Int
@@ -76,7 +76,7 @@ data Verse = Verse
     , verse'paragraph     :: Int
     , verse'verse         :: Int
     , verse'content       :: Text
-    } deriving (Show, Generic)
+    } deriving (Show, Eq, Generic)
 
 $(deriveJSON dropPrefixOptions ''Book)
 $(deriveJSON dropPrefixOptions ''Chapter)
