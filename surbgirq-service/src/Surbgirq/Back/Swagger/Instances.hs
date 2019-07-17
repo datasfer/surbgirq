@@ -8,6 +8,7 @@
 
 module Surbgirq.Back.Swagger.Instances where
 
+import Control.Lens ((&), (.~), (?~))
 import Data.Swagger
 
 import Data.Aeson (Value)
@@ -19,7 +20,6 @@ import Data.Proxy
 import Surbgirq.API
 import Surbgirq.Types
 
-instance ToParamSchema Girq
 instance ToSchema Girq
 instance ToParamSchema Testament
 instance ToSchema Testament
@@ -29,6 +29,15 @@ instance ToSchema Language
 instance ToParamSchema ChapterNum
 instance ToParamSchema SectionNum
 instance ToParamSchema VerseNum
+
+
+instance ToParamSchema Girq
+
+    -- where
+    -- toParamSchema _ = mempty
+    --     & type_ .~ SwaggerString
+
+     --        & default_ ?~ Matthew -- Always show the first page by default.
 
 
 instance ToSchema Value where

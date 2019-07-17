@@ -91,10 +91,8 @@ data ScriptureAPI route = ScriptureAPI {
                                       :> Get '[JSON] [Verse]
 
     , scriptureVerseByRefTextEndpoint :: route :- "verse" :> Summary "Get Verse by ref text 'Book chnum.v1-v2' "
-                                      :> Capture "girq" Girq
-                                      :> Capture "ch" ChapterNum
-                                      :> Capture "verseRef" Text
-                                      :> Get '[JSON] [Verse]
+                                         :> Capture "verseRef" Text
+                                         :> Get '[JSON] [Verse]
 
 } deriving (Generic)
 

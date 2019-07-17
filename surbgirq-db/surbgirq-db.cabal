@@ -36,7 +36,7 @@ library
                , common
   default-language: Haskell2010
 
-executable surbgirq-db-exe
+executable surbgirq-db
   main-is: Main.hs
   other-modules: Paths_surbgirq_db
   hs-source-dirs: app

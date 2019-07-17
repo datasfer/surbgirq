@@ -71,8 +71,33 @@ scriptureVerse g c v = runQ $ queryVerse g c v
 scriptureVerseFromTo :: Girq -> ChapterNum -> VerseNum -> VerseNum -> AppM [Verse]
 scriptureVerseFromTo g c v1 v2 = runQ $ queryVerseInterval g c v1 v2
 
-scriptureVerseByRefText :: Girq -> ChapterNum -> Text -> AppM [Verse]
-scriptureVerseByRefText g c verseRange =  do
+
+--
+scriptureVerseByRefText :: Text -> AppM [Verse]
+scriptureVerseByRefText verseText =  do
+  let vs = T.split (==' ') verseText
+  liftIO $ print vs
+  case vs of
+    [girqText, chVerseText] -> let girq = findByAbbr girqText
+                                   [v1, v2] = T.split (=='.') chVerseText
+                                   chNum = readMaybe $ T.unpack v1
+                               in case (girq, chNum) of
+                                    (Just g, Just ch) -> scriptureVerseByRef g (ChapterNum ch) v2
+                                    _  -> do
+                                       liftIO $ print girq
+                                       liftIO $ print chNum
+                                       liftIO $ print v1
+                                       liftIO $ print v2
+
+
+
+                                       error "cuold not parse book or ch num from verRef text"
+
+    _  -> error "invalid format for refText"
+
+
+scriptureVerseByRef :: Girq -> ChapterNum -> Text -> AppM [Verse]
+scriptureVerseByRef g c verseRange =  do
       let vs = T.split (=='-') verseRange
       liftIO $ print verseRange
       liftIO $ print vs

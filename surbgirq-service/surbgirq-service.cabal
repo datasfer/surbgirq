@@ -84,7 +84,7 @@ library
                , hasbolt
   default-language: Haskell2010
 
-executable surbgirq-service-exe
+executable surbgirq-service
   main-is: Main.hs
   other-modules: Paths_surbgirq_service
   hs-source-dirs: app

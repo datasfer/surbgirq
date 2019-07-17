@@ -26,13 +26,13 @@ import Surbgirq.Types.Girq
 
 
 newtype ChapterNum = ChapterNum Int
-  deriving (Show, Eq, Ord, Generic)
+  deriving (Show, Eq, Read,  Ord, Generic)
 
 newtype SectionNum = SectionNum Int
-  deriving (Show, Eq, Ord, Generic)
+  deriving (Show, Eq, Read, Ord, Generic)
 
 newtype VerseNum = VerseNum Int
-  deriving (Show, Eq, Ord, Generic)
+  deriving (Show, Eq, Read, Ord, Generic)
 
 
 data Book = Book
