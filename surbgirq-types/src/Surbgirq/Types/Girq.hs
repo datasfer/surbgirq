@@ -3,11 +3,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 
-module Surbgirq.Types.Girq (
-   Girq(..)
- , Testament(..)
- , Language(..)
- ) where
+module Surbgirq.Types.Girq where
 
 import Data.Aeson   (Value)
 import Data.Text    (Text)
@@ -178,24 +174,36 @@ data Testament = Old
                | New
                  deriving (Show, Eq,  Read, Generic)
 
-data TYear = T1994
-           | T1969
-           | T1805
-           | T1895
-             deriving (Show, Eq)
-
-data Language = Grabar
-              | Ashxarhabar
+data Dialect = Grabar
+             | Ashxarhabar
               deriving (Show, Eq, Read, Generic)
 
 
-data Lang = AM
-          | RU
-          | EN
-            deriving (Show, Eq, Read, Generic)
+data Language = Armenian
+              | Russian
+              | English
+                deriving (Show, Eq, Read, Generic)
+
+-- data Scripture = Scripture
+--     { scripture'Year   :: Int
+--     , scripture'Author :: Text
+--     , scripture'Title  :: Text
+--     , scripture'Info   :: Text
+--     }
+
+data Translation = Translation
+    { translation'name    :: Text
+--    , translation'from    :: Scripture
+    , translation'Year    :: Int
+    , translation'Dialect :: Maybe Dialect
+    , translation'Lang    :: Language
+    , translation'Author  :: Text
+    }
 
 $(deriveJSON dropPrefixOptions ''Testament)
+$(deriveJSON dropPrefixOptions ''Dialect)
 $(deriveJSON dropPrefixOptions ''Language)
-$(deriveJSON dropPrefixOptions ''TYear)
+$(deriveJSON dropPrefixOptions ''Translation)
+-- $(deriveJSON dropPrefixOptions ''Scripture)
 
 $(deriveJSON dropPrefixOptions ''Girq)

@@ -38,20 +38,20 @@ data Chapter = Chapeter
     , chapter'title    :: Int
     , chapter'language :: Language
     , chapter'sections :: [Section]
-  } deriving (Show)
+    } deriving (Show)
 
 
 data Section = Section
     { section'title      :: Text
     , section'number     :: Int
     , section'paragraphs :: [Paragraph]
-  } deriving (Show)
+    } deriving (Show)
 
 
 data Paragraph = Paragraph
     { paragraph'number :: Int
     , paragraph'verses :: [Verse]
-  } deriving (Show)
+    } deriving (Show)
 
 
 data Verse = Verse
@@ -89,6 +89,8 @@ data Scripture = Scripture
 -- |
 data Book = Book
   { book'book        :: Girq
+  , book'labels      :: Maybe Text
+  -- ^ neo4j node labels
   , book'title       :: Text
   , book'number      :: Int
   , book'chapters    :: Int

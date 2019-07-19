@@ -126,7 +126,7 @@ generateInitCypher bookFile path outPath = do
      let inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
          bookDir = path </> (T.unpack inPath)
          outFile = outPath </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
-         bookLabel = show book'book
+         bookLabel = maybe (show book'book) ((show book'book) ++)  (T.unpack <$> book'labels)
          bookTestament = show book'testament
          bookName = T.toLower . T.pack  $ show book'book
 
@@ -188,6 +188,7 @@ generateInitCypher bookFile path outPath = do
                  forM_ (zip ws [1..] ) $ \(word, index) -> do
                    let wordName = concat [verseName, del, "word", show index]
 
+
                        wordNode = if isLower $ T.head word
                                   then [qc|  ({wordName}:Word \{word: '{word}', index: {index}}),|]
                                   else [qc|  ({wordName}:Capitalized:Word \{word: '{word}', index: {index}}),|]
@@ -196,13 +197,20 @@ generateInitCypher bookFile path outPath = do
                                   then [qc|  ({verseName})-[:FIRST_WORD]->({wordName}), ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
                                   else [qc|  ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
 
+                       -- relArmat = [qc| (match (wf:WordForm \{word: '{word}'})<-[:HAS_WORDFORM]-(wh:WordHead)),
+                       --                (Create ({wordName})-[:HAS_ARMAT]->(wh)), |]
+
                    TIO.hPutStrLn outh wordNode
                    TIO.hPutStrLn outh wordRel
+                 -- TIO.hPutStrLn outh relArmat
+
                  -- add [NEEXT] relationshipp between words
                  forM_ (zip (zip ws (tail' ws)) [1..] ) $ \((w1, w2), index) -> do
                    let w1Name = concat [verseName, del, "word", show index]
                        w2Name = concat [verseName, del, "word", show $ index + 1]
                        nextRel = [qc|  ({w1Name})-[:NEXT]->({w2Name}),|]
+
+
 
                    TIO.hPutStrLn outh nextRel
 
