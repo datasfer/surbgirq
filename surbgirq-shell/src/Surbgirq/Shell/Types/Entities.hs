@@ -35,7 +35,8 @@ data RefType = RefBooks   [Text]
 data Chapter = Chapeter
     { chapter'book     :: Book
     , chapter'number   :: Int
-    , chapter'title    :: Int
+    , chapter'title    :: Text
+    , chapter'ref      :: Text
     , chapter'language :: Language
     , chapter'sections :: [Section]
     } deriving (Show)
@@ -44,6 +45,7 @@ data Chapter = Chapeter
 data Section = Section
     { section'title      :: Text
     , section'number     :: Int
+    , section'ref        :: Text
     , section'paragraphs :: [Paragraph]
     } deriving (Show)
 
@@ -96,6 +98,8 @@ data Book = Book
   , book'chapters    :: Int
   , book'testament   :: Testament
   , book'translation :: Text
+  , book'language    :: Language
+  , book'dialect     :: Dialect
   , book'input       :: Maybe Text
     -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
   , book'output      :: Maybe Text

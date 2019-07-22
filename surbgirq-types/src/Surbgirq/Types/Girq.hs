@@ -179,9 +179,9 @@ data Dialect = Grabar
               deriving (Show, Eq, Read, Generic)
 
 
-data Language = Armenian
-              | Russian
-              | English
+data Language = AM
+              | RU
+              | EN
                 deriving (Show, Eq, Read, Generic)
 
 -- data Scripture = Scripture
