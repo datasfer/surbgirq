@@ -151,7 +151,7 @@ generateInitCypher bookFile path outPath = do
 
          -- a file == a chapter
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
-           ch@Chapeter{chapter'book=Book{..}, ..} <- readChapter (bookDir </> file)
+           ch@Chapeter{..} <- readChapter (bookDir </> file)
 
            let chName = concat [T.unpack bookName, del, "ch", show chapter'number]
                chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}', num: {chapter'number} }),|]

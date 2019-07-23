@@ -50,8 +50,7 @@ data Book = Book
   } deriving (Show)
 
 data Chapter = Chapeter
-    { chapter'book     :: Book
-    , chapter'number   :: Int
+    { chapter'number   :: Int
     , chapter'title    :: Text
     , chapter'sections :: [Section]
     } deriving (Show)
