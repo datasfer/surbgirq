@@ -22,7 +22,7 @@ import           Data.Text.Lazy.Encoding as TLE
 
 import Options.Applicative
 import System.Directory
-import System.FilePath.Posix         (takeBaseName)
+import System.FilePath.Posix         (takeBaseName, takeDirectory)
 import System.IO
 import Text.InterpolatedString.Perl6 (qc)
 
@@ -125,16 +125,20 @@ generateInitCypher bookFile path outPath = do
 
      let inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
          bookDir = path </> (T.unpack inPath)
-         outFile = outPath </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
+         outFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
+         outFile = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
+
          bookLabel = maybe (show book'book) ((show book'book) ++)  (T.unpack <$> book'labels)
          bookTestament = show book'testament
          bookName = T.toLower . T.pack  $ show book'book
-
+         lang = show book'language
+         dialect = show book'dialect
 
      exists <- doesDirectoryExist bookDir
      -- check if books input directory exists
      when exists $ do
        -- here no need to error check
+       createDirectoryIfMissing True outFileRoot
        txtFiles <- listDirectory bookDir `catchError` \_ -> do
                                       liftIO $ putStrLn (concat [bookDir, " does not exist."])
                                       return []
@@ -142,7 +146,7 @@ generateInitCypher bookFile path outPath = do
        bracket (openFile outFile WriteMode) hClose $ \outh -> do
 
          TIO.hPutStrLn outh "CREATE"
-         TIO.hPutStrLn outh [qc|  ({bookName}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', num: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
+         TIO.hPutStrLn outh [qc|  ({bookName}:{lang}:{dialect}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', num: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
                              |]
 
          -- a file == a chapter
@@ -189,9 +193,10 @@ generateInitCypher bookFile path outPath = do
                    let wordName = concat [verseName, del, "word", show index]
 
 
-                       wordNode = if isLower $ T.head word
-                                  then [qc|  ({wordName}:Word \{word: '{word}', index: {index}}),|]
-                                  else [qc|  ({wordName}:Capitalized:Word \{word: '{word}', index: {index}}),|]
+                       wordNodeLabels = if isLower $ T.head word
+                                        then concat [lang, ":", dialect, ":", "Word"]
+                                        else concat [lang, ":", dialect, ":", "Capitalized", ":", "Word"]
+                       wordNode = [qc|  ({wordName}:{wordNodeLabels} \{word: '{word}', index: {index}}),|]
 
                        wordRel  = if index == 1
                                   then [qc|  ({verseName})-[:FIRST_WORD]->({wordName}), ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]

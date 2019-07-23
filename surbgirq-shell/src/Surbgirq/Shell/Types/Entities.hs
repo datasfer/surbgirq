@@ -31,13 +31,28 @@ data RefType = RefBooks   [Text]
              | RefWord    Text
              | RefText    Text
                deriving (Show, Read)
+-- |
+data Book = Book
+  { book'book        :: Girq
+  , book'labels      :: Maybe Text
+  -- ^ neo4j node labels
+  , book'title       :: Text
+  , book'number      :: Int
+  , book'chapters    :: Int
+  , book'testament   :: Testament
+  , book'translation :: Text
+  , book'language    :: Language
+  , book'dialect     :: Dialect
+  , book'input       :: Maybe Text
+    -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
+  , book'output      :: Maybe Text
+  -- ^ the path to store processed result
+  } deriving (Show)
 
 data Chapter = Chapeter
     { chapter'book     :: Book
     , chapter'number   :: Int
     , chapter'title    :: Text
-    , chapter'ref      :: Text
-    , chapter'language :: Language
     , chapter'sections :: [Section]
     } deriving (Show)
 
@@ -45,7 +60,6 @@ data Chapter = Chapeter
 data Section = Section
     { section'title      :: Text
     , section'number     :: Int
-    , section'ref        :: Text
     , section'paragraphs :: [Paragraph]
     } deriving (Show)
 
@@ -88,23 +102,6 @@ data Scripture = Scripture
     , scripture'chapters :: [Chapter]
     } deriving (Show)
 
--- |
-data Book = Book
-  { book'book        :: Girq
-  , book'labels      :: Maybe Text
-  -- ^ neo4j node labels
-  , book'title       :: Text
-  , book'number      :: Int
-  , book'chapters    :: Int
-  , book'testament   :: Testament
-  , book'translation :: Text
-  , book'language    :: Language
-  , book'dialect     :: Dialect
-  , book'input       :: Maybe Text
-    -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
-  , book'output      :: Maybe Text
-  -- ^ the path to store processed result
-  } deriving (Show)
 
 
 $(deriveJSON dropPrefixOptions ''Book)

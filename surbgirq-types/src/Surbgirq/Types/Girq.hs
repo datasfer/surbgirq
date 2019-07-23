@@ -178,7 +178,6 @@ data Dialect = Grabar
              | Ashxarhabar
               deriving (Show, Eq, Read, Generic)
 
-
 data Language = AM
               | RU
               | EN
@@ -193,7 +192,7 @@ data Language = AM
 
 data Translation = Translation
     { translation'name    :: Text
---    , translation'from    :: Scripture
+    -- , translation'from    :: Scripture
     , translation'Year    :: Int
     , translation'Dialect :: Maybe Dialect
     , translation'Lang    :: Language
