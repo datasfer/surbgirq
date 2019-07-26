@@ -43,6 +43,7 @@ data Book = Book
   , book'translation :: Text
   , book'language    :: Language
   , book'dialect     :: Dialect
+  , book'ref         :: Maybe Text
   , book'input       :: Maybe Text
     -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
   , book'output      :: Maybe Text
@@ -52,6 +53,7 @@ data Book = Book
 data Chapter = Chapeter
     { chapter'number   :: Int
     , chapter'title    :: Text
+    , chapter'ref      :: Text
     , chapter'sections :: [Section]
     } deriving (Show)
 
@@ -59,6 +61,7 @@ data Chapter = Chapeter
 data Section = Section
     { section'title      :: Text
     , section'number     :: Int
+    , section'ref        :: Text
     , section'paragraphs :: [Paragraph]
     } deriving (Show)
 

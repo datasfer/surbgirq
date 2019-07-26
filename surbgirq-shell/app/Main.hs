@@ -125,8 +125,14 @@ generateInitCypher bookFile path outPath = do
 
      let inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
          bookDir = path </> (T.unpack inPath)
-         outFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
-         outFile = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
+
+         -- cypher out file
+         outCypherFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
+         outFile = outCypherFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.cypher|]
+
+         -- ref file
+         outRefFileRoot = outCypherFileRoot </> "refs"
+         outRefFile = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.ref|]
 
          bookLabel = maybe (show book'book) ((show book'book) ++)  (T.unpack <$> book'labels)
          bookTestament = show book'testament
@@ -138,15 +144,22 @@ generateInitCypher bookFile path outPath = do
      -- check if books input directory exists
      when exists $ do
        -- here no need to error check
-       createDirectoryIfMissing True outFileRoot
+       createDirectoryIfMissing True outCypherFileRoot
+       createDirectoryIfMissing True outRefFileRoot
        txtFiles <- listDirectory bookDir `catchError` \_ -> do
                                       liftIO $ putStrLn (concat [bookDir, " does not exist."])
                                       return []
 
-       bracket (openFile outFile WriteMode) hClose $ \outh -> do
+       bracket (do
+                  h1 <- openFile outFile WriteMode
+                  h2 <- openFile outRefFile WriteMode
+                  return (h1, h2))
+                (\(h1, h2) -> do
+                   hClose h1
+                   hClose h2) $ \(outh, outRefh) -> do
 
          TIO.hPutStrLn outh "CREATE"
-         TIO.hPutStrLn outh [qc|  ({bookName}:{lang}:{dialect}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', num: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
+         TIO.hPutStrLn outh [qc| ({bookName}:{lang}:{dialect}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', num: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
                              |]
 
          -- a file == a chapter
@@ -154,20 +167,28 @@ generateInitCypher bookFile path outPath = do
            ch@Chapeter{..} <- readChapter (bookDir </> file)
 
            let chName = concat [T.unpack bookName, del, "ch", show chapter'number]
-               chNode = [qc|  ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}', num: {chapter'number} }),|]
-               chRel  = [qc|  ({bookName})-[:HAS_CH \{num: {chapter'number}}]->({chName}),|]
+               chNode = [qc| ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}', num: {chapter'number} }),|]
+               chRel  = [qc| ({bookName})-[:HAS_CH \{num: {chapter'number}}]->({chName}),|]
 
            TIO.hPutStrLn outh chNode
            TIO.hPutStrLn outh chRel
 
+           unless (T.null $ T.strip chapter'ref) $ do
+               let chRefRel  = [qc| ({chName})-[:REF_TO]->({chapter'ref}),|]
+               TIO.hPutStrLn outRefh chRefRel
+
            -- Sections
            forM_ chapter'sections $ \Section{..} -> do
              let secName = concat [chName, del, "sec", show section'number ]
-                 secNode = [qc|  ({secName}:Section \{title: '{section'title}', num: {section'number}}),|]
-                 secRel  = [qc|  ({chName})-[:HAS_SEC \{num: {section'number}} ]->({secName}),|]
+                 secNode = [qc| ({secName}:Section \{title: '{section'title}', num: {section'number}}),|]
+                 secRel  = [qc| ({chName})-[:HAS_SEC \{num: {section'number}} ]->({secName}),|]
 
              TIO.hPutStrLn outh secNode
              TIO.hPutStrLn outh secRel
+
+             unless (T.null $ T.strip section'ref) $ do
+                 let secRefRel  = [qc|  ({secName})-[:REF_TO]->({section'ref}),|]
+                 TIO.hPutStrLn outRefh secRefRel
 
               -- Paragraphs
              forM_ section'paragraphs $ \Paragraph{..} -> do
