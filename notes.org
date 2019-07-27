@@ -1,0 +1,11 @@
+* Neo4j
+
+** Bulk Insert
+*** CSV import
+    https://medium.com/neo4j/5-tips-tricks-for-fast-batched-updates-of-graph-structures-with-neo4j-and-cypher-73c7f693c8cc
+    https://gist.github.com/jexp/d788e117129c3730a042
+    https://www.youtube.com/watch?v=aWqQNDi7p9I
+
+
+** Example of inport
+   - https://learnmeabitcoin.com/neo4j/how/

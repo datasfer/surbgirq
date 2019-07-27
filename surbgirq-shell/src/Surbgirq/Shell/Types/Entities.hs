@@ -13,6 +13,8 @@ module Surbgirq.Shell.Types.Entities (
  , BookRef(..)
  , VerseRef(..)
  , RefType(..)
+ , RefTo(..)
+ , Ref(..)
  ) where
 
 import Data.Aeson (Value)
@@ -25,8 +27,17 @@ import Surbgirq.Types.Girq
 --
 
 
+
+data RefTo = YouTube Text
+           | ScriptureSource Text
+           | Meknutyun Text
+             deriving (Show, Read)
+
+
+
 data RefType = RefBooks   [Text]
-             | RefChapter Text
+             | RefChapter Int
+             | RefSection Int Int
              | RefVerse   Text
              | RefWord    Text
              | RefText    Text
@@ -46,6 +57,8 @@ data Book = Book
   , book'ref         :: Maybe Text
   , book'input       :: Maybe Text
     -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
+  , book'inputRef    :: Maybe Text
+  -- ^ the ref file
   , book'output      :: Maybe Text
   -- ^ the path to store processed result
   } deriving (Show)
@@ -93,17 +106,18 @@ data VerseRef = VerseRef
     } deriving (Show, Read)
 
 
-data BookRef =  BookRef
-    {
-      bookRef'book :: Book
-    , bookRef'ref  :: RefType
-    }
+data BookRef =  BookRef {  bookRef'ref  :: [Ref] }
+                deriving (Show, Read)
 
 data Scripture = Scripture
     { scripture'book     :: Book
     , scripture'chapters :: [Chapter]
     } deriving (Show)
 
+data Ref = Ref
+    { ref'From :: RefType
+    , ref'To   :: [RefTo]
+    } deriving (Show, Read)
 
 
 $(deriveJSON dropPrefixOptions ''Book)
@@ -116,6 +130,8 @@ $(deriveJSON dropPrefixOptions ''RefType)
 $(deriveJSON dropPrefixOptions ''VerseRef)
 $(deriveJSON dropPrefixOptions ''BookRef)
 $(deriveJSON dropPrefixOptions ''Ban)
+$(deriveJSON dropPrefixOptions ''Ref)
+$(deriveJSON dropPrefixOptions ''RefTo)
 
 
 

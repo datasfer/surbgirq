@@ -140,6 +140,17 @@ generateInitCypher bookFile path outPath = do
          lang = show book'language
          dialect = show book'dialect
 
+
+
+    -- TODO: process ref file for each book
+         -- ref file fo the book
+         kk = maybe "" (path </>) (T.unpack <$> book'inputRef)
+         inRefFile =  kk
+
+     unless (null kk) $ do
+       refs :: [Ref] <- readYaml inRefFile
+       print refs
+
      exists <- doesDirectoryExist bookDir
      -- check if books input directory exists
      when exists $ do
