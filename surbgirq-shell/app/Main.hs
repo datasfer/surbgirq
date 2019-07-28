@@ -18,6 +18,7 @@ import qualified Data.Text               as T
 import qualified Data.Text.Encoding      as TE
 import qualified Data.Text.IO            as TIO
 import qualified Data.Text.Lazy          as TL
+import qualified Data.Text.Lazy.Builder  as TB
 import           Data.Text.Lazy.Encoding as TLE
 
 import Options.Applicative
@@ -68,6 +69,7 @@ main = do
                Bible -> do
                  TIO.putStrLn "Start genererating Bible scriptures for neo4j input..."
                  generateInitCypher cmd'config cmd'inPath cmd'outPath --  "./data/yaml" "./data/cypher"
+                 generateRefCypher  cmd'config cmd'inPath cmd'outPath
                  TIO.putStrLn "Bible scriptures generation success!"
                Narek -> do
                  TIO.putStrLn "Narek scriptures generation not ready yet!"
@@ -113,6 +115,40 @@ instance NodeName Book where
     node _ = "Book"
 
 
+generateRefCypher :: FilePath -> FilePath -> FilePath -> IO ()
+generateRefCypher bookFile path outPath = do
+   books :: [Book] <- readYaml bookFile
+
+   forM_ books $ \Book{..} -> do
+     -- ref file fo the book
+     let inRefFile = maybe "" (path </>) (T.unpack <$> book'inputRef)
+         inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
+         outCypherFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
+         bookLabel = maybe (show book'book) ((show book'book) ++)  (T.unpack <$> book'labels)
+
+         -- ref file
+         outRefFileRoot = outCypherFileRoot </> "refs"
+         outRefFile = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}-ref.cypher|]
+
+         bookMatch = concat [show book'language, ":", show book'dialect, ":", bookLabel, ":", "Book" ]
+
+     unless (null inRefFile) $ do
+       refs :: [Ref] <- readYaml inRefFile
+       bracket (openFile outRefFile WriteMode) hClose $ \refh -> do
+         forM_  refs $ \(Ref from  rs) -> do
+             let matchFrom = case from of
+                               RefChapter n -> [qc|match (b:{bookMatch})-[:HAS_CH \{num: {n}}]->(from:Chapter) |]
+                               RefSection n m -> [qc|match (b:{bookMatch})-[:HAS_CH \{num: {n}}]-()-[*]->(from:Section: \{num: {m}}) |]
+             TIO.hPutStrLn refh matchFrom
+
+             forM_  rs $ \ r -> do
+               case r of
+                 YouTube url author title desc ->   do
+                                  TIO.hPutStrLn refh [qc|  merge (yt:YouTube \{url: '{url}', author: '{author}', title: '{title}', desc: '{desc}'})|]
+                                  TIO.hPutStrLn refh [qc|  create (from)-[:YOUTUBE_REF \{author: '{author}'} ]->(yt)|]
+                 ScriptureBible ref ->  TIO.hPutStrLn refh [qc|  merge (from)-[]->()|]
+             TIO.hPutStrLn refh ";"
+
 
 generateInitCypher :: FilePath -> FilePath -> FilePath -> IO ()
 generateInitCypher bookFile path outPath = do
@@ -149,7 +185,7 @@ generateInitCypher bookFile path outPath = do
 
      unless (null kk) $ do
        refs :: [Ref] <- readYaml inRefFile
-       print refs
+       forM_ refs $ \r -> print $ createRef r
 
      exists <- doesDirectoryExist bookDir
      -- check if books input directory exists
@@ -281,3 +317,25 @@ generateInitCypher bookFile path outPath = do
 
 
 
+createRef :: Ref -> TB.Builder
+createRef (Ref from  rs) =
+   let matchFrom = case from of
+                 RefChapter n -> [qc|match (b:Grabar:Book) -[:HAS_CH \{num: {n}}]->(from:Chapter) |]
+                 RefSection n m -> [qc|match (b:Book)-[:HAS_CH \{num: {n}}]-()-[*]->(from:Section: \{num: {m}}) |]
+
+       xs = map (\r ->
+            case r of
+              YouTube url _ _ _        ->  [qc| merge (yt:YouTube \{url: {url}}|]  <> (TB.fromText $ T.pack $ show '\n') <> [qc| create (from) -[:YOUTUBE_REF]->(yt)|]
+              ScriptureBible ref ->  [qc| {ref}|]
+                ) rs
+   in foldl (<>) matchFrom  xs
+
+
+
+     -- data RefType = RefBooks   [Text]
+     --         | RefChapter Int
+     --         | RefSection Int Int
+     --         | RefVerse   Text
+     --         | RefWord    Text
+     --         | RefText    Text
+     --           deriving (Show, Read)

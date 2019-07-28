@@ -27,10 +27,14 @@ import Surbgirq.Types.Girq
 --
 
 
+type YtUrl         = Text
+type YtAuthor      = Text
+type YtTitle       = Text
+type YtDesc        = Text
 
-data RefTo = YouTube Text
-           | ScriptureSource Text
-           | Meknutyun Text
+data RefTo = YouTube YtUrl YtAuthor YtTitle YtDesc
+           | ScriptureBible Text
+           | ScriptureMeknutyun Text
              deriving (Show, Read)
 
 

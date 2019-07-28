@@ -48,50 +48,49 @@ wordFormsCypher wordFormFile outPath = do
 
     bracket (openFile outFile WriteMode) hClose $ \outh -> do
 
-      TIO.hPutStrLn outh "CREATE"
-
       forM_ (sortBy (comparing armat) ws) $ \WordForm{..} -> do
-        hashMap <- readIORef hashMapRef
+          hashMap <- readIORef hashMapRef
 
-        armatName <- case HMap.lookup armat hashMap  of
-          Just name -> do
-              -- this need to get the var for cypher file, this is in case if we seperated cypher files
-              mode <- readIORef subRef
-              when (mode == 0) $  do
-                         let hw = [qc|MERGE ({name}:HeadWord \{word: '{armat}' }); |]
-                         TIO.hPutStrLn outh hw
+          armatName <- case HMap.lookup armat hashMap  of
+            Just name -> do
+                -- this need to get the var for cypher file, this is in case if we seperated cypher files
+                mode <- readIORef subRef
+                when (mode == 0) $  do
+                           let hw = [qc|MERGE ({name}:HeadWord \{word: '{armat}' }) |]
+                           TIO.hPutStrLn outh hw
 
-              return name
-          Nothing -> do
-            modifyIORef ref (+1)
-            writeIORef subRef 0
+                return name
+            Nothing -> do
+              modifyIORef ref (+1)
+              writeIORef subRef 0
 
-            suf <- readIORef ref
-            let v = [qc|hw_{suf}|]
-                m = HMap.insert armat v hashMap
-            writeIORef hashMapRef m
+              suf <- readIORef ref
+              let v = [qc|hw_{suf}|]
+                  m = HMap.insert armat v hashMap
+              writeIORef hashMapRef m
 
-            -- add headWord only for fiurst accurance
-            let headWordNode = [qc| ({v}:HeadWord \{word: '{armat}' }), |]
-            TIO.hPutStrLn outh headWordNode
+              -- add headWord only for fiurst accurance
+              let headWordNode = [qc|CREATE ({v}:HeadWord \{word: '{armat}' }) |]
+              TIO.hPutStrLn outh headWordNode
 
-            return v
+              return v
 
 
-        suffix <- readIORef ref
-        subSuffix <- readIORef subRef
+          suffix <- readIORef ref
+          subSuffix <- readIORef subRef
 
-        -- if prop. then add label NAME or
-        let formWordName = T.pack $ concat ["wf_", show suffix, "_",  show subSuffix ]
-            formWordNode = [qc| ({formWordName}:WordForm \{word: '{form}' }), |]
+          -- if prop. then add label NAME or
+          let formWordName = T.pack $ concat ["wf_", show suffix, "_",  show subSuffix ]
+              formWordNode = [qc|CREATE ({formWordName}:WordForm \{word: '{form}' })|]
 
-            formWordRel  = [qc| ({armatName})-[:HAS_WORDFORM \{form: '{tags}' }]->({formWordName}),|]
+              formWordRel  = [qc|CREATE ({armatName})-[:HAS_WORDFORM \{form: '{tags}' }]->({formWordName})|]
 
-        modifyIORef subRef (+1)
+          modifyIORef subRef (+1)
 
-        TIO.hPutStrLn outh formWordNode
-        TIO.hPutStrLn outh formWordRel
+          TIO.hPutStrLn outh formWordNode
+          TIO.hPutStrLn outh formWordRel
 
+      TIO.hPutStrLn outh ";"
 
 
 
