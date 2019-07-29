@@ -7,6 +7,7 @@
 module Surbgirq.Shell.Store.Neo4j where
 
 import Data.IORef
+import Database.Selda
 import System.Directory
 import System.FilePath
 import System.IO
@@ -15,6 +16,7 @@ import Text.Printf
 import Control.Exception             (bracket)
 import Control.Monad                 (forM_, when)
 import Data.List                     (sortBy, splitAt)
+import Data.Maybe                    (isNothing)
 import Data.Ord                      (comparing)
 import Data.Text                     (Text)
 import System.FilePath               (FilePath)
@@ -91,6 +93,63 @@ wordFormsCypher wordFormFile outPath = do
           TIO.hPutStrLn outh formWordRel
 
       TIO.hPutStrLn outh ";"
+
+
+
+
+
+-- |
+-- generate csv file to
+wordFormsCSV :: FilePath -> FilePath -> IO ()
+wordFormsCSV wordFormFile outPath = do
+
+  wordForms <- parseWordFormFile wordFormFile
+
+  hashMapRef <- newIORef (HMap.empty :: HMap.HashMap Text Int)
+  armatRef <- newIORef (0 :: Int)
+  formRef <- newIORef (0 :: Int)
+
+  let outFileArmat = outPath </> "armat.csv"
+      outFileForms = outPath </> "form.csv"
+      outFileRel     = outPath </> "armatFormRel.csv"
+
+  bracket (do
+            h1 <- openFile outFileArmat WriteMode
+            h2 <- openFile outFileForms WriteMode
+            h3 <- openFile outFileRel WriteMode
+            return (h1, h2, h3))
+           (\(h1, h2, h3) -> do
+              hClose h1
+              hClose h2
+              hClose h3) $ \(outArmath, outFormh, outRelh) -> do
+
+      forM_ (sortBy (comparing armat) wordForms) $ \WordForm{..} -> do
+          hashMap <- readIORef hashMapRef
+          modifyIORef formRef (+1)
+          form_ID <- readIORef formRef
+
+
+          let formLine = [qc|{form_ID}, {form}, {armat}, {tags} |]
+          TIO.hPutStrLn outFormh formLine
+
+          let armatExists = HMap.lookup armat hashMap
+          when (isNothing armatExists) $ do
+              modifyIORef armatRef (+1)
+              headID <- readIORef armatRef
+
+              let m = HMap.insert armat headID hashMap
+              writeIORef hashMapRef m
+
+              -- add headWord only for fiurst accurance
+              let headWordLine = [qc|{headID}, {armat} |]
+              TIO.hPutStrLn outArmath headWordLine
+
+
+          -- add relationship
+          aID <- readIORef armatRef
+          let armatRel = [qc|{aID}, {form_ID} |]
+          TIO.hPutStrLn outRelh armatRel
+
 
 
 

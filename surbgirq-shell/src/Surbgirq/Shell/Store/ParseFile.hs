@@ -2,6 +2,7 @@
 
 module Surbgirq.Shell.Store.ParseFile where
 
+import Database.Selda
 import System.IO
 
 import Control.Exception (bracket)
@@ -27,7 +28,7 @@ parseLemmaFile file = do
     lineToEntity line =
         let ws = T.words (T.strip line)
         in  case ws of
-              (w1:w2) -> Just $ EngLemma w1 (T.unwords w2)
+              (w1:w2) -> Just $ EngLemma def w1 (T.unwords w2)
               _       -> Nothing
 
 
@@ -43,6 +44,6 @@ parseWordFormFile file = do
     lineToEntity line =
         let ws = T.words (T.strip line)
         in  case ws of
-              (w1:w2:w3) -> Just $ WordForm w1 w2 (T.unwords w3)
+              (w1:w2:w3) -> Just $ WordForm def w1 w2 (T.unwords w3)
               _          -> Nothing
 
