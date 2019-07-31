@@ -24,6 +24,7 @@ library
                    Surbgirq.Shell.Store.SQLite.Selda
                    Surbgirq.Shell.Store.ParseFile
                    Surbgirq.Shell.Store.Neo4j
+                   Surbgirq.Shell.CSV.Generate
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Entities
                  Surbgirq.Shell.Store.Types
@@ -39,6 +40,7 @@ library
                , selda
                , selda-sqlite
                , filepath
+               , mtl
                , containers
                , unordered-containers
   default-language: Haskell2010

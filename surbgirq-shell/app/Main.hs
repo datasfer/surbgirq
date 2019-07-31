@@ -33,6 +33,7 @@ import System.FilePath
 
 import Common.Yaml
 import Surbgirq.Shell.Commands
+import Surbgirq.Shell.CSV.Generate
 import Surbgirq.Shell.Store.Neo4j
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
@@ -74,8 +75,8 @@ main = do
                Narek -> do
                  TIO.putStrLn "Narek scriptures generation not ready yet!"
                  -- wordFormsCypher "./data/txt/wordForms.txt" "./data/cypher/words"
-                 wordFormsCSV "./data/txt/wordForms.txt" "./data/csv/words"
-
+                 -- wordFormsCSV "./data/txt/wordForms.txt" "./data/csv/words"
+                 generateVerseCsv cmd'config cmd'inPath cmd'outPath
 
 readBooks :: FilePath -> IO [Book]
 readBooks file = do
