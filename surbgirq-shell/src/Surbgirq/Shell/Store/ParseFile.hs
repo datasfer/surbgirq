@@ -44,6 +44,7 @@ parseWordFormFile file = do
     lineToEntity line =
         let ws = T.words (T.strip line)
         in  case ws of
-              (w1:w2:w3) -> Just $ WordForm def w1 w2 (T.unwords w3)
-              _          -> Nothing
+              [w1,w2,w3]    -> Just $ WordForm def w1 w2 w3
+              [w1,w2,w3,w4] -> Just $ WordForm def w1 (w2 <> w3) w4
+              _             -> Nothing
 

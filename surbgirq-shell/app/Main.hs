@@ -241,8 +241,8 @@ generateInitCypher bookFile path outPath = do
               -- Paragraphs
              forM_ section'paragraphs $ \Paragraph{..} -> do
                let prghName = concat [secName, del, "prgh", show paragraph'number]
-                   prghNode = [qc|  ({prghName}:Paragraph \{num: {paragraph'number}}),|]
-                   prghRel  = [qc|  ({secName})-[:HAS_PRGH \{num: {paragraph'number}} ]->({prghName}),|]
+                   prghNode = [qc| ({prghName}:Paragraph \{num: {paragraph'number}}),|]
+                   prghRel  = [qc| ({secName})-[:HAS_PRGH \{num: {paragraph'number}} ]->({prghName}),|]
 
                TIO.hPutStrLn outh prghNode
                TIO.hPutStrLn outh prghRel
@@ -250,8 +250,8 @@ generateInitCypher bookFile path outPath = do
                -- Verses
                forM_ paragraph'verses $ \v@Verse{..} -> do
                  let verseName = concat [prghName , del, "verse", show verse'verse]
-                     verseNode = [qc|  ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', num: {verse'verse}, section: {section'number}, section_title: '{section'title}', paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
-                     verseRel  = [qc|  ({prghName})-[:HAS_VERSE \{num: {verse'verse}}]->({verseName}),|]
+                     verseNode = [qc| ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', num: {verse'verse}, section: {section'number}, section_title: '{section'title}', paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
+                     verseRel  = [qc| ({prghName})-[:HAS_VERSE \{num: {verse'verse}}]->({verseName}),|]
                  TIO.hPutStrLn outh verseNode
                  TIO.hPutStrLn outh verseRel
 
@@ -265,11 +265,11 @@ generateInitCypher bookFile path outPath = do
                        wordNodeLabels = if isLower $ T.head word
                                         then concat [lang, ":", dialect, ":", "Word"]
                                         else concat [lang, ":", dialect, ":", "Capitalized", ":", "Word"]
-                       wordNode = [qc|  ({wordName}:{wordNodeLabels} \{word: '{word}', index: {index}}),|]
+                       wordNode = [qc| ({wordName}:{wordNodeLabels} \{word: '{word}', index: {index}}),|]
 
                        wordRel  = if index == 1
-                                  then [qc|  ({verseName})-[:FIRST_WORD]->({wordName}), ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
-                                  else [qc|  ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
+                                  then [qc| ({verseName})-[:FIRST_WORD]->({wordName}), ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
+                                  else [qc| ({verseName})-[:HAS_WORD \{num: {index}}]->({wordName}),|]
 
                        -- relArmat = [qc| (match (wf:WordForm \{word: '{word}'})<-[:HAS_WORDFORM]-(wh:WordHead)),
                        --                (Create ({wordName})-[:HAS_ARMAT]->(wh)), |]
@@ -282,7 +282,7 @@ generateInitCypher bookFile path outPath = do
                  forM_ (zip (zip ws (tail' ws)) [1..] ) $ \((w1, w2), index) -> do
                    let w1Name = concat [verseName, del, "word", show index]
                        w2Name = concat [verseName, del, "word", show $ index + 1]
-                       nextRel = [qc|  ({w1Name})-[:NEXT]->({w2Name}),|]
+                       nextRel = [qc| ({w1Name})-[:NEXT]->({w2Name}),|]
 
 
 
@@ -297,8 +297,8 @@ generateInitCypher bookFile path outPath = do
                        RefText txt -> do
                          let wordN = concat [verseName, del, "word", show verseRef'index]
                              footnoteName = concat [wordN, del, "footnote", show verseRef'index]
-                             footnoteNode = [qc|  ({footnoteName}:Footnote \{text: '{txt}', index: {verseRef'index}}),|]
-                             footnoteRel  = [qc|  ({wordN})-[:REF_FOOTNOTE]->({footnoteName}),|]
+                             footnoteNode = [qc| ({footnoteName}:Footnote \{text: '{txt}', index: {verseRef'index}}),|]
+                             footnoteRel  = [qc| ({wordN})-[:REF_FOOTNOTE]->({footnoteName}),|]
                          TIO.hPutStrLn outh footnoteNode
                          TIO.hPutStrLn outh footnoteRel
                        _ -> return ()

@@ -112,7 +112,7 @@ wordFormsCSV wordFormFile outPath = do
   let outFileArmat = outPath </> "armat.csv"
       outFileForms = outPath </> "form.csv"
       outFileRel     = outPath </> "armatFormRel.csv"
-
+      del = ';'
   bracket (do
             h1 <- openFile outFileArmat WriteMode
             h2 <- openFile outFileForms WriteMode
@@ -129,7 +129,7 @@ wordFormsCSV wordFormFile outPath = do
           form_ID <- readIORef formRef
 
 
-          let formLine = [qc|{form_ID}, {form}, {armat}, {tags} |]
+          let formLine = [qc|{form_ID}{del} {form}{del} {armat}{del} {tags} |]
           TIO.hPutStrLn outFormh formLine
 
           let armatExists = HMap.lookup armat hashMap
@@ -141,13 +141,13 @@ wordFormsCSV wordFormFile outPath = do
               writeIORef hashMapRef m
 
               -- add headWord only for fiurst accurance
-              let headWordLine = [qc|{headID}, {armat} |]
+              let headWordLine = [qc|{headID}{del} {armat} |]
               TIO.hPutStrLn outArmath headWordLine
 
 
           -- add relationship
           aID <- readIORef armatRef
-          let armatRel = [qc|{aID}, {form_ID} |]
+          let armatRel = [qc|{aID}{del} {form_ID} |]
           TIO.hPutStrLn outRelh armatRel
 
 
