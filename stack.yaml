@@ -23,6 +23,8 @@ extra-deps:
   - servant-swagger-ui-jensoleg-0.3.2
   - tasty-hedgehog-1.0.0.1
   - hedgehog-1.0
+  - scalpel-0.6.0
+  - scalpel-core-0.6.0
 nix:
   enable: true
 #  shell-file: shell.nix
@@ -33,3 +35,4 @@ nix:
     - autoreconfHook
     - lzma
     - haskellPackages.happy
+    - curl

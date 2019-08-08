@@ -24,6 +24,7 @@ library
                    Surbgirq.Shell.Store.SQLite.Selda
                    Surbgirq.Shell.Store.ParseFile
                    Surbgirq.Shell.Store.Neo4j
+                   Surbgirq.Shell.Scraper.Scalpel
                    Surbgirq.Shell.CSV.Generate
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Entities
@@ -43,6 +44,8 @@ library
                , mtl
                , containers
                , unordered-containers
+               , scalpel >= 0.6.0
+               , split
   default-language: Haskell2010
 
 executable surbgirq-shell
@@ -62,6 +65,25 @@ executable surbgirq-shell
                , filepath
                , mtl
   default-language: Haskell2010
+
+executable surbgirq-scraper
+  main-is: Scraper.hs
+  other-modules: Paths_surbgirq_shell
+  hs-source-dirs: app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-shell
+               , surbgirq-types
+               , common
+               , text
+               , aeson
+               , optparse-applicative
+               , directory
+               , interpolatedstring-perl6
+               , filepath
+               , mtl
+  default-language: Haskell2010
+
 
 
 executable surbgirq-sqlite
