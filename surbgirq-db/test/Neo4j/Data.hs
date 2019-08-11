@@ -28,5 +28,5 @@ testBooks  = do
   pipe <- connect config
   result <- run pipe queryBooks
   -- assertEqual ("Get Books ") ([]) result
-  asstasertBool "Books exists" (not $ null result )
+  assertBool "Books exists" (not $ null result )
   return ()

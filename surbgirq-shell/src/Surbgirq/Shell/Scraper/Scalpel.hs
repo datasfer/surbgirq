@@ -9,6 +9,7 @@ import           Control.Applicative
 import           Data.List
 import           Data.List.Split
 import qualified Data.Text           as T
+import qualified Data.Text.Encoding  as TE
 import qualified Data.Text.IO        as TIO
 import           System.IO
 import           Text.HTML.Scalpel
@@ -16,7 +17,7 @@ import           Text.HTML.Scalpel
 
 htmlData :: String
 htmlData = "<section id='examples'>\
-           \<h2 id='toc_marker-2-1' class='heading2'>ԱՒԵՏԱՐԱՆ ԸՍՏ ՄԱՏԹԷՈՍԻ </h2>\
+           \<h2 id='toc_marker-2-1' class='heading2'>Title1 </h2>\
            \<h3 class='heading3'>1</h3>\
            \<h4 class='heading4'>ՎԵՐՆԱԳԻՐ </h4>\
            \<p class='Body-Text'>verse 1-1</p>\
@@ -32,7 +33,8 @@ htmlData = "<section id='examples'>\
 
 data Item
     = BookTitle String
-    | Section Int String
+    | SectionTitle String
+    | SectionNum String
     | VerseLine String
     deriving (Show, Eq)
 
@@ -44,12 +46,27 @@ items :: Scraper String [Item]
 items = chroots ("section" @: ["id" @= "examples"]) item
 
 item :: Scraper String Item
-item = bookTitle
+item = bookTitle <|> chNum <|> secTitle <|> verse1 -- (VerseLine <$> parseVerse)
 
 bookTitle :: Scraper String Item
 bookTitle = do
   title <- text $ "h2" @: [hasClass "heading2"]
   return $ BookTitle title
+
+chNum :: Scraper String Item
+chNum = do
+  num <- text $ "h3" @: [hasClass "heading3"]
+  return $ SectionNum num
+
+secTitle :: Scraper String Item
+secTitle = do
+  title <- text $ "h4" @: [hasClass "heading4"]
+  return $ SectionTitle title
+
+verse1 :: Scraper String Item
+verse1 = do
+  title <- text $ "p"
+  return $ VerseLine title
 
 sections :: Scraper String [(String, [[String]])]
 sections = do
@@ -87,14 +104,8 @@ allSections url = scrapeURL url (sections <|> sections1)
 
 
 
-test1 :: String -> IO () -- Maybe [String])
-test1 url = do
-  hSetEncoding stdout utf8
-
-  ts <- scrapeURL url parse
-  case ts of
-    Nothing   -> TIO.putStrLn "Գիրք ծննդեան"
-    Just [xs] -> mapM_ (TIO.putStrLn) xs
+test1 :: String -> IO (Maybe [[T.Text]])
+test1 url = scrapeURL url parse
     where
   parse = chroots ("section" @: ["id" @= "examples"]) $ do
             a <- chroots ("div" // "p") $ do

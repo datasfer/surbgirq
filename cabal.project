@@ -4,5 +4,6 @@ packages:
   surbgirq-api
   surbgirq-shell
   surbgirq-db
+  surbgirq-bot
   common
   surbgirq

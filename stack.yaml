@@ -6,6 +6,7 @@ packages:
 - surbgirq-api
 - surbgirq-shell
 - surbgirq-db
+- surbgirq-bot
 - common
 - surbgirq
 
@@ -25,6 +26,8 @@ extra-deps:
   - hedgehog-1.0
   - scalpel-0.6.0
   - scalpel-core-0.6.0
+  - git: https://github.com/fizruk/telegram-bot-simple.git
+    commit: v0.2
 nix:
   enable: true
 #  shell-file: shell.nix
