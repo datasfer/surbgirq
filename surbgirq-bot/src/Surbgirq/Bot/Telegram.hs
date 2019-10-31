@@ -6,12 +6,12 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 
 import           Telegram.Bot.API
-import qualified Telegram.Bot.API                 as Telegram
+import qualified Telegram.Bot.API    as Telegram
 import           Telegram.Bot.Simple
-import           Telegram.Bot.Simple
-import           Telegram.Bot.Simple.Debug
-import           Telegram.Bot.Simple.UpdateParser (updateMessageText)
-import           Telegram.Bot.Simple.UpdateParser
+-- import           Telegram.Bot.Simple
+-- import           Telegram.Bot.Simple.Debug
+-- import           Telegram.Bot.Simple.UpdateParser (updateMessageText)
+import Telegram.Bot.Simple.UpdateParser
 
 
 
@@ -34,7 +34,7 @@ updateToAction :: Update -> Model -> Maybe Action
 updateToAction update _ =
   case updateMessageText update of
     Just ("/start") -> Just Start
-    Just text       -> Just (Echo text)
+    Just txt        -> Just (Echo txt)
     Nothing         -> Nothing
 
 handleAction :: Action -> Model -> Eff Action Model
