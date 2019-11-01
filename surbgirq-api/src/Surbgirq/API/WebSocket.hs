@@ -23,6 +23,4 @@ import Servant.API.WebSocket (WebSocket)
 type NotifyDailyReadEndpoint = "channels" :> "notify-dailty-read" :> WebSocket
 
 
-type SurbgirqWebSocketAPI = "girq" :> (
-        NotifyDailyReadEndpoint
-  )
+type SurbgirqWebSocketAPI = "girq" :> NotifyDailyReadEndpoint

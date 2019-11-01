@@ -1,6 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
-
 {-|
 Module      : Surbgirq.API.Instances
 Description : Instances for http url

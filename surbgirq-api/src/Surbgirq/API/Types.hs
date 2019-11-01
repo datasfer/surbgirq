@@ -25,7 +25,7 @@ import Surbgirq.Types
 --
 ------------------------------------------------------------
 
-data GetApiInfoResponse = GetApiInfoResponse
+newtype GetApiInfoResponse = GetApiInfoResponse
   { apiInfoResponse'apiInfo   :: ApiInfo
   } deriving (Show, Generic)
 
