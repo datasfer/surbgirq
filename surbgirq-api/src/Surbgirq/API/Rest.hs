@@ -2,8 +2,18 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 
+{-|
+Module      : Surbgirq.API.Rest
+Description : REST API endpoints
 
-module Surbgirq.API.Rest where
+Web API Endpoints generic definition as ADT
+-}
+
+module Surbgirq.API.Rest (
+   MetaAPI(..)
+ , BookAPI(..)
+ , ScriptureAPI(..)
+  ) where
 
 import Data.Int     (Int64)
 import Data.Text    (Text)

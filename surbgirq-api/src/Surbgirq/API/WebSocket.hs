@@ -1,19 +1,28 @@
-{-# LANGUAGE DataKinds   #-}
-{-# LANGUAGE TypeOperators   #-}
+{-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE TypeOperators #-}
 
-module Surbgirq.API.WebSocket where
+{-|
+Module      : Surbgirq.API.WebSocket
+Description : Web socket endpoints
+
+Web socket endpoint strucutre, at this moment not used
+-}
+
+module Surbgirq.API.WebSocket (
+   SurbgirqWebSocketAPI(..)
+    )where
 
 import Servant.API
 import Servant.API.WebSocket (WebSocket)
 
 ------------------------------------------------------------
--- Bex web sockets endpoints
+-- Surbgirq web sockets endpoints
 ------------------------------------------------------------
 
 
-type NotifyNewBlockWsEndpoint = "channels" :> "notify-new" :> WebSocket
+type NotifyDailyReadEndpoint = "channels" :> "notify-dailty-read" :> WebSocket
 
 
-type BexWebSocketAPI = "block" :> (
-        NotifyNewBlockWsEndpoint
+type SurbgirqWebSocketAPI = "girq" :> (
+        NotifyDailyReadEndpoint
   )

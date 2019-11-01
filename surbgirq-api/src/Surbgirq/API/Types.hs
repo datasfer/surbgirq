@@ -1,7 +1,16 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Surbgirq.API.Types where
+{-|
+Module      : Surbgirq.API.Types
+Description : REST API types
+
+Types to wrap REST API request/response
+-}
+
+module Surbgirq.API.Types (
+  GetApiInfoResponse(..)
+ ) where
 
 import Data.Default
 

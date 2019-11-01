@@ -1,3 +1,13 @@
+
+{-|
+Module      : Surbgirq.API
+Description : REST API Endpoints types and definition
+
+REST API Endpoints generic definition as ADT.
+
+The types to wrap request and response of web api.
+-}
+
 module Surbgirq.API(
   module X
 ) where

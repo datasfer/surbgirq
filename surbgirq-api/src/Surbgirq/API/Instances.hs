@@ -1,8 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
+{-|
+Module      : Surbgirq.API.Instances
+Description : Instances for http url
 
-module Surbgirq.API.Instances where
+Instances for parse and convert to url
+-}
+
+module Surbgirq.API.Instances() where
 
 import Data.Bifunctor
 import Text.Read
@@ -47,12 +53,13 @@ instance FromHttpApiData VerseNum where
   {-# INLINE parseUrlPiece #-}
 
 
--- | will parse matthew as well
+-- | Make first letter upper case
+-- will parse matthew as well
 capitalized :: String -> String
-capitalized (head:tail) = toUpper head : tail
 capitalized []          = []
+capitalized (head:tail) = toUpper head : tail
 
-
+-- | Make first letter lower case
 lowerized :: String -> String
-lowerized (head:tail) = toLower head : tail
 lowerized []          = []
+lowerized (head:tail) = toLower head : tail
