@@ -1,6 +1,13 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
+{-|
+Module      : Surbgirq.Back.App
+Description : Transform servant api to wai web applicaton
+
+Transform servant api to wai web applicaton
+-}
+
 module Surbgirq.Back.App (
    app
  , module Env

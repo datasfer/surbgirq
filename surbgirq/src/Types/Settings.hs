@@ -76,7 +76,7 @@ data LogSpec = LogSpec
 
 
 
--- | the block explorer front and thundermint node settings
+-- | Surbgirq settings
 data SurbgirqSettings = SurbgirqSettings
   { surbgirq'server :: !ServerSettings
   -- ^ the server front settings, port ...

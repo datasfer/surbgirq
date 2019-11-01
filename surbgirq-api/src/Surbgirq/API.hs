@@ -1,4 +1,3 @@
-
 {-|
 Module      : Surbgirq.API
 Description : REST API Endpoints types and definition

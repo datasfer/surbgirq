@@ -12,6 +12,15 @@
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE UndecidableInstances       #-}
+
+
+{-|
+Module      : Surbgirq.Back.Api
+Description : Servant API type definitions
+
+Convert REST API adt to servant api type
+-}
+
 module Surbgirq.Back.Api where
 
 
@@ -20,7 +29,6 @@ import Servant
 import Servant.API
 import Servant.API.Generic
 import Servant.Server
-
 import Servant.Swagger.UI
 
 import Data.Text    (Text)
@@ -29,18 +37,17 @@ import GHC.TypeLits (AppendSymbol, Symbol)
 
 import Surbgirq.API
 import Surbgirq.Back.App.Env
+
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
+
 #define SUMMARY(d) Summary d :>
 
 
-
--- type SurbgirqAPI = FullBexAPI -- SurbgirqRestAPI :<|> BexWebSocketAPI
-
 type SwaggerAPI = SwaggerSchemaUI "docs" "swagger.json"
 
-type SurbgirqAPI = "api" :> ("book" :> ToServantApi BookAPI :<|> "scripture" :> ToServantApi ScriptureAPI) -- :<|> "socket" :> ToServantApi BexSocketAPI
+type SurbgirqAPI = "api" :> ("book" :> ToServantApi BookAPI :<|> "scripture" :> ToServantApi ScriptureAPI)
 
 type SurbgirqAPISwagger = SwaggerAPI :<|> SurbgirqAPI
 

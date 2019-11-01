@@ -1,7 +1,9 @@
 # Surbgirq
 
+## Projects
 
+### surbgirq-api
 
-# Setup Telegram bot
+### surbgirq-bot
 
 1. Create the bot using botfather https://telegram.me/botfather

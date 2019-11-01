@@ -1,5 +1,13 @@
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
+{-|
+Module      : Surbgirq.Back.App.Env
+Description : Moand AppM
+
+Server Environment data type and AppM Monad
+-}
+
 module Surbgirq.Back.App.Env
     ( ServerEnv(..)
     , AppM(..)
@@ -8,12 +16,13 @@ module Surbgirq.Back.App.Env
 
 import Control.Monad.Logger
 import Control.Monad.Reader
+import Database.Bolt
+
+import Data.Pool (Pool, createPool)
+import Servant   (Handler)
 
 import qualified Database.SQLite.Simple as SQL
 
-import Data.Pool     (Pool, createPool)
-import Database.Bolt
-import Servant       (Handler)
 ------------------------------------------------------------
 --
 ------------------------------------------------------------

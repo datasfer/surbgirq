@@ -1,5 +1,12 @@
 {-# LANGUAGE TypeOperators #-}
 
+{-|
+Module      : Surbgirq.Back.Server
+Description : Endpoints handlers
+
+Construct endpoints handlers as  ADT
+-}
+
 module Surbgirq.Back.Server where
 
 import Servant.API
@@ -16,23 +23,6 @@ import Surbgirq.Back.Server.WebSocket
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
-
-{-
-server :: ServerT BexAPI AppM
-server =  ( getApiInfoHandler
-          :<|> getBooksHandler
-          :<|> getChapterHandler
-          :<|> getChapterSectionsHandler
-          :<|> getVerseHandler
-          :<|> getVerseFromToHandler
-          :<|> getVerseIntervalHandler
-          )
-          :<|> notifyNewBlock
-
--}
-
-
-
 
 surbgirqServer :: ServerT SurbgirqAPI AppM
 surbgirqServer = toServant bookServer :<|> toServant scriptureServer

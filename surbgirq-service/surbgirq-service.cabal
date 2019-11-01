@@ -26,7 +26,6 @@ library
 
                        Surbgirq.Back.App
                        Surbgirq.Back.App.Env
-                       Surbgirq.Back.App.Settings
 
                        Surbgirq.Back.Server
                        Surbgirq.Back.Server.Rest
