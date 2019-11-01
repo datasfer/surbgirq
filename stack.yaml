@@ -6,7 +6,7 @@ packages:
 - surbgirq-api
 - surbgirq-shell
 - surbgirq-db
-#- surbgirq-bot
+- surbgirq-bot
 - common
 - surbgirq
 
@@ -30,8 +30,8 @@ extra-deps:
   - binary-0.8.7.0
   - servant-websockets-2.0.0
   - text-1.2.4.0
-#  - git: https://github.com/fizruk/telegram-bot-simple.git
-#    commit: f56c45a3aaeaf3842406d3098de2aafa4251e97d
+  - git: git@github.com:ArthurVard/telegram-bot-simple.git # https://github.com/fizruk/telegram-bot-simple.git
+    commit: 7e109f2bb29652ee6387eb1a8b44fc5549537043
 nix:
   enable: true
 #  shell-file: shell.nix
