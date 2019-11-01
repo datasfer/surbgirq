@@ -54,7 +54,7 @@ scriptureServer =  ScriptureAPI
               { scriptureChapterEndpoint = scriptureChapter
               , scriptureChapterAllSectionsEndpoint = scriptureChapterAllSections
               , scriptureChapterSectionEndpoint = scriptureChapterSection
-              -- * Verses
+              -- Verses
               , scriptureChapterAllVersesEndpoint = scriptureChapterAllVerses
               , scriptureVerseEndpoint = scriptureVerse
               , scriptureVerseFromToEndpoint = scriptureVerseFromTo

@@ -46,7 +46,7 @@ generateVerseCsv :: FilePath -> FilePath -> FilePath -> IO ()
 generateVerseCsv bookFile path outPath = do
    let del = ';';
 
-   books :: [Book] <- readYaml bookFile -- $ path </> "books.yaml"
+   books :: [Book] <- readYaml bookFile -- path </> "books.yaml"
 
    -- Booksx
    forM_ books $ \Book{..} -> do

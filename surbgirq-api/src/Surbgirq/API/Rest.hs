@@ -81,7 +81,7 @@ data ScriptureAPI route = ScriptureAPI {
                                   :> Get '[JSON] [Section]
 
 
-    -- * Verses
+    -- | Verses endpoints
     , scriptureChapterAllVersesEndpoint :: route :- "chapter" :> "verses" :> Summary "Get all Verses of Chapter"
                                         :> Capture "girq" Girq
                                         :> Capture "ch" ChapterNum

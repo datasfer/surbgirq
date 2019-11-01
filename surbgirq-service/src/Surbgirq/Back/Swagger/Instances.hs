@@ -88,8 +88,7 @@ dropPunctuation = filter (not . isPunctuation)
 -- | Converts first symbol to lower case
 headToLower :: String -> String
 headToLower []           = []
-headToLower (x:xs@(y:_)) = (if (isLower y) then toLower else id) x : xs
-                           -- ^ So that HTTP remains as is
+headToLower (x:xs@(y:_)) = (if (isLower y) then toLower else id) x : xs -- So that HTTP remains as is
 headToLower (x:xs)       = toLower x : xs
 
 
