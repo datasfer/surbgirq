@@ -1,6 +1,13 @@
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+{-|
+Module      : Surbgirq.Back.Server.Rest.Scripture
+Description : Provide detail information about Scriptures
+
+Scriptures endpoints (Verse, Chapters, etc)
+-}
+
 module Surbgirq.Back.Server.Rest.Scripture(
    scriptureChapter
  , scriptureChapterAllSections
@@ -16,16 +23,14 @@ module Surbgirq.Back.Server.Rest.Scripture(
 import Control.Monad.Reader
 import Data.Time.Clock.POSIX
 
-import Control.Monad.Trans (lift, liftIO)
 -- import Control.Monad.Trans.Reader (ask)
-
-import Data.Maybe  (fromMaybe)
-import Data.Pool   (withResource)
-import Data.String (IsString(..))
-import Data.Text   (Text, pack, unpack)
-import Text.Read   (readMaybe)
-
-import GHC.Int (Int64)
+import Control.Monad.Trans (lift, liftIO)
+import Data.Maybe          (fromMaybe)
+import Data.Pool           (withResource)
+import Data.String         (IsString(..))
+import Data.Text           (Text, pack, unpack)
+import GHC.Int             (Int64)
+import Text.Read           (readMaybe)
 
 import Text.InterpolatedString.Perl6 (qc)
 
@@ -40,36 +45,43 @@ import Surbgirq.Back.App.Env
 import Surbgirq.Neo4j
 import Surbgirq.Types
 
------------------------------------------------------------------
---  Api info
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
+-- | execute a neo4j query
+-- get the neo4j pool resource from env and run neo4j query
 runQ :: BoltActionT IO a -> AppM a
 runQ act = do env <- ask
               liftIO $ withResource (env'pool env) (`run` act)
 
-
+-- | return the @chNum chapter of @girq book
 scriptureChapter :: Girq -> ChapterNum -> AppM [Chapter]
-scriptureChapter girq ch_num = runQ $ queryChapter girq ch_num
+scriptureChapter girq chNum = runQ $ queryChapter girq chNum
 
 
+-- | return all sections of @chNum chapter of @girq book
 scriptureChapterAllSections :: Girq -> ChapterNum -> AppM [Section]
-scriptureChapterAllSections girq ch_num = runQ $ queryAllSections girq ch_num
+scriptureChapterAllSections girq chNum = runQ $ queryAllSections girq chNum
 
+-- | return the @secNum section of @chNum chapter of @girq booka
 scriptureChapterSection :: Girq -> ChapterNum -> SectionNum -> AppM [Section]
-scriptureChapterSection girq ch_num sec_num = runQ $ querySection girq ch_num sec_num
+scriptureChapterSection girq chNum secNum = runQ $ querySection girq chNum secNum
 
-
+-- | return all verses of @chNum chapter of @girq book
 scriptureChapterAllVerses :: Girq -> ChapterNum -> AppM [Verse]
-scriptureChapterAllVerses girq ch_num = runQ $ queryAllVerses girq ch_num
+scriptureChapterAllVerses girq chNum = runQ $ queryAllVerses girq chNum
 
+-- | return the @verseNum verse of @chNum chapter of @girq booka
 scriptureVerse :: Girq -> ChapterNum -> VerseNum -> AppM [Verse]
-scriptureVerse g c v = runQ $ queryVerse g c v
+scriptureVerse girq chNum verseNum = runQ $ queryVerse girq chNum verseNum
 
+-- | return the verses from @vFrom verse to @vTo verse of @chNum chapter of @girq booka
 scriptureVerseFromTo :: Girq -> ChapterNum -> VerseNum -> VerseNum -> AppM [Verse]
-scriptureVerseFromTo g c v1 v2 = runQ $ queryVerseInterval g c v1 v2
+scriptureVerseFromTo girq chNum vFrom vTo = runQ $ queryVerseInterval girq chNum vFrom vTo
 
 
---
+-- | return verse(s) by ref text
 scriptureVerseByRefText :: Text -> AppM [Verse]
 scriptureVerseByRefText verseText =  do
   let vs = T.split (==' ') verseText
@@ -92,7 +104,7 @@ scriptureVerseByRefText verseText =  do
 
     _  -> error "invalid format for refText"
 
-
+-- | TODO: add proper comment
 scriptureVerseByRef :: Girq -> ChapterNum -> Text -> AppM [Verse]
 scriptureVerseByRef g c verseRange =  do
       let vs = T.split (=='-') verseRange

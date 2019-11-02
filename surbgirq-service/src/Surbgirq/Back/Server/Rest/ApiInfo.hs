@@ -1,6 +1,14 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
+
+{-|
+Module      : Surbgirq.Back.Server.Rest.ApiInfo
+Description : Api info handler
+
+Implement method to return the api information (version and etc.)
+-}
+
 module Surbgirq.Back.Server.Rest.ApiInfo(
  getApiInfoHandler
  ) where
@@ -21,11 +29,12 @@ import Surbgirq.Types
 --
 ------------------------------------------------------------
 
+-- | get api info endpoint' handler
 getApiInfoHandler :: AppM GetApiInfoResponse
 getApiInfoHandler = return $ GetApiInfoResponse getApiInfo
 
 
-
+-- | fill @ApiInfo data with cabal version and git information
 getApiInfo :: ApiInfo
 getApiInfo =  ApiInfo
               { apiinfo'version   = pack $ showVersion Cabal.version

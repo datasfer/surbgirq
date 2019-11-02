@@ -1,4 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+
+{-|
+Module      : Surbgirq.Back.Swagger.Doc
+Description : Swagger service
+
+Swagger service
+-}
+
 module Surbgirq.Back.Swagger.Doc where
 
 import Control.Lens    ((&), (.~), (?~))
@@ -9,6 +17,10 @@ import Servant.Swagger (toSwagger)
 import Surbgirq.API
 import Surbgirq.Back.Api
 import Surbgirq.Back.Swagger.Instances ()
+
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 swaggerDoc :: Swagger
 swaggerDoc = toSwagger (Proxy :: Proxy SurbgirqAPI)

@@ -4,6 +4,12 @@
 {-# LANGUAGE TypeOperators       #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
+{-|
+Module      : Surbgirq.Back.Swagger.Instances
+Description : Instances for Swagger schemes
+
+Implement Swagger schemes instances
+-}
 
 module Surbgirq.Back.Swagger.Instances where
 
@@ -19,30 +25,22 @@ import Data.Proxy
 import Surbgirq.API
 import Surbgirq.Types
 
+------------------------------------------------------------
+--
+------------------------------------------------------------
+
 instance ToSchema Girq
 instance ToParamSchema Testament
 instance ToSchema Testament
 instance ToParamSchema Language
 instance ToSchema Language
-
 instance ToParamSchema ChapterNum
 instance ToParamSchema SectionNum
 instance ToParamSchema VerseNum
-
-
 instance ToParamSchema Girq
-
-    -- where
-    -- toParamSchema _ = mempty
-    --     & type_ .~ SwaggerString
-
-     --        & default_ ?~ Matthew -- Always show the first page by default.
-
 
 instance ToSchema Value where
     declareNamedSchema = genericDeclareNamedSchemaUnrestricted $ stripPrefixOption "aeson-value'"
-
-
 
 instance ToSchema Chapter where
     declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "chapter'"
@@ -53,18 +51,14 @@ instance ToSchema Section where
 instance ToSchema Verse where
     declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "verse'"
 
-
 instance ToSchema Book where
     declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "book'"
-
 
 instance ToSchema GetApiInfoResponse where
     declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "apiInfoResponse'"
 
-
 instance ToSchema ApiInfo where
     declareNamedSchema = genericDeclareNamedSchema $ stripPrefixOption "apiinfo'"
-
 
 
 stripPrefixOption prefix = defaultSchemaOptions {

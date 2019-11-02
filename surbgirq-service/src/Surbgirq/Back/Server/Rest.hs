@@ -1,3 +1,10 @@
+{-|
+Module      : Surbgirq.Back.Server.Rest
+Description : REST API Service
+
+REST API Service
+-}
+
 module Surbgirq.Back.Server.Rest (module X) where
 
 import Surbgirq.Back.Server.Rest.ApiInfo   as X

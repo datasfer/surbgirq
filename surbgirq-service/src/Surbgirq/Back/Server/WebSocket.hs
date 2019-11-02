@@ -1,5 +1,12 @@
+{-|
+Module      : Surbgirq.Back.Server.WebSocket
+Description : Web Socket Service
+
+Web Socket Service
+-}
+
 module Surbgirq.Back.Server.WebSocket(
- notifyNewBlock
+  notifyNewX
  ) where
 import Control.Concurrent     (threadDelay)
 import Control.Monad          (forever)
@@ -16,9 +23,9 @@ import Surbgirq.Back.App.Env
 --  Web Socket Enpoints implementations
 ------------------------------------------------------------
 
-
-notifyNewBlock :: WS.Connection -> AppM ()
-notifyNewBlock c = do
+-- | web socket handler sample
+notifyNewX :: WS.Connection -> AppM ()
+notifyNewX c = do
   liftIO $ forkPingThread c 10
   _ <- forever $ liftIO $ WS.sendTextData c (pack $ show 1000) >> threadDelay 1000000
   return ()
