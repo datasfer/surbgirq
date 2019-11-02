@@ -1,0 +1,63 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 3ab2068b902d39e1a527f8cdb4de220946e653488e9745f11d4fdd639512b072
+
+name:           surbgirq-bot
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/arthurvard/surbgirq-bot#readme>
+homepage:       https://github.com/arthurvard/surbgirq-bot#readme
+bug-reports:    https://github.com/arthurvard/surbgirq-bot/issues
+author:         Arthur Vardanyan
+maintainer:     arthur@datasfer.com
+copyright:      2019
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/arthurvard/surbgirq-bot
+
+library
+  ghc-options:   -Wall -Werror
+  exposed-modules: Surbgirq.Bot.Telegram
+  other-modules: Paths_surbgirq_bot
+  hs-source-dirs: src
+  build-depends: base >=4.7 && <5
+               , aeson
+               , http-api-data
+               , http-client
+               , http-client-tls
+               , mtl
+               , servant-client
+               , telegram-bot-simple
+               , text
+               , time
+  default-language: Haskell2010
+
+executable surbgirq-bot
+  main-is: Main.hs
+  other-modules: Paths_surbgirq_bot
+  hs-source-dirs: app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-bot
+               , text
+  default-language: Haskell2010
+
+test-suite surbgirq-bot-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules: Paths_surbgirq_bot
+  hs-source-dirs: test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-bot
+  default-language: Haskell2010

@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 {-|
@@ -39,4 +38,4 @@ data ServerEnv = ServerEnv
   }
 
 -- | External store data type
-data ExternalStore = ExternalStore { getConn :: SQL.Connection}
+newtype ExternalStore = ExternalStore { getConn :: SQL.Connection}

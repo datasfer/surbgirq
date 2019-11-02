@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeOperators       #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -69,7 +68,7 @@ instance ToSchema ApiInfo where
 
 
 stripPrefixOption prefix = defaultSchemaOptions {
-                               fieldLabelModifier = headToLower . (stripExactPrefix prefix) . dropPunctuation
+                               fieldLabelModifier = headToLower . stripExactPrefix prefix . dropPunctuation
                            }
 
 
@@ -88,7 +87,7 @@ dropPunctuation = filter (not . isPunctuation)
 -- | Converts first symbol to lower case
 headToLower :: String -> String
 headToLower []           = []
-headToLower (x:xs@(y:_)) = (if (isLower y) then toLower else id) x : xs -- So that HTTP remains as is
+headToLower (x:xs@(y:_)) = (if isLower y then toLower else id) x : xs -- So that HTTP remains as is
 headToLower (x:xs)       = toLower x : xs
 
 

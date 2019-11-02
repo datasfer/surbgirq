@@ -48,6 +48,5 @@ app env = simpleCors $ logStdoutDev $
           serve (Proxy :: Proxy SurbgirqAPISwagger) $
           -- jensolegSwaggerSchemaUIServer swaggerDoc
           swaggerSchemaUIServer swaggerDoc
-        :<|> (hoistServer api (nt env) surbgirqServer)
-
+        :<|> hoistServer (Proxy :: Proxy SurbgirqAPI) (nt env) surbgirqServer
 

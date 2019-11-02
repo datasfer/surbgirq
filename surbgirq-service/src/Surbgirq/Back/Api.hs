@@ -1,17 +1,11 @@
-{-# LANGUAGE CPP                        #-}
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE DeriveDataTypeable         #-}
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE KindSignatures             #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE TypeApplications           #-}
-{-# LANGUAGE TypeFamilies               #-}
-{-# LANGUAGE TypeOperators              #-}
-{-# LANGUAGE UndecidableInstances       #-}
+{-# LANGUAGE CPP                   #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeOperators         #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 
 {-|
@@ -21,7 +15,11 @@ Description : Servant API type definitions
 Convert REST API adt to servant api type
 -}
 
-module Surbgirq.Back.Api where
+module Surbgirq.Back.Api (
+   SwaggerAPI
+ , SurbgirqAPI
+ , SurbgirqAPISwagger
+ ) where
 
 
 import Data.Proxy
@@ -53,8 +51,6 @@ type SurbgirqAPISwagger = SwaggerAPI :<|> SurbgirqAPI
 
 
 
-api :: Proxy SurbgirqAPI
-api = Proxy
 
 
 type family TypeName (x :: *) :: Symbol where

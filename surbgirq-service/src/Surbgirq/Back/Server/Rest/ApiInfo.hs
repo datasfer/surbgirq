@@ -33,9 +33,9 @@ getApiInfo =  ApiInfo
               , apiinfo'branch    = $(gitBranch)
               , apiinfo'git = object
                        [
-                         "commitDate" .= concat [ $(gitCommitDate)]
-                       , "commitCount" .= concat [$(gitCommitCount)]
-                       , "desc" .= concat [$(gitDescribe)]
+                         "commitDate" .= ($(gitCommitDate) :: String)
+                       , "commitCount" .= ($(gitCommitCount) :: String)
+                       , "desc" .= ($(gitDescribe) :: String)
                        , "branch" .= concat [$(gitBranch), "@", $(gitHash)]
                        , "status" .=  concat [dirty, " ", dirtyTrack]
                        ]

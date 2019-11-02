@@ -20,6 +20,5 @@ import Surbgirq.Back.App.Env
 notifyNewBlock :: WS.Connection -> AppM ()
 notifyNewBlock c = do
   liftIO $ forkPingThread c 10
-  _ <- forever $ do
-                 liftIO $ WS.sendTextData c (pack $ show 1000) >> threadDelay 1000000
+  _ <- forever $ liftIO $ WS.sendTextData c (pack $ show 1000) >> threadDelay 1000000
   return ()
