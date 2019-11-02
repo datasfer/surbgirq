@@ -2,20 +2,25 @@
 
 module Main where
 
-import Control.Exception      (bracket)
-import Control.Monad.IO.Class (liftIO)
-
+import Data.Aeson
 import Database.Bolt
 import System.IO
 
-import qualified Data.Text as T
+import Control.Exception      (bracket)
+import Control.Monad.IO.Class (liftIO)
 
-import           Data.Aeson
-import qualified Data.Text.IO            as TIO
-import qualified Data.Text.Lazy          as TL
-import           Data.Text.Lazy.Encoding as TLE
-import           Surbgirq.Neo4j
-import           Surbgirq.Types
+import Data.Text.Lazy.Encoding as TLE
+
+import qualified Data.Text      as T
+import qualified Data.Text.IO   as TIO
+import qualified Data.Text.Lazy as TL
+
+import Surbgirq.Neo4j
+import Surbgirq.Types
+
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 main :: IO ()
 main = do
@@ -27,11 +32,11 @@ main = do
         (liftIO . print) nodes
 
         books <- queryBooks
-        let booksRes = (TL.toStrict . TLE.decodeUtf8 $ encode books)
+        let booksRes = TL.toStrict . TLE.decodeUtf8 $ encode books
         (liftIO . TIO.putStrLn) booksRes
 
         chs <- queryChapter Matthew (ChapterNum 2)
-        let res = (TL.toStrict . TLE.decodeUtf8 $ encode chs)
+        let res = TL.toStrict . TLE.decodeUtf8 $ encode chs
         (liftIO . TIO.putStrLn) res
 
         liftIO $ TIO.writeFile "file.txt" res

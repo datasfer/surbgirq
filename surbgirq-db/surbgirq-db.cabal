@@ -1,8 +1,7 @@
 cabal-version: 1.12
-
 name:           surbgirq-db
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/arthurvard/surbgirq-db#readme>
+description:    Data access repository access (Neo4j)
 homepage:       https://github.com/arthurvard/surbgirq
 bug-reports:    https://github.com/arthurvard/surbgirq/issues
 author:         Arthur Vardanyan
@@ -22,18 +21,19 @@ library
   exposed-modules: Surbgirq.Neo4j
   other-modules: Paths_surbgirq_db
                , Surbgirq.Neo4j.Config
-               , Surbgirq.Neo4j.Types
+               , Surbgirq.Neo4j.Instances
                , Surbgirq.Neo4j.Data
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
                , surbgirq-types
+               , common
                , containers
                , hasbolt >= 0.1.3.3
                , lens
                , mtl
                , text
                , data-default
-               , common
+               , transformers
   default-language: Haskell2010
 
 executable surbgirq-db

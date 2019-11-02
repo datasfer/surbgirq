@@ -1,26 +1,31 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell     #-}
 
-module Surbgirq.Neo4j.Types where
+{-|
+Module      : Surbgirq.Neo4j.Instances
+Description : Instances for Neo4j representations
 
-import           Data.Text (Text)
+Instances to coerce from/to Neo4j
+-}
+
+module Surbgirq.Neo4j.Instances where
+
+import Database.Bolt
+
 import qualified Data.Text as T
 
 -- import           Database.Bolt.Extras.Template
-import Database.Bolt
 
 import Common.Aeson
 import Surbgirq.Types
 
+------------------------------------------------------------
+--
+------------------------------------------------------------
+
 data HAS_CH = HAS_CH
 data HAS_VERSE = HAS_VERSE
 
-
-
--------------------------------------------------------------------------------
--- Book Node
--------------------------------------------------------------------------------
 
 
 -- fromList [("b",S (Structure {signature = 78, fields = [I 0,L [T "Book"],M (fromList [("title",T "matthew")])]}))]
@@ -36,9 +41,13 @@ data HAS_VERSE = HAS_VERSE
 -- S (Structure {signature = 78, fields = [I 41,L [T "Book"],M (fromList [("title",T "matthew")])]}),S (Structure {signature = 78, fields = [I 640,L [T "Book",T "Matthew",T "New"],M (fromList [("title",T "Matthew")])]})]
 
 
+-------------------------------------------------------------------------------
+-- Book Node
+-------------------------------------------------------------------------------
 
+-- | parse Neo4j bolt representation to `Book` data type
 instance RecordValue Book where
-    exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Book") labels =
+    exact (S Structure {fields = (I i: L labels : M props : _)}) | T "Book" `elem` labels =
         do
             title <- exact =<< props `at` "title"
             lbs   <- traverse exact labels
@@ -52,12 +61,12 @@ instance RecordValue Book where
     exact x = fail $ show x ++ " is not a Book"
 
 
-
+-- | parse Neo4j bolt representation to `Girq` data type
 instance RecordValue Girq where
     exact (T book) = return $ read $ T.unpack  book
     exact x        = fail $ show x ++ " is not a Girq"
 
-
+-- | parse Neo4j bolt representation to `Testament` data type
 instance RecordValue Testament where
     exact (T tes) = return $ read $ T.unpack  tes
     exact x       = fail $ show x ++ " is not a Testament"
@@ -69,9 +78,9 @@ instance RecordValue Testament where
 -- Chapter Node
 -------------------------------------------------------------------------------
 
-
+-- | parse Neo4j bolt representation to `Chapter` data type
 instance RecordValue Chapter where
-    exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Chapter") labels =
+    exact (S Structure {fields = (I i : L labels : M props :_)}) | T "Chapter" `elem` labels =
         do
             title <- exact =<< props `at` "title"
             number <- exact =<< props `at` "num"
@@ -86,8 +95,9 @@ instance RecordValue Chapter where
 -------------------------------------------------------------------------------
 
 
+-- | parse Neo4j bolt representation to `Section` data type
 instance RecordValue Section where
-    exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Section") labels =
+    exact (S Structure {fields = (I i : L labels : M props : _)}) | T "Section" `elem` labels =
         do
             title <- exact =<< props `at` "title"
             number <- exact =<< props `at` "num"
@@ -103,8 +113,9 @@ instance RecordValue Section where
 -- Verse Node
 -------------------------------------------------------------------------------
 
+-- | parse Neo4j bolt representation to `Verse` data type
 instance RecordValue Verse where
-    exact (S (Structure {fields = (I i:(L labels):(M props):_)})) | elem (T "Verse") labels =
+    exact (S Structure {fields = (I i : L labels : M props : _)}) | T "Verse" `elem` labels =
         do
             chNum <- exact =<< props `at` "chapter"
             secNum <- exact =<< props `at` "section"
