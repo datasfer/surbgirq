@@ -1,3 +1,10 @@
+{-|
+Module      : Common.Yaml
+Description : Helpers to parse yaml
+
+Helpers to parse yaml text or bytestring to type
+-}
+
 module Common.Yaml(
     loadYaml
   , readYaml
@@ -5,19 +12,26 @@ module Common.Yaml(
 ) where
 
 import Data.Aeson
-import Data.ByteString (ByteString)
-import Data.ByteString as BS       (readFile)
-import Data.Yaml                   (decodeEither')
-import Data.Yaml.Config            (loadYamlSettings, useEnv)
-import qualified Control.Exception   as Exception
 
-loadYaml ::  FromJSON settings => ByteString -> IO settings
+import Data.ByteString  (ByteString)
+import Data.Yaml        (decodeEither')
+import Data.Yaml.Config (loadYamlSettings, useEnv)
+
+import Data.ByteString as BS (readFile)
+
+import qualified Control.Exception as Exception
+
+------------------------------------------------------------
+--
+------------------------------------------------------------
+
+loadYaml  ::  FromJSON settings => ByteString -> IO settings
 loadYaml bs = loadYamlSettings [] [value] useEnv
   where
     value = either Exception.throw id $ decodeEither' bs
 
 readYaml' :: FromJSON settings => FilePath -> IO settings
-readYaml' fp = loadYaml =<< BS.readFile fp
+readYaml' file = loadYaml =<< BS.readFile file
 
 readYaml :: FromJSON settings => FilePath -> IO settings
-readYaml fp = loadYamlSettings [fp] [] useEnv
+readYaml file = loadYamlSettings [file] [] useEnv
