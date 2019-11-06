@@ -1,8 +1,7 @@
 cabal-version: 1.12
-
 name:           surbgirq
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/surbgirq#readme>
+description:    Surbgirq REST API executables
 homepage:       https://github.com/githubuser/surbgirq#readme
 bug-reports:    https://github.com/githubuser/surbgirq/issues
 author:         Author name here

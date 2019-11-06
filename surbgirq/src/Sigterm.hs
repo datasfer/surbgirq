@@ -1,11 +1,21 @@
--- |
--- Install handler for SIGTERM which converts it to UserInterrupt sent
--- to main thread
+{-|
+Module      : Settings
+Description : Install handler for SIGTERM
+
+Install handler for SIGTERM which converts it to UserInterrupt sent
+to main thread
+
+-}
+
 module Sigterm where
 
-import           Control.Concurrent
-import           Control.Exception
-import           System.Posix.Signals
+import Control.Concurrent
+import Control.Exception
+import System.Posix.Signals
+
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 -- | Converts SIGTERM to UserInterrupt exception and send it to thread
 --   in which handler was called. Naturally this functions is expected

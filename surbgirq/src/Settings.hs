@@ -1,19 +1,27 @@
 {-# LANGUAGE ApplicativeDo   #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
+
+{-|
+Module      : Settings
+Description : Read cmd line args parse settings
+
+Read cmd line args parse settings
+-}
+
 module Settings where
 
-import           Options.Applicative
+import Options.Applicative
 
-import           Data.Aeson          (FromJSON)
-import           Data.Monoid         ((<>))
+import Data.Aeson  (FromJSON)
+import Data.Monoid ((<>))
 
-import           Common.Aeson
-import           Common.Yaml
-import           Types
+import Common.Aeson
+import Common.Yaml
+import Types
 
--------------------------------------------------------------------------------
+------------------------------------------------------------
 --
+------------------------------------------------------------
 
 data CmdOptions = CmdOptions
                { cmdConfigPath :: FilePath
@@ -21,9 +29,9 @@ data CmdOptions = CmdOptions
                }
 
 getSettings :: (FromJSON a)
-            => String                   -- ^ Application header
-            -> (a -> [ScribeSpec] -> a) -- ^ Extra logs adder
-            -> IO a                     -- ^ Reading resulg
+            => String
+            -> (a -> [ScribeSpec] -> a)
+            -> IO a
 getSettings cmdHeader cmdExtraLogAdder = do
   cmd <- customExecParser (prefs showHelpOnError)
             $ info (helper <*> parser)

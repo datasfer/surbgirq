@@ -1,6 +1,13 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# LANGUAGE TemplateHaskell #-}
 
+{-|
+Module      : Types.Settings
+Description : Settings types
+
+Settings types
+-}
+
 module Types.Settings where
 
 import Data.Aeson
@@ -16,14 +23,13 @@ import Common.Aeson
 import Surbgirq.Neo4j
 import Surbgirq.Service
 import Types.Logger
--------------------------------------------------------------------------------
+
+------------------------------------------------------------
 --
-
-
-
+------------------------------------------------------------
 
 instance FromJSON HostPreference where
-  parseJSON = withText "HostPreference" $ \t -> do
+  parseJSON = withText "HostPreference" $ \t ->
     pure $ fromString . T.unpack $ t
 
 data ServerSettings = ServerSettings
@@ -44,7 +50,7 @@ data ServerSettings = ServerSettings
   } deriving (Eq, Show)
 
 
-data SqliteConfig = SqliteConfig
+newtype SqliteConfig = SqliteConfig
     { sqliteConfig'dbName :: String
     } deriving (Show)
 

@@ -4,19 +4,28 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
+{-|
+Module      : Types.Logger
+Description : Types for Logging types
+
+Types for Logging types
+-}
+
 module Types.Logger where
 
-import           Data.Aeson
-import           Katip
-import           Katip.Scribes.ElasticSearch
+import Data.Aeson
+import Katip
+import Katip.Scribes.ElasticSearch
 
-import           Control.Monad               (unless)
-import           Data.Text                   (Text)
-import           GHC.Generics                (Generic)
+import Control.Monad (unless)
+import Data.Text     (Text)
+import GHC.Generics  (Generic)
 
-import           Common.Aeson
--------------------------------------------------------------------------------
+import Common.Aeson
+
+------------------------------------------------------------
 --
+------------------------------------------------------------
 
 -- | Type of scribe to use
 data ScribeType
