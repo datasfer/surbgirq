@@ -22,12 +22,15 @@ data Action
   | Echo Text
   | Start
 
+
 echoBot :: BotApp Model Action
 echoBot = BotApp
-  { botInitialModel = ()
-  , botAction = updateToAction
-  , botHandler = handleAction
-  , botJobs = []
+  { botInitialModel = (),
+    botAction = updateToAction,
+    botHandler = handleAction,
+    botErrorHandlers = [],
+    botForkErrorHandler = Nothing,
+    botJobs = []
   }
 
 updateToAction :: Update -> Model -> Maybe Action
@@ -54,8 +57,8 @@ handleAction action model = case action of
 run :: Text -> IO ()
 run token = do
   env <- defaultTelegramClientEnv (Token token)
-  startBot_ (conversationBot updateChatId echoBot) env
-
+--  startBot_ (conversationBot updateChatId echoBot) env
+  startBot_ defaultPeriod (conversationBot updateChatId echoBot) env
 
 
 -- | A help message to show on conversation start with bot.

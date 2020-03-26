@@ -30,8 +30,11 @@ extra-deps:
   - binary-0.8.7.0
   - servant-websockets-2.0.0
   - text-1.2.4.0
-  - git: git@github.com:ArthurVard/telegram-bot-simple.git # https://github.com/fizruk/telegram-bot-simple.git
-    commit: 7e109f2bb29652ee6387eb1a8b44fc5549537043
+#  - git: git@github.com:ArthurVard/telegram-bot-simple.git # https://github.com/fizruk/telegram-bot-simple.git
+#    commit: 7e109f2bb29652ee6387eb1a8b44fc5549537043
+  - git: https://github.com/anpryl/telegram-bot-simple
+    commit: 8e459a59efa9ca42d933119a28cb41b512445e68
+  - o-clock-1.1.0@sha256:941ac2bc1732e6622b165831c4badb1a8e846f451620bd028064339f5b284224,5043
 nix:
   enable: true
 #  shell-file: shell.nix
