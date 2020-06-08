@@ -45,10 +45,8 @@ import Surbgirq.Back.App.Env
 
 type SwaggerAPI = SwaggerSchemaUI "docs" "swagger.json"
 
-type SurbgirqAPI = "api" :> ("book" :> ToServantApi BookAPI :<|> "scripture" :> ToServantApi ScriptureAPI)
 
 type SurbgirqAPISwagger = SwaggerAPI :<|> SurbgirqAPI
-
 
 
 

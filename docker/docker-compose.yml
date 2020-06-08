@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+
+ # $ docker run -v ~/haskell/surbgirq/data:/data  -v ~/haskell/surbgirq/docker/neo4j/plugins:/plugins  -d -p 7474:7474 -p 7687:7687 neo4j-surbgirq
+
+  neo4j-db:
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Docker
+            - SENDGRID_API_KEY=REMOVED-SENDGRID-KEY
+        build: .
+        ports:
+            - "80:80"
+            - "443:443"
+        depends_on:
+            - sql-db
+        volumes:
+            - type: volume
+              source: artefacts
+              target: /app/wwwroot/Artefacts
+  sql-db:
+    container_name: sql-server-db
+    image: microsoft/mssql-server-linux:2017-latest
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "CHANGE_ME"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - type: volume
+        source: sql-db-data
+        target: /var/opt/mssql
+
+volumes:
+  sql-db-data:
+  artefacts:

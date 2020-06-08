@@ -13,6 +13,8 @@ module Surbgirq.API.Rest (
    MetaAPI(..)
  , BookAPI(..)
  , ScriptureAPI(..)
+ , SurbgirqAPI
+ ,
   ) where
 
 import Data.Int     (Int64)
@@ -28,6 +30,12 @@ import Surbgirq.Types
 ------------------------------------------------------------
 -- Surbgirq API endpoints
 ------------------------------------------------------------
+
+type SurbgirqAPI = "api" :> ("book" :> ToServantApi BookAPI :<|> "scripture" :> ToServantApi ScriptureAPI)
+
+-- type SurbgirqAPI = "api" :> ("book" :> ToServantApi BookAPI :<|> "scripture" :> ToServantApi ScriptureAPI)
+
+
 
 -- |
 -- info related to api

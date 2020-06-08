@@ -3,7 +3,8 @@ resolver: lts-14.23
 packages:
 - surbgirq-types
 - surbgirq-service
-- surbgirq-api
+- surbgirq-api/surbgirq-api
+# - surbgirq-api/surbgirq-api-client
 - surbgirq-shell
 - surbgirq-db
 - surbgirq-bot

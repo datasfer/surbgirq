@@ -1,7 +1,7 @@
 packages:
   surbgirq-types
   surbgirq-service
-  surbgirq-api
+  surbgirq-api/surbgirq-api
   surbgirq-shell
   surbgirq-db
   surbgirq-bot
