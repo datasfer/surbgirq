@@ -51,6 +51,7 @@ data Book = Book
   { book'book        :: Girq
   , book'labels      :: Maybe Text
   -- ^ neo4j node labels
+  , book'shortName   :: Text
   , book'title       :: Text
   , book'number      :: Int
   , book'chapters    :: Int

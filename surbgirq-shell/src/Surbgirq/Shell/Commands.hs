@@ -17,6 +17,7 @@ someFunc = putStrLn "someFunc"
 
 data Command = Command
     { cmd'book    :: BookKind
+    , cmd'outFormat    :: OutFormat
     , cmd'config  :: FilePath
     , cmd'inPath  :: FilePath
     , cmd'outPath :: FilePath
@@ -25,6 +26,9 @@ data Command = Command
 
 data BookKind = Bible
               | Narek
+
+data OutFormat = Cypher
+                | CSV
 
 
 bibleInput :: Parser BookKind
@@ -39,12 +43,28 @@ narekInput = flag' Narek
   <> short 'n'
   <> help "Narek Scriptures processing" )
 
+cypherOut :: Parser OutFormat
+cypherOut = flag' Cypher
+  (  long "cypher"
+  <> short 'p'
+  <> help "Cypher script output" )
+
+csvOut :: Parser OutFormat
+csvOut = flag' CSV
+  (  long "csv"
+  <> short 'v'
+  <> help "CSV output" )
+
 bookInput :: Parser BookKind
 bookInput = bibleInput <|> narekInput
+
+outFormat :: Parser OutFormat
+outFormat = cypherOut <|> csvOut
 
 parser :: Parser Command
 parser = do
   cmd'book <- bookInput
+  cmd'outFormat <- outFormat
   cmd'config <- strOption
     (  metavar "PATH"
     <> long "config"

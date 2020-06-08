@@ -51,7 +51,7 @@ main1 = do
   TIO.putStrLn res
   TIO.putStrLn "Գիրք ծննդեան"
 
--- |  stack exec -- surbgirq-shell --bible -c ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher
+-- |  stack exec -- surbgirq-shell --bible --cypher -c ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher
 main :: IO ()
 main = do
   cmd <- customExecParser (prefs showHelpOnError) $
@@ -68,10 +68,17 @@ main = do
 --             let res = (TL.toStrict . TLE.decodeUtf8 $ encode ch)
              case cmd'book of
                Bible -> do
-                 TIO.putStrLn "Start genererating Bible scriptures for neo4j input..."
-                 generateInitCypher cmd'config cmd'inPath cmd'outPath --  "./data/yaml" "./data/cypher"
-                 generateRefCypher  cmd'config cmd'inPath cmd'outPath
-                 TIO.putStrLn "Bible scriptures generation success!"
+                 case cmd'outFormat of
+                   Cypher -> do
+                          TIO.putStrLn "Start genererating Bible scriptures for neo4j input..."
+                          generateInitCypher cmd'config cmd'inPath cmd'outPath --  "./data/yaml" "./data/cypher"
+                          generateRefCypher  cmd'config cmd'inPath cmd'outPath
+                          TIO.putStrLn "Bible scriptures generation success!"
+                   CSV -> do
+                          TIO.putStrLn "CSV genererating starting ..."
+                          generateAllCsv cmd'config cmd'inPath cmd'outPath
+                          TIO.putStrLn "CSV generation success!"
+
                Narek -> do
                  TIO.putStrLn "Narek scriptures generation not ready yet!"
                  -- wordFormsCypher "./data/txt/wordForms.txt" "./data/cypher/words"
