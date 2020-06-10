@@ -45,7 +45,7 @@ import Surbgirq.Types.Girq
 generateVerseCsv :: FilePath -> FilePath -> FilePath -> IO ()
 generateVerseCsv bookFile path outPath = do
    let del = ';';
-
+       arrayDel = "|";
    books :: [Book] <- readYaml bookFile -- path </> "books.yaml"
 
    -- Booksx
@@ -142,7 +142,10 @@ data FileHandlers =  FileHandlers
     {
       outh :: Handle
     , outHeaderh :: Handle
-    , outRefh :: Handle
+    , outRefsh :: Handle
+    , outRefsHeaderh :: Handle
+    , outRefRelh :: Handle
+    , outRefRelHeaderh :: Handle 
     , outChh :: Handle
     , outChHeaderh :: Handle
     , outChVerseRelh :: Handle
@@ -158,7 +161,10 @@ closeHs :: FileHandlers -> IO ()
 closeHs FileHandlers {..} = do
     hClose outh
     hClose outHeaderh
-    hClose outRefh
+    hClose outRefsh
+    hClose outRefsHeaderh
+    hClose outRefRelh
+    hClose outRefRelHeaderh
     hClose outChh
     hClose outChHeaderh       
     hClose outChVerseRelh       
@@ -174,6 +180,7 @@ closeHs FileHandlers {..} = do
 generateAllCsv :: FilePath -> FilePath -> FilePath -> IO ()
 generateAllCsv bookFile path outPath = do
    let del = ';';
+       arrayDel = "|"      
 
    books :: [Book] <- readYaml bookFile -- path </> "books.yaml"
 
@@ -206,14 +213,14 @@ generateAllCsv bookFile path outPath = do
                          
          -- ref file
          outRefFileRoot = outFileRoot </> "refs"
-         outRefFile = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.ref|]
+         outRefsHeader = outRefFileRoot </> [qc|ref_header.csv|]
+         outRefs = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_refs.csv|]
+         outRefRel = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_WordRefRel.csv|]
+         outRefRelHeader = outRefFileRoot </> [qc|WordRefRel_Header.csv|]
 
          bookLabel = maybe (show book'book) ((show book'book) ++)  (T.unpack <$> book'labels)
          bookTestament = show book'testament
          bookName = T.toLower . T.pack  $ show book'book
-         lang = show book'language
-         dialect = show book'dialect
-
 
 
      exists <- doesDirectoryExist bookDir
@@ -229,7 +236,10 @@ generateAllCsv bookFile path outPath = do
        bracket (do
                   outh <- openFile outFile WriteMode
                   outHeaderh <- openFile outFileHeader WriteMode
-                  outRefh <- openFile outRefFile WriteMode
+                  outRefsh <- openFile outRefs WriteMode
+                  outRefsHeaderh <- openFile outRefsHeader WriteMode
+                  outRefRelh <- openFile outRefRel WriteMode
+                  outRefRelHeaderh <- openFile outRefRelHeader WriteMode
                   outChh <- openFile outCh WriteMode
                   outChHeaderh <- openFile outChHeader WriteMode
                   outChVerseRelh <- openFile outChVerseRel WriteMode
@@ -250,8 +260,12 @@ generateAllCsv bookFile path outPath = do
          TIO.hPutStrLn outChVerseRelHeaderh [qc|:START_ID(CHAPTER-ID){del}:END_ID(VERSE-ID)|]
 
          -- Words Headers
-         TIO.hPutStrLn outWordsHeaderh [qc|wordID:ID(WORD-ID){del}book{del}chapter{del}section{del}paragraph{del}verse{del}token{del}|]
+         TIO.hPutStrLn outWordsHeaderh [qc|wordID:ID(WORD-ID){del}book{del}chapter{del}section{del}paragraph{del}verse{del}token{del}position{del}:LABEL|]
          TIO.hPutStrLn outVerseWordRelHeaderh [qc|:START_ID(VERSE-ID){del}:END_ID(WORD-ID)|]
+
+         -- Ref Headers
+         TIO.hPutStrLn outRefsHeaderh [qc|refID:ID(REF-ID){del}text{del}index:int{del}:LABEL|]
+         TIO.hPutStrLn outRefRelHeaderh [qc|:START_ID(WORD-ID){del}:END_ID(REF-ID){del}:TYPE|]
          
             
          -- a file == a chapter
@@ -270,38 +284,45 @@ generateAllCsv bookFile path outPath = do
                forM_ paragraph'verses $ \v@Verse{..} -> do
                  let verseID = concat [T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse]
                      verseLine = [qc|{verseID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verse'verse}{del}{verse'content}|]
-                     verseWords = T.words verse'content
+                     -- verseWords = T.words verse'content
+                     verseWords = filter ((>0) . T.length) $ T.splitOn " " verse'content
 
                  TIO.hPutStrLn outh verseLine
                  TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
-                                 
-                 forM_ (zip [1..] verseWords) $ \(index,w) -> do
-                   let wordID = concat ["word_", T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse, "-", show index]
-                       wordLine = [qc|{wordID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verseID}{del}{w}|]
+
+                 let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse]
+                 forM_ (zip [1..] verseWords) $ \(index,word) -> do
+                   let wordID = concat [ wordIDPrefix, "-", show index]
+                       wordNodeLabels = wordLabels word (show book'language) (show book'dialect) arrayDel
+                       wordLine = [qc|{wordID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verse'verse}{del}{word}{del}{index}{del}{wordNodeLabels}|]
                        vwRel  = [qc|{verseID}{del}{wordID}|]
+                   
 
                    TIO.hPutStrLn outWordsh wordLine
                    TIO.hPutStrLn outVerseWordRelh vwRel
 
-                 
-
-
-                 -- -- verse ref processing
-                 -- case verse'ref of
-                 --   Nothing -> return ()
-                 --   Just VerseRef{..} -> do
-                 --     case verseRef'type of
-                 --       RefText txt -> do
-                 --         let wordN = concat [verseName, del, "word", show verseRef'index]
-                 --             footnoteName = concat [wordN, del, "footnote", show verseRef'index]
-                 --             footnoteNode = [qc| ({footnoteName}:Footnote \{text: '{txt}', index: {verseRef'index}}),|]
-                 --             footnoteRel  = [qc| ({wordN})-[:REF_FOOTNOTE]->({footnoteName}),|]
-                 --         TIO.hPutStrLn outh footnoteNode
-                 --         TIO.hPutStrLn outh footnoteRel
-                 --       _ -> return ()
+                 -- verse ref processing
+                 case verse'ref of
+                    Nothing -> return ()
+                    Just VerseRef{..} -> do
+                      case verseRef'type of
+                        RefText txt -> do
+                          let refWordID = concat [wordIDPrefix, "-", show verseRef'index]
+                              footnoteID = concat ["ref_", wordIDPrefix, "-", show verseRef'index]
+                              footnoteLine = [qc|{footnoteID}{del}{txt}{del}{verseRef'index}{del}Footnote|]
+                              footnoteRel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+                          TIO.hPutStrLn outRefsh footnoteLine
+                          TIO.hPutStrLn outRefRelh footnoteRel
+                        _ -> return ()
 
 
   where
+    wordLabels :: Text -> String -> String -> String -> String
+    wordLabels w lang dialect arrayDel =
+        if isLower $ T.head w
+        then concat [lang, arrayDel, dialect, arrayDel, "Word"]
+        else concat [lang, arrayDel, dialect, arrayDel, "Capitalized", arrayDel, "Word"]
+
     tail' :: [a] -> [a]
     tail' []     = []
     tail' (x:xs) = xs
