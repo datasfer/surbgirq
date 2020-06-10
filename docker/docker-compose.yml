@@ -1,35 +1,28 @@
-version: "3.7"
+version: '3'
 services:
-
- # $ docker run -v ~/haskell/surbgirq/data:/data  -v ~/haskell/surbgirq/docker/neo4j/plugins:/plugins  -d -p 7474:7474 -p 7687:7687 neo4j-surbgirq
-
-  neo4j-db:
-        environment:
-            - ASPNETCORE_ENVIRONMENT=Docker
-            - SENDGRID_API_KEY=REMOVED-SENDGRID-KEY
-        build: .
-        ports:
-            - "80:80"
-            - "443:443"
-        depends_on:
-            - sql-db
-        volumes:
-            - type: volume
-              source: artefacts
-              target: /app/wwwroot/Artefacts
-  sql-db:
-    container_name: sql-server-db
-    image: microsoft/mssql-server-linux:2017-latest
-    ports:
-      - "1433:1433"
+  neo4j-docker:
+    container_name: neo4j-lab
+    image: neo4j-4-enterprise:latest
+    # user: "1000:100" # Allow write access for neo4j
     environment:
-      SA_PASSWORD: "CHANGE_ME"
-      ACCEPT_EULA: "Y"
+      - NEO4J_dbms_memory_pagecache_size=2G
+      - NEO4J_dbms_memory_heap_maxSize=4G
+      - NEO4J_dbms_memory_heap_initialSize=512M
+      - NEO4J_AUTH=neo4j/CHANGE_ME
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+   #   - NEO4JLABS_PLUGINS=["apoc", "n10s"] # "graphql",
+    ports:
+      - 7474:7474
+      - 7687:7687
     volumes:
-      - type: volume
-        source: sql-db-data
-        target: /var/opt/mssql
-
+      - neo4j_data:/data
+      - neo4j_data:/conf
+      - neo4j_data:/import
+      - neo4j_data:/plugin
 volumes:
-  sql-db-data:
-  artefacts:
+  neo4j_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: $HOME/haskell/surbgirq/data

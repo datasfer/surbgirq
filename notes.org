@@ -9,3 +9,34 @@
 
 ** Example of inport
    - https://learnmeabitcoin.com/neo4j/how/
+   - https://neo4j.com/developer/guide-import-csv/#_super_fast_batch_importer_for_huge_datasets
+   - https://medium.com/@akshaykadidal/bulk-upload-csv-to-neo4j-on-windows-54321e9f0198
+   - https://neo4j.com/docs/operations-manual/current/tutorial/import-tool/#import-tool-types-labels
+
+
+*** open new created db in enterprise
+- version >= 4.*
+
+:use system
+create database <your_db_name>
+
+- version < 4.0
+from config
+activate db bla bla
+
+** Tips for running docker
+
+https://neo4j.com/docs/operations-manual/current/docker/introduction/#docker-user
+
+for enterprise editin nad auth for fixing auth problem
+```
+docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
+            --env NEO4J_AUTH=neo4j/CHANGE_ME \
+            --publish=7474:7474  --publish=7687:7687 \
+            --volume=$HOME/haskell/surbgirq/data:/data \
+            --user="$(id -u):$(id -g)" \
+            neo4j-4-enterprise:latest 
+```
+
+
+

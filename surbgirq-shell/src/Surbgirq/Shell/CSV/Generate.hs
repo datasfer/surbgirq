@@ -155,8 +155,8 @@ generateAllCsv bookFile path outPath = do
 
          -- csv out file
          outFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
-         outFile = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.csv|]
-         outFileHeader = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_header.csv|]
+         outFile = outFileRoot </> [qc|{verse.csv|]
+         outFileHeader = outFileRoot </> [qc|verse_header.csv|]
 
 
          -- Chapters
@@ -209,10 +209,10 @@ generateAllCsv bookFile path outPath = do
                 ) $ \(outh, outHeaderh, outRefh, outChh, outChHeaderh, outChVerseRelh, outChVerseRelHeaderh) -> do
 
 
-         TIO.hPutStrLn outHeaderh [qc|verseID:ID(Verse){del} book{del} chapter {del} section {del} paragraph {del} verse {del} verseText|]
-         TIO.hPutStrLn outChHeaderh [qc|chapterID:ID(Chapter){del} title {del} num{del} book|]
+         TIO.hPutStrLn outHeaderh [qc|verseID:ID(VERSE-ID){del}book{del}chapter{del}section{del}paragraph{del}verse{del}verseText|]
+         TIO.hPutStrLn outChHeaderh [qc|chapterID:ID(CHAPTER-ID){del}title{del}num{del}book|]
 
-         TIO.hPutStrLn outChVerseRelHeaderh [qc|:START_ID(ArmatChapter) {del} :END_ID(Verse)|]
+         TIO.hPutStrLn outChVerseRelHeaderh [qc|:START_ID(CHAPTER-ID){del}:END_ID(VERSE-ID)|]
 
             
          -- a file == a chapter
@@ -220,7 +220,7 @@ generateAllCsv bookFile path outPath = do
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
            ch@Chapeter{..} <- readChapter (bookDir </> file)
            let chapterID = concat [T.unpack book'shortName, "_", show chapter'number ]
-               chNode = [qc|{chapterID}{del} Գլ. {chapter'number}{del}  {chapter'number}{del} {show book'book} |]
+               chNode = [qc|{chapterID}{del}Գլ. {chapter'number}{del}{chapter'number}{del}{show book'book}|]
            TIO.hPutStrLn outChh chNode
 
            -- Sections
@@ -230,9 +230,9 @@ generateAllCsv bookFile path outPath = do
                -- Verses
                forM_ paragraph'verses $ \v@Verse{..} -> do
                  let verseID = concat [T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse]
-                     verseLine = [qc|{verseID}{del} {bookLabel}{del} {chapter'number}{del} {section'number}{del} {paragraph'number}{del} {verse'verse}{del} {verse'content} |]
+                     verseLine = [qc|{verseID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verse'verse}{del}{verse'content}|]
                  TIO.hPutStrLn outh verseLine
-                 TIO.hPutStrLn outChVerseRelh  [qc|{chapterID} {del} {verseID}|]
+                 TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
 
 
 

@@ -35,7 +35,15 @@ $ docker run -v ~/haskell/surbgirq/data:/data  -v ~/haskell/surbgirq/docker/neo4
 
 $ docker run -v ~/haskell/surbgirq/data:/data -v ~/haskell/surbgirq/data:/config  -v ~/haskell/surbgirq/docker/neo4j/plugins:/plugins  -d -p 7474:7474 -p 7687:7687 neo4j-surbgirq
 
-docker run -v ~/haskell/surbgirq/data:/data -v ~/haskell/surbgirq/data:/config  -v ~/haskell/surbgirq/docker/neo4j/plugins1:/plugins  -d -p 7474:7474 -p 7687:7687 neo4j:4.0.4
+$ docker run -v ~/haskell/surbgirq/data:/data -v ~/haskell/surbgirq/data:/config  -v ~/haskell/surbgirq/docker/neo4j/plugins1:/plugins  -d -p 7474:7474 -p 7687:7687 neo4j:4.0.4
+
+docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
+            --env NEO4J_AUTH=neo4j/CHANGE_ME \
+            --publish=7474:7474  --publish=7687:7687 \
+            --volume=$HOME/haskell/surbgirq/data:/data \
+            --user="$(id -u):$(id -g)" \
+            neo4j-4-enterprise:latest 
+
 ```
 
 This will setup web-interface at http://localhost:7474 and Bolt server at localhost:7687.
