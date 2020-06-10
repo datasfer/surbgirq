@@ -235,7 +235,7 @@ generateAllCsv bookFile path outPath = do
    -- Books
    forM_ books $ \book@Book{..} -> do
 
-     let outFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
+     let outFileRoot = outPath </> (takeDirectory $ T.unpack inPath) </> "scriptures"
          inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
          bookDir = path </> (T.unpack inPath)
 
