@@ -140,8 +140,8 @@ generateVerseCsv bookFile path outPath = do
 
 data FileHandlers =  FileHandlers
     {
-      outh :: Handle
-    , outHeaderh :: Handle
+      outVerseh :: Handle
+    , outVerseHeaderh :: Handle
     , outRefsh :: Handle
     , outRefsHeaderh :: Handle
     , outRefRelh :: Handle
@@ -159,8 +159,8 @@ data FileHandlers =  FileHandlers
 
 closeHs :: FileHandlers -> IO ()
 closeHs FileHandlers {..} = do
-    hClose outh
-    hClose outHeaderh
+    hClose outVerseh
+    hClose outVerseHeaderh
     hClose outRefsh
     hClose outRefsHeaderh
     hClose outRefRelh
@@ -206,8 +206,8 @@ openHs outFileRoot outRefFileRoot Book{..} = do
            outRefRelHeader = outRefFileRoot </> [qc|WordRefRel_Header.csv|]
 
        -- open files
-       outh <- openFile outFile WriteMode
-       outHeaderh <- openFile outFileHeader WriteMode
+       outVerseh <- openFile outFile WriteMode
+       outVerseHeaderh <- openFile outFileHeader WriteMode
        outRefsh <- openFile outRefs WriteMode
        outRefsHeaderh <- openFile outRefsHeader WriteMode
        outRefRelh <- openFile outRefRel WriteMode
@@ -260,13 +260,15 @@ generateAllCsv bookFile path outPath = do
                closeHs
                    $ \FileHandlers {..} -> do
 
-         -- CSV Headers
-         TIO.hPutStrLn outHeaderh [qc|verseID:ID(VERSE-ID){del}book{del}chapter{del}section{del}paragraph{del}verse{del}verseText|]
+         -- Chapter Headers
          TIO.hPutStrLn outChHeaderh [qc|chapterID:ID(CHAPTER-ID){del}title{del}num{del}book|]
          TIO.hPutStrLn outChVerseRelHeaderh [qc|:START_ID(CHAPTER-ID){del}:END_ID(VERSE-ID)|]
 
+         -- Verse Headers
+         TIO.hPutStrLn outVerseHeaderh [qc|verseID:ID(VERSE-ID){del}book{del}chapter:int{del}section:int{del}paragraph:int{del}verse:int{del}verseText|]
+   
          -- Words Headers
-         TIO.hPutStrLn outWordsHeaderh [qc|wordID:ID(WORD-ID){del}book{del}chapter{del}section{del}paragraph{del}verse{del}token{del}position{del}:LABEL|]
+         TIO.hPutStrLn outWordsHeaderh [qc|wordID:ID(WORD-ID){del}word{del}book{del}chapter:int{del}section:int{del}paragraph:int{del}verse:int{del}token{del}position:int{del}:LABEL|]
          TIO.hPutStrLn outVerseWordRelHeaderh [qc|:START_ID(VERSE-ID){del}:END_ID(WORD-ID)|]
 
          -- Ref Headers
@@ -293,14 +295,15 @@ generateAllCsv bookFile path outPath = do
                      -- verseWords = T.words verse'content
                      verseWords = filter ((>0) . T.length) $ T.splitOn " " verse'content
 
-                 TIO.hPutStrLn outh verseLine
+                 TIO.hPutStrLn outVerseh verseLine
                  TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
 
                  let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse]
                  forM_ (zip [1..] verseWords) $ \(index,word) -> do
                    let wordID = concat [ wordIDPrefix, "-", show index]
                        wordNodeLabels = wordLabels word (show book'language) (show book'dialect) arrayDel
-                       wordLine = [qc|{wordID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verse'verse}{del}{word}{del}{index}{del}{wordNodeLabels}|]
+                       token = word
+                       wordLine = [qc|{wordID}{del}{word}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verse'verse}{del}{token}{del}{index}{del}{wordNodeLabels}|]
                        vwRel  = [qc|{verseID}{del}{wordID}|]
                    
 
