@@ -161,10 +161,10 @@ data FileHandlers =  FileHandlers
     , outSecPrghRelh :: Handle
     , outSecPrghRelHeaderh :: Handle
     -- * paragraph
---    , outPrghh :: Handle
---    , outPrghHeaderh :: Handle
- --   , outPrghVerseRelh :: Handle
-  --  , outPrghVerseRelHeaderh :: Handle
+    , outPrghh :: Handle
+    , outPrghHeaderh :: Handle
+    , outPrghVerseRelh :: Handle
+    , outPrghVerseRelHeaderh :: Handle
     -- * word/tokens
     , outWordsh :: Handle
     , outWordsHeaderh :: Handle
@@ -195,6 +195,11 @@ closeHs FileHandlers {..} = do
     hClose outSecPrghRelh
     hClose outSecPrghRelHeaderh
 
+    hClose outPrghh
+    hClose outPrghHeaderh 
+    hClose outPrghVerseRelh
+    hClose outPrghVerseRelHeaderh
+
            
     hClose outWordsh 
     hClose outWordsHeaderh 
@@ -217,12 +222,20 @@ openHs outFileRoot outRefFileRoot Book{..} = do
 
            outChVerseRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterVerseRel.csv|]
            outChVerseRelHeader = outFileRoot </> [qc|ChapterVerseRel_Header.csv|]
+
            -- Sections
            outSec = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_sections.csv|]
            outSecHeader = outFileRoot </> [qc|section_header.csv|]
 
-           outSecPrghRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_SecPrghRel.csv|]
-           outSecPrghRelHeader = outFileRoot </> [qc|SecPrghRel_Header.csv|]
+           outSecPrghRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_SectionPrghRel.csv|]
+           outSecPrghRelHeader = outFileRoot </> [qc|SectionPrghRel_Header.csv|]
+
+           -- Paragraphs
+           outPrgh = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_prghs.csv|]
+           outPrghHeader = outFileRoot </> [qc|prgh_header.csv|]
+
+           outPrghVerseRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_PrghVerseRel.csv|]
+           outPrghVerseRelHeader = outFileRoot </> [qc|PrghVerseRel_Header.csv|]
 
            -- Words
            outWords = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_words.csv|]
@@ -256,6 +269,12 @@ openHs outFileRoot outRefFileRoot Book{..} = do
        outSecHeaderh <- openFile outSecHeader WriteMode
        outSecPrghRelh <- openFile outSecPrghRel WriteMode
        outSecPrghRelHeaderh <- openFile outSecPrghRelHeader WriteMode
+
+       -- paragraph
+       outPrghh <- openFile outPrgh WriteMode
+       outPrghHeaderh <- openFile outPrghHeader WriteMode
+       outPrghVerseRelh <- openFile outPrghVerseRel WriteMode
+       outPrghVerseRelHeaderh <- openFile outPrghVerseRelHeader WriteMode
 
                                
        outWordsh <- openFile outWords WriteMode
@@ -310,6 +329,10 @@ generateAllCsv bookFile path outPath = do
 
          -- Section Headers
          TIO.hPutStrLn outSecHeaderh [qc|sectionID:ID(CHAPTER-ID){del}title{del}num:int{del}chapter:int|]
+         TIO.hPutStrLn outSecPrghRelHeaderh  [qc|:START_ID(CHAPTER-ID){del}:END_ID(CHAPTER-ID)|]
+
+         -- Paragraph Headers
+         TIO.hPutStrLn outPrghHeaderh [qc|prghID:ID(CHAPTER-ID){del}title{del}num:int{del}section:int{del}chapter:int|]
 
          -- Verse Headers
          TIO.hPutStrLn outVerseHeaderh [qc|verseID:ID(VERSE-ID){del}book{del}chapter:int{del}section:int{del}paragraph:int{del}verse:int{del}verseText|]
@@ -333,13 +356,18 @@ generateAllCsv bookFile path outPath = do
 
            -- Sections
            forM_ chapter'sections $ \Section{..} -> do
-             let sectionID = concat [chapterID, "_", show section'number ]
+             let sectionID = concat [chapterID, "-", show section'number ]
                  secLine = [qc|{sectionID}{del}{section'title}{del}{section'number}{del}{chapter'number}|]
              TIO.hPutStrLn outSech secLine
              TIO.hPutStrLn outChSecRelh  [qc|{chapterID}{del}{sectionID}|]
                                          
               -- Paragraphs
              forM_ section'paragraphs $ \Paragraph{..} -> do
+               let prghID = concat [sectionID, "-", show paragraph'number ]
+                   prghLine = [qc|{prghID}{del}{section'title}{del}{paragraph'number}{del}{section'number}{del}{chapter'number}|]
+               TIO.hPutStrLn outPrghh prghLine
+               TIO.hPutStrLn outSecPrghRelh  [qc|{sectionID}{del}{prghID}|]
+                                                      
                -- Verses
                forM_ paragraph'verses $ \v@Verse{..} -> do
                  let verseID = concat [T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse]
@@ -349,6 +377,7 @@ generateAllCsv bookFile path outPath = do
 
                  TIO.hPutStrLn outVerseh verseLine
                  TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
+                 TIO.hPutStrLn outChVerseRelh  [qc|{prghID}{del}{verseID}|]
 
                  let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse]
                  forM_ (zip [1..] verseWords) $ \(index,word) -> do
