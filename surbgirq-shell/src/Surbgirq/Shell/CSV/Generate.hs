@@ -224,7 +224,7 @@ openHs outFileRoot outRefFileRoot Book{..} = do
        return  FileHandlers {..}  
 
 -- | Generate all possible csv file for a book
--- to use with neo4j-import '* shceme'
+-- to use with neo4j-import '* scheme'
 generateAllCsv :: FilePath -> FilePath -> FilePath -> IO ()
 generateAllCsv bookFile path outPath = do
    let del = ';';
@@ -232,7 +232,7 @@ generateAllCsv bookFile path outPath = do
 
    books :: [Book] <- readYaml bookFile -- path </> "books.yaml"
 
-   -- Booksx
+   -- Books
    forM_ books $ \book@Book{..} -> do
 
      let outFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
