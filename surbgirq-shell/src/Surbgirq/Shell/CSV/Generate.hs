@@ -138,6 +138,36 @@ generateVerseCsv bookFile path outPath = do
 
 
 
+data FileHandlers =  FileHandlers
+    {
+      outh :: Handle
+    , outHeaderh :: Handle
+    , outRefh :: Handle
+    , outChh :: Handle
+    , outChHeaderh :: Handle
+    , outChVerseRelh :: Handle
+    , outChVerseRelHeaderh :: Handle
+    , outWordsh :: Handle
+    , outWordsHeaderh :: Handle
+    , outVerseWordRelh:: Handle
+    , outVerseWordRelHeaderh:: Handle
+    }
+    
+
+closeHs :: FileHandlers -> IO ()
+closeHs FileHandlers {..} = do
+    hClose outh
+    hClose outHeaderh
+    hClose outRefh
+    hClose outChh
+    hClose outChHeaderh       
+    hClose outChVerseRelh       
+    hClose outChVerseRelHeaderh
+    hClose outWordsh 
+    hClose outWordsHeaderh 
+    hClose outVerseWordRelh
+    hClose outVerseWordRelHeaderh
+  
 
 -- | Generate all possible csv file for a book
 -- to use with neo4j-import '* shceme'
@@ -155,17 +185,24 @@ generateAllCsv bookFile path outPath = do
 
          -- csv out file
          outFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
-         outFile = outFileRoot </> [qc|{verse.csv|]
+         outFile = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verses.csv|]
          outFileHeader = outFileRoot </> [qc|verse_header.csv|]
 
 
          -- Chapters
-         outCh = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_chapter.csv|]
-         outChHeader = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_chapter_header.csv|]
+         outCh = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_chapters.csv|]
+         outChHeader = outFileRoot </> [qc|chapter_header.csv|]
 
          outChVerseRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterVerseRel.csv|]
-         outChVerseRelHeader = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterVerseRel_Header.csv|]
+         outChVerseRelHeader = outFileRoot </> [qc|ChapterVerseRel_Header.csv|]
 
+         -- Words
+         outWords = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_words.csv|]
+         outWordsHeader = outFileRoot </> [qc|word_header.csv|]
+
+         outVerseWordRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_VerseWordRel.csv|]
+         outVerseWordRelHeader = outFileRoot </> [qc|VerseWordRel_Header.csv|]
+                               
                          
          -- ref file
          outRefFileRoot = outFileRoot </> "refs"
@@ -190,30 +227,32 @@ generateAllCsv bookFile path outPath = do
                                       return []
 
        bracket (do
-                  h1 <- openFile outFile WriteMode
-                  h2 <- openFile outFileHeader WriteMode
-                  h3 <- openFile outRefFile WriteMode
-                  h4 <- openFile outCh WriteMode
-                  h5 <- openFile outChHeader WriteMode
-                  h6 <- openFile outChVerseRel WriteMode
-                  h7 <- openFile outChVerseRelHeader WriteMode
-                  return (h1, h2, h3, h4, h5, h6, h7))
-                (\(h1, h2, h3, h4, h5, h6, h7) -> do
-                   hClose h1
-                   hClose h2
-                   hClose h3
-                   hClose h4
-                   hClose h5       
-                   hClose h6       
-                   hClose h7     
-                ) $ \(outh, outHeaderh, outRefh, outChh, outChHeaderh, outChVerseRelh, outChVerseRelHeaderh) -> do
+                  outh <- openFile outFile WriteMode
+                  outHeaderh <- openFile outFileHeader WriteMode
+                  outRefh <- openFile outRefFile WriteMode
+                  outChh <- openFile outCh WriteMode
+                  outChHeaderh <- openFile outChHeader WriteMode
+                  outChVerseRelh <- openFile outChVerseRel WriteMode
+                  outChVerseRelHeaderh <- openFile outChVerseRelHeader WriteMode
+                  outWordsh <- openFile outWords WriteMode
+                  outWordsHeaderh <- openFile outWordsHeader WriteMode
+                  outVerseWordRelh <- openFile outVerseWordRel  WriteMode
+                  outVerseWordRelHeaderh <- openFile outVerseWordRelHeader WriteMode
+                  return FileHandlers{..})
+                closeHs
+                $ \FileHandlers {..} -> do
 
 
+
+         -- CSV Headers
          TIO.hPutStrLn outHeaderh [qc|verseID:ID(VERSE-ID){del}book{del}chapter{del}section{del}paragraph{del}verse{del}verseText|]
          TIO.hPutStrLn outChHeaderh [qc|chapterID:ID(CHAPTER-ID){del}title{del}num{del}book|]
-
          TIO.hPutStrLn outChVerseRelHeaderh [qc|:START_ID(CHAPTER-ID){del}:END_ID(VERSE-ID)|]
 
+         -- Words Headers
+         TIO.hPutStrLn outWordsHeaderh [qc|wordID:ID(WORD-ID){del}book{del}chapter{del}section{del}paragraph{del}verse{del}token{del}|]
+         TIO.hPutStrLn outVerseWordRelHeaderh [qc|:START_ID(VERSE-ID){del}:END_ID(WORD-ID)|]
+         
             
          -- a file == a chapter
          -- Chapter
@@ -231,9 +270,20 @@ generateAllCsv bookFile path outPath = do
                forM_ paragraph'verses $ \v@Verse{..} -> do
                  let verseID = concat [T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse]
                      verseLine = [qc|{verseID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verse'verse}{del}{verse'content}|]
+                     verseWords = T.words verse'content
+
                  TIO.hPutStrLn outh verseLine
                  TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
+                                 
+                 forM_ (zip [1..] verseWords) $ \(index,w) -> do
+                   let wordID = concat ["word_", T.unpack book'shortName, "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse, "-", show index]
+                       wordLine = [qc|{wordID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verseID}{del}{w}|]
+                       vwRel  = [qc|{verseID}{del}{wordID}|]
 
+                   TIO.hPutStrLn outWordsh wordLine
+                   TIO.hPutStrLn outVerseWordRelh vwRel
+
+                 
 
 
                  -- -- verse ref processing
