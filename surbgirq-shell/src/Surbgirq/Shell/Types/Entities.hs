@@ -52,6 +52,7 @@ data RefType = RefBooks   [Text]
 data Scripture = Scripture
      { scripture'books   :: [Book]
      , scripture'Info   :: Text
+     , scripture'dataFolder :: Text
      , scripture'translation :: Translation
      }
 
