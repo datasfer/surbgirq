@@ -340,8 +340,8 @@ openHs outFileRoot outRefFileRoot Book{..} = do
                         
 -- | Generate all possible csv file for a book
 -- to use with neo4j-import '* scheme'
-generateAllCsv :: FilePath -> FilePath -> FilePath -> IO ()
-generateAllCsv bookFile path outPath = do
+generateScripturesCSV :: FilePath -> FilePath -> FilePath -> IO ()
+generateScripturesCSV bookFile path outPath = do
    let del = ';';
        arrayDel = "|"      
 

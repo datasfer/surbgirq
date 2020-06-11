@@ -103,16 +103,21 @@ wordFormsCypher wordFormFile outPath = do
 wordFormsCSV :: FilePath -> FilePath -> IO ()
 wordFormsCSV wordFormFile outPath = do
 
+  TIO.putStrLn "Words processing..."
+
+  createDirectoryIfMissing True outPath
+
   wordForms <- parseWordFormFile wordFormFile
 
   hashMapRef <- newIORef (HMap.empty :: HMap.HashMap Text Int)
   armatRef <- newIORef (0 :: Int)
   formRef <- newIORef (0 :: Int)
 
-  let outFileArmat = outPath </> "armat.csv"
-      outFileForms = outPath </> "form.csv"
-      outFileRel     = outPath </> "armatFormRel.csv"
+  let outFileArmat = outPath </> "armats.csv"
+      outFileForms = outPath </> "wordForms.csv"
+      outFileRel   = outPath </> "WordArmatRel.csv"
       del = ';'
+
   bracket (do
             h1 <- openFile outFileArmat WriteMode
             h2 <- openFile outFileForms WriteMode
@@ -123,13 +128,17 @@ wordFormsCSV wordFormFile outPath = do
               hClose h2
               hClose h3) $ \(outArmath, outFormh, outRelh) -> do
 
+      TIO.hPutStrLn outFormh  [qc|armatID:ID(ARMAT-ID){del}token{del}armat{del}tags|]
+      TIO.hPutStrLn outArmath [qc|formID:ID(WORDFORM-ID){del}armat|]
+      TIO.hPutStrLn outRelh   [qc|:START_ID(WORDFORM-ID){del}:END_ID(ARMAT-ID)|]
+
       forM_ (sortBy (comparing armat) wordForms) $ \WordForm{..} -> do
           hashMap <- readIORef hashMapRef
           modifyIORef formRef (+1)
           form_ID <- readIORef formRef
 
 
-          let formLine = [qc|{form_ID}{del} {form}{del} {armat}{del} {tags} |]
+          let formLine = [qc|{form_ID}{del}{form}{del}{armat}{del}{tags}|]
           TIO.hPutStrLn outFormh formLine
 
           let armatExists = HMap.lookup armat hashMap
@@ -141,13 +150,13 @@ wordFormsCSV wordFormFile outPath = do
               writeIORef hashMapRef m
 
               -- add headWord only for fiurst accurance
-              let headWordLine = [qc|{headID}{del} {armat} |]
+              let headWordLine = [qc|{headID}{del}{armat}|]
               TIO.hPutStrLn outArmath headWordLine
 
 
           -- add relationship
           aID <- readIORef armatRef
-          let armatRel = [qc|{aID}{del} {form_ID} |]
+          let armatRel = [qc|{aID}{del}{form_ID}|]
           TIO.hPutStrLn outRelh armatRel
 
 
