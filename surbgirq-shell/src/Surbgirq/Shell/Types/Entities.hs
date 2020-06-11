@@ -46,6 +46,15 @@ data RefType = RefBooks   [Text]
              | RefWord    Text
              | RefText    Text
                deriving (Show, Read)
+
+
+
+data Scripture = Scripture
+     { scripture'books   :: [Book]
+     , scripture'Info   :: Text
+     , scripture'translation :: Translation
+     }
+
 -- |
 data Book = Book
   { book'book        :: Girq
@@ -61,6 +70,9 @@ data Book = Book
   , book'dialect     :: Dialect
   , book'ref         :: Maybe Text
   , book'input       :: Maybe Text
+--                             , scripture'Year   :: Int
+ --    , scripture'Author :: Text
+
     -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
   , book'inputRef    :: Maybe Text
   -- ^ the ref file
@@ -114,10 +126,6 @@ data VerseRef = VerseRef
 data BookRef =  BookRef {  bookRef'ref  :: [Ref] }
                 deriving (Show, Read)
 
-data Scripture = Scripture
-    { scripture'book     :: Book
-    , scripture'chapters :: [Chapter]
-    } deriving (Show)
 
 data Ref = Ref
     { ref'From :: RefType

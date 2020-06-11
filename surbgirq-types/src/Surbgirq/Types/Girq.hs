@@ -183,20 +183,16 @@ data Language = AM
               | EN
                 deriving (Show, Eq, Read, Generic)
 
--- data Scripture = Scripture
---     { scripture'Year   :: Int
---     , scripture'Author :: Text
---     , scripture'Title  :: Text
---     , scripture'Info   :: Text
---     }
-
+type ScriptureID = String
+                         
 data Translation = Translation
-    { translation'name    :: Text
-    -- , translation'from    :: Scripture
-    , translation'Year    :: Int
-    , translation'Dialect :: Maybe Dialect
-    , translation'Lang    :: Language
-    , translation'Author  :: Text
+    { translation'ID      :: Text
+    , translation'name    :: Text
+    , translation'from    :: Maybe ScriptureID
+    , translation'year    :: Maybe Int
+    , translation'dialect :: Maybe Dialect
+    , translation'lang    :: Language
+    , translation'translators  :: [Text]
     }
 
 $(deriveJSON dropPrefixOptions ''Testament)
