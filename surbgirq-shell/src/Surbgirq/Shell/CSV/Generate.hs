@@ -140,14 +140,11 @@ generateVerseCsv bookFile path outPath = do
 
 data FileHandlers =  FileHandlers
     {
-    -- * verse
-      outVerseh :: Handle
-    , outVerseHeaderh :: Handle
-    -- * refs
-    , outRefsh :: Handle
-    , outRefsHeaderh :: Handle
-    , outRefRelh :: Handle
-    , outRefRelHeaderh :: Handle
+    -- * book
+      outBookh :: Handle
+    , outBookHeaderh :: Handle
+    , outBookChapterRelh :: Handle
+    , outBookChapterRelHeaderh :: Handle
     -- * chapter
     , outChh :: Handle
     , outChHeaderh :: Handle
@@ -165,55 +162,72 @@ data FileHandlers =  FileHandlers
     , outPrghHeaderh :: Handle
     , outPrghVerseRelh :: Handle
     , outPrghVerseRelHeaderh :: Handle
-    -- * word/tokens
+    -- * verse
+    , outVerseh :: Handle
+    , outVerseHeaderh :: Handle
+      -- * word/tokens
     , outWordsh :: Handle
     , outWordsHeaderh :: Handle
     , outVerseWordRelh:: Handle
     , outVerseWordRelHeaderh:: Handle
-    }
+    -- * refs
+    , outRefsh :: Handle
+    , outRefsHeaderh :: Handle
+    , outRefRelh :: Handle
+    , outRefRelHeaderh :: Handle
+  }
     
 
 closeHs :: FileHandlers -> IO ()
 closeHs FileHandlers {..} = do
-    hClose outVerseh
-    hClose outVerseHeaderh
 
-    hClose outRefsh
-    hClose outRefsHeaderh
-    hClose outRefRelh
-    hClose outRefRelHeaderh
+  -- books
+  hClose outBookh
+  hClose outBookHeaderh       
+  hClose outBookChapterRelh       
+  hClose outBookChapterRelHeaderh
+  -- Chapters
+  hClose outChh
+  hClose outChHeaderh       
+  hClose outChVerseRelh       
+  hClose outChVerseRelHeaderh
+  hClose outChSecRelh       
+  hClose outChSecRelHeaderh
+  -- sections
+  hClose outSech
+  hClose outSecHeaderh 
+  hClose outSecPrghRelh
+  hClose outSecPrghRelHeaderh
+  -- paragraphs
+  hClose outPrghh
+  hClose outPrghHeaderh 
+  hClose outPrghVerseRelh
+  hClose outPrghVerseRelHeaderh
+  -- verses
+  hClose outVerseh
+  hClose outVerseHeaderh
+  -- words         
+  hClose outWordsh 
+  hClose outWordsHeaderh 
+  hClose outVerseWordRelh
+  hClose outVerseWordRelHeaderh
+  -- refs
+  hClose outRefsh
+  hClose outRefsHeaderh
+  hClose outRefRelh
+  hClose outRefRelHeaderh
 
-    hClose outChh
-    hClose outChHeaderh       
-    hClose outChVerseRelh       
-    hClose outChVerseRelHeaderh
-    hClose outChSecRelh       
-    hClose outChSecRelHeaderh
-
-    hClose outSech
-    hClose outSecHeaderh 
-    hClose outSecPrghRelh
-    hClose outSecPrghRelHeaderh
-
-    hClose outPrghh
-    hClose outPrghHeaderh 
-    hClose outPrghVerseRelh
-    hClose outPrghVerseRelHeaderh
-
-           
-    hClose outWordsh 
-    hClose outWordsHeaderh 
-    hClose outVerseWordRelh
-    hClose outVerseWordRelHeaderh
-  
 
 
 openHs :: FilePath -> FilePath -> Book -> IO FileHandlers
 openHs outFileRoot outRefFileRoot Book{..} = do
-       let 
-           -- csv out file
-           outFile = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verses.csv|]
-           outFileHeader = outFileRoot </> [qc|verse_header.csv|]
+       let
+           -- Books
+           outBook = outFileRoot </> [qc|books.csv|]
+           outBookHeader = outFileRoot </> [qc|book_header.csv|]
+           outBookChapterRel = outFileRoot </> [qc|BookChapterRel.csv|]
+           outBookChapterRelHeader = outFileRoot </> [qc|BookChapterRel_Header.csv|]
+
            -- Chapters
            outCh = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_chapters.csv|]
            outChHeader = outFileRoot </> [qc|chapter_header.csv|]
@@ -237,12 +251,15 @@ openHs outFileRoot outRefFileRoot Book{..} = do
            outPrghVerseRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_PrghVerseRel.csv|]
            outPrghVerseRelHeader = outFileRoot </> [qc|PrghVerseRel_Header.csv|]
 
+           -- Verses
+           outVerse = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verses.csv|]
+           outVerseHeader = outFileRoot </> [qc|verse_header.csv|]
+           outVerseWordRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_VerseWordRel.csv|]
+           outVerseWordRelHeader = outFileRoot </> [qc|VerseWordRel_Header.csv|]
+
            -- Words
            outWords = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_words.csv|]
            outWordsHeader = outFileRoot </> [qc|word_header.csv|]
-
-           outVerseWordRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_VerseWordRel.csv|]
-           outVerseWordRelHeader = outFileRoot </> [qc|VerseWordRel_Header.csv|]
 
            -- ref file
            outRefsHeader = outRefFileRoot </> [qc|ref_header.csv|]
@@ -250,20 +267,21 @@ openHs outFileRoot outRefFileRoot Book{..} = do
            outRefRel = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_WordRefRel.csv|]
            outRefRelHeader = outRefFileRoot </> [qc|WordRefRel_Header.csv|]
 
-       -- open files
-       outVerseh <- openFile outFile WriteMode
-       outVerseHeaderh <- openFile outFileHeader WriteMode
-       outRefsh <- openFile outRefs WriteMode
-       outRefsHeaderh <- openFile outRefsHeader WriteMode
-       outRefRelh <- openFile outRefRel WriteMode
-       outRefRelHeaderh <- openFile outRefRelHeader WriteMode
-                           
+
+       -- books
+       outBookh <- openFile outBook WriteMode
+       outBookHeaderh <- openFile outBookHeader WriteMode
+       outBookChapterRelh <- openFile outBookChapterRel WriteMode
+       outBookChapterRelHeaderh <- openFile outBookChapterRelHeader WriteMode
+
+       -- chapter
        outChh <- openFile outCh WriteMode
        outChHeaderh <- openFile outChHeader WriteMode
        outChSecRelh <- openFile outChSecRel WriteMode
        outChSecRelHeaderh <- openFile outChSecRelHeader WriteMode
        outChVerseRelh <- openFile outChVerseRel WriteMode
        outChVerseRelHeaderh <- openFile outChVerseRelHeader WriteMode
+
        -- section
        outSech <- openFile outSec WriteMode
        outSecHeaderh <- openFile outSecHeader WriteMode
@@ -276,11 +294,21 @@ openHs outFileRoot outRefFileRoot Book{..} = do
        outPrghVerseRelh <- openFile outPrghVerseRel WriteMode
        outPrghVerseRelHeaderh <- openFile outPrghVerseRelHeader WriteMode
 
-                               
-       outWordsh <- openFile outWords WriteMode
-       outWordsHeaderh <- openFile outWordsHeader WriteMode
+       -- veses
+       outVerseh <- openFile outVerse WriteMode
+       outVerseHeaderh <- openFile outVerseHeader WriteMode
        outVerseWordRelh <- openFile outVerseWordRel  WriteMode
        outVerseWordRelHeaderh <- openFile outVerseWordRelHeader WriteMode
+
+       -- words
+       outWordsh <- openFile outWords WriteMode
+       outWordsHeaderh <- openFile outWordsHeader WriteMode
+
+       -- reference
+       outRefsh <- openFile outRefs WriteMode
+       outRefsHeaderh <- openFile outRefsHeader WriteMode
+       outRefRelh <- openFile outRefRel WriteMode
+       outRefRelHeaderh <- openFile outRefRelHeader WriteMode
 
        return  FileHandlers {..}  
 
@@ -304,7 +332,9 @@ generateAllCsv bookFile path outPath = do
          
          bookLabel = maybe (show book'book) ((show book'book) ++)  (T.unpack <$> book'labels)
          bookTestament = show book'testament
-         bookName = T.toLower . T.pack  $ show book'book
+         bookName = show book'book
+         lang = show book'language
+         dialect = show book'dialect
 
 
      exists <- doesDirectoryExist bookDir
@@ -320,6 +350,10 @@ generateAllCsv bookFile path outPath = do
        bracket (openHs outFileRoot outRefFileRoot book)
                closeHs
                    $ \FileHandlers {..} -> do
+
+         -- Book Headers
+         TIO.hPutStrLn outBookHeaderh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
+         TIO.hPutStrLn outBookChapterRelHeaderh [qc|:START_ID{del}:END_ID(CHAPTER-ID)|]
 
          -- Chapter Headers
          TIO.hPutStrLn outChHeaderh [qc|chapterID:ID(CHAPTER-ID){del}title{del}num:int{del}book|]
@@ -344,15 +378,28 @@ generateAllCsv bookFile path outPath = do
          -- Ref Headers
          TIO.hPutStrLn outRefsHeaderh [qc|refID:ID(REF-ID){del}text{del}index:int{del}:LABEL|]
          TIO.hPutStrLn outRefRelHeaderh [qc|:START_ID(WORD-ID){del}:END_ID(REF-ID){del}:TYPE|]
-         
+
+
+
+         -- book csv
+         let bookNodeLabels = intercalate arrayDel [bookName, lang, dialect, bookLabel, bookTestament, "Book"]
+             bookID = concat [T.unpack book'shortName, lang, "_", show book'number]
+             bookLine = [qc|{bookID}{del}{book'book}{del}{book'title}{del}{book'number}{del}{book'chapters}{del}{book'testament}{del}{book'translation}{del}{bookNodeLabels}|]
+
+         TIO.hPutStrLn outBookh bookLine
+                
+
             
          -- a file == a chapter
          -- Chapter
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
            ch@Chapeter{..} <- readChapter (bookDir </> file)
-           let chapterID = concat [T.unpack book'shortName, "_", show chapter'number ]
+           let chapterID = concat [bookID, "-", show chapter'number ]
                chNode = [qc|{chapterID}{del}Գլ. {chapter'number}{del}{chapter'number}{del}{show book'book}|]
+               bookRel  = [qc|{bookID}{del}{chapterID}|]
+
            TIO.hPutStrLn outChh chNode
+           TIO.hPutStrLn outBookChapterRelh bookRel
 
            -- Sections
            forM_ chapter'sections $ \Section{..} -> do
