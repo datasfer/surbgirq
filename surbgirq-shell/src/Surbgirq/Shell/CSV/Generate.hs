@@ -141,14 +141,15 @@ generateVerseCsv bookFile path outPath = do
 data FileHandlers =  FileHandlers
     {
      -- * scriptures
-      outTranslationh :: Handle
-    , outDivisionh :: Handle
-    , outTestamenth :: Handle
-    , outScriptureBookRelth :: Handle
+  --    outTranslationh :: Handle
+  --  , outDivisionh :: Handle
+  --  , outTestamenth :: Handle
+  --  , outScriptureBookRelth :: Handle
     -- * book
     -- ,  outBookh :: Handle
-    , outBookHeaderh :: Handle
-    , outBookChapterRelh :: Handle
+    -- , outBookHeaderh :: Handle
+     
+      outBookChapterRelh :: Handle
     , outBookChapterRelHeaderh :: Handle
     -- * chapter
     , outChh :: Handle
@@ -187,20 +188,20 @@ closeHs :: FileHandlers -> IO ()
 closeHs FileHandlers {..} = do
 
   -- scriptures with headers
-  hClose outTranslationh
-  hClose outDivisionh       
-  hClose outTestamenth
-  hClose outScriptureBookRelth
+--  hClose outTranslationh
+--  hClose outDivisionh       
+--  hClose outTestamenth
+--  hClose outScriptureBookRelth
 
   -- books
   -- hClose outBookh
-  hClose outBookHeaderh       
+  -- hClose outBookHeaderh       
   hClose outBookChapterRelh       
   hClose outBookChapterRelHeaderh
 
   -- books
   -- hClose outBookh
-  hClose outBookHeaderh       
+  -- hClose outBookHeaderh       
   hClose outBookChapterRelh       
   hClose outBookChapterRelHeaderh
   -- Chapters
@@ -241,7 +242,7 @@ openHs outFileRoot outRefFileRoot Book{..} = do
        let
            -- Books
            -- outBook = outFileRoot </> [qc|books.csv|]
-           outBookHeader = outFileRoot </> [qc|book_header.csv|]
+           -- outBookHeader = outFileRoot </> [qc|book_header.csv|]
            outBookChapterRel = outFileRoot </> [qc|BookChapterRel.csv|]
            outBookChapterRelHeader = outFileRoot </> [qc|BookChapterRel_Header.csv|]
 
@@ -285,14 +286,10 @@ openHs outFileRoot outRefFileRoot Book{..} = do
            outRefRelHeader = outRefFileRoot </> [qc|WordRefRel_Header.csv|]
 
        -- scriptures -- append
-       outTranslationh <- openFile (outFileRoot </> [qc|translations.csv|]) WriteMode
-       outDivisionh <- openFile (outFileRoot </> [qc|divisions.csv|]) WriteMode
-       outTestamenth <- openFile (outFileRoot </> [qc|testaments.csv|]) WriteMode
-       outScriptureBookRelth <- openFile (outFileRoot </> [qc|scriptureRel.csv|]) WriteMode
 
        -- books -- append
   --     outBookh <- openFile outBook AppendMode
-       outBookHeaderh <- openFile outBookHeader WriteMode
+       --- outBookHeaderh <- openFile outBookHeader WriteMode
        outBookChapterRelh <- openFile outBookChapterRel AppendMode
        outBookChapterRelHeaderh <- openFile outBookChapterRelHeader WriteMode
 
@@ -351,18 +348,29 @@ generateAllCsv bookFile path outPath = do
    scriptures :: [Scripture] <- readYaml bookFile -- path </> "books.yaml"
 
    let outRootPath = outPath </> "scriptures" 
-     -- save all books in one place
-       outBook = outRootPath </> [qc|books.csv|]
+
 
    createDirectoryIfMissing True outRootPath
     
    bracket (do
-              h1 <- openFile outBook WriteMode
-              return h1)
-            (\h1 -> do
+              h1 <- openFile (outRootPath </> [qc|books.csv|]) WriteMode -- save all books in one place
+              h2 <- openFile (outRootPath </> [qc|translations.csv|]) WriteMode
+              h3 <- openFile (outRootPath </> [qc|divisions.csv|]) WriteMode
+              h4 <- openFile (outRootPath </> [qc|testaments.csv|]) WriteMode
+              h5 <- openFile (outRootPath </> [qc|scriptureRel.csv|]) WriteMode
+              return (h1,h2,h3,h4,h5))
+            (\(h1, h2, h3, h4, h5) -> do
                hClose h1
-             ) $ \outBookh -> do
+               hClose h2
+               hClose h3
+               hClose h4
+               hClose h5
+             ) $ \(outBookh, outTranslationh, outDivisionh, outTestamenth, outScriptureBookRelth) -> do
 
+
+     TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
+     TIO.hPutStrLn outTranslationh [qc|translationID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
+                      
      -- scriptures
      forM_ scriptures $ \scripture@Scripture{..} -> do
 
@@ -416,7 +424,7 @@ generateAllCsv bookFile path outPath = do
 
 
                -- Book Headers
-               TIO.hPutStrLn outBookHeaderh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
+               -- TIO.hPutStrLn outBookHeaderh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
                TIO.hPutStrLn outBookChapterRelHeaderh [qc|:START_ID{del}:END_ID(CHAPTER-ID)|]
 
                -- Chapter Headers
