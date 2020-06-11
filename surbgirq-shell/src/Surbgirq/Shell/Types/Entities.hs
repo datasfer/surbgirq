@@ -106,6 +106,8 @@ data Paragraph = Paragraph
 data Verse = Verse
   { verse'verse   :: Int
   , verse'content :: Text
+  , verse'seperatedBy :: Maybe Int
+  -- ^ next part of this verse should go to next section or prgh
 --   , verse'grabar    :: Text
   , verse'ref     :: Maybe VerseRef
   } deriving (Show)
