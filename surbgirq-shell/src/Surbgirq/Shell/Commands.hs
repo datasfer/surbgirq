@@ -69,8 +69,8 @@ parser = do
     (  metavar "PATH"
     <> long "config"
     <> short 'c'
-    <> help "Config file, list of books and etc..x"
-    <> value "data/yaml/config.yaml"
+    <> help "Configuration file for all scriptures corpora"
+    <> value "data/corpora.conf"
     <> showDefault
     )
   cmd'inPath <- strOption

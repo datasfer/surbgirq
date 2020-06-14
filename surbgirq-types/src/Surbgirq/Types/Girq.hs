@@ -193,7 +193,8 @@ data Translation = Translation
     , translation'dialect :: Maybe Dialect
     , translation'lang    :: Language
     , translation'translators  :: [Text]
-    }
+    } deriving (Show, Read)
+
 
 $(deriveJSON dropPrefixOptions ''Testament)
 $(deriveJSON dropPrefixOptions ''Dialect)

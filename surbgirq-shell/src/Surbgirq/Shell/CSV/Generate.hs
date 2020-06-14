@@ -6,9 +6,6 @@
 
 module Surbgirq.Shell.CSV.Generate where
 
-
-
-
 import Control.Exception    (bracket)
 import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
 
@@ -39,14 +36,15 @@ import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
 
 
-
-
-
 generateVerseCsv :: FilePath -> FilePath -> FilePath -> IO ()
 generateVerseCsv bookFile path outPath = do
    let del = ';';
        arrayDel = "|";
-   books :: [Book] <- readYaml bookFile -- path </> "books.yaml"
+   corpora :: Corpora <- readYaml bookFile
+
+   scriptures :: [Scripture] <- readYaml (corpora'scripturesPath corpora)
+
+   let books = let  (x:_) = scriptures in scripture'books x
 
    -- Booksx
    forM_ books $ \Book{..} -> do
@@ -341,11 +339,15 @@ openHs outFileRoot outRefFileRoot Book{..} = do
 -- | Generate all possible csv file for a book
 -- to use with neo4j-import '* scheme'
 generateScripturesCSV :: FilePath -> FilePath -> FilePath -> IO ()
-generateScripturesCSV bookFile path outPath = do
+generateScripturesCSV configFile path outPath = do
    let del = ';';
        arrayDel = "|"      
 
-   scriptures :: [Scripture] <- readYaml bookFile -- path </> "books.yaml"
+   corpora :: Corpora <- readYaml configFile
+
+   TIO.putStrLn  $ T.pack $ show corpora
+              
+   scriptures :: [Scripture] <- readYaml (corpora'scripturesPath corpora)
 
    let outRootPath = outPath </> "scriptures" 
 
@@ -370,7 +372,15 @@ generateScripturesCSV bookFile path outPath = do
 
      TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
      TIO.hPutStrLn outTranslationh [qc|translationID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
-                      
+
+
+   -- read word forms csv file
+--     wordForms <- parseWordFormFile wordFormFile
+
+        
+     -- TODO: read words/WordForms.csv
+     -- find verse  tokens in wordForms list and make referecen 
+        
      -- scriptures
      forM_ scriptures $ \scripture@Scripture{..} -> do
 

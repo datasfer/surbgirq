@@ -3,7 +3,8 @@
 
 
 module Surbgirq.Shell.Types.Entities (
-   Scripture(..)
+   Corpora(..)
+ , Scripture(..)
  , Book(..)
  , Chapter (..)
  , Section(..)
@@ -48,13 +49,18 @@ data RefType = RefBooks   [Text]
                deriving (Show, Read)
 
 
+data Corpora = Corpora
+     { corpora'scripturesPath  :: FilePath
+     , corpora'grabar60kPath   :: FilePath
+     } deriving (Show, Read)
 
 data Scripture = Scripture
      { scripture'books   :: [Book]
      , scripture'Info   :: Text
      , scripture'dataFolder :: Text
      , scripture'translation :: Translation
-     }
+     } deriving (Show, Read)
+
 
 -- |
 data Book = Book
@@ -79,7 +85,7 @@ data Book = Book
   -- ^ the ref file
   , book'output      :: Maybe Text
   -- ^ the path to store processed result
-  } deriving (Show)
+  } deriving (Show, Read)
 
 data Chapter = Chapeter
     { chapter'number   :: Int
@@ -136,6 +142,7 @@ data Ref = Ref
     } deriving (Show, Read)
 
 
+$(deriveJSON dropPrefixOptions ''Corpora)
 $(deriveJSON dropPrefixOptions ''Book)
 $(deriveJSON dropPrefixOptions ''Scripture)
 $(deriveJSON dropPrefixOptions ''Chapter)
