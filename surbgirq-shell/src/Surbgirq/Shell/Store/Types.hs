@@ -7,13 +7,13 @@ import Database.Selda
 import GHC.Generics
 
 data EngLemma = EngLemma
-  { lemmaID :: ID EngLemma
+  { lemmaID :: Int -- ID EngLemma
   , amWord  :: Text
   , enWord  :: Text
   } deriving (Show, Generic)
 
 data WordForm = WordForm
-  { formID :: ID WordForm
+  { formID :: Int -- ID WordForm
   , form   :: Text
   , armat  :: Text
   , tags   :: Text
@@ -22,12 +22,12 @@ data WordForm = WordForm
 
 
 data Armat = Armat
-  { armatID   :: ID Armat
+  { armatID   :: Int -- ID Armat
   , armatWord :: Text
   } deriving (Show, Generic)
 
 data ArmatForm = ArmatForm
-  { armatFormID :: ID ArmatForm
-  , relArmat    :: ID Armat
+  { armatFormID :: Int -- ID ArmatForm
+  , relArmat    :: Int -- ID Armat
   , wordForm    :: Text
   } deriving (Show, Generic)

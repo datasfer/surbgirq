@@ -346,7 +346,8 @@ generateScripturesCSV configFile path outPath = do
    corpora :: Corpora <- readYaml configFile
 
    TIO.putStrLn  $ T.pack $ show corpora
-              
+
+   TIO.putStrLn "reading list of Scriptures..."
    scriptures :: [Scripture] <- readYaml (corpora'scripturesPath corpora)
 
    let outRootPath = outPath </> "scriptures" 
@@ -371,11 +372,19 @@ generateScripturesCSV configFile path outPath = do
 
 
      TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
-     TIO.hPutStrLn outTranslationh [qc|translationID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
+     TIO.hPutStrLn outTranslationh [qc|translationID:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
 
+     TIO.putStrLn "before read tr"
+        
+     translations :: [Translation] <- readYaml (corpora'translationsPath corpora)
+     TIO.putStrLn "read tr"
+     forM_ translations $ \tr@Translation{..} -> do
+       let trTranslators = T.intercalate (T.pack arrayDel) translation'translators
+           trLine = [qc|{translation'ID}{del}{translation'name}{del}{translation'version}{del}{translation'language}{del}{translation'from}{del}{translation'year}{del}{translation'dialect}{del}{translation'lang}{del}{trTranslators}{del}{translation'description}{del}Translation|]
+       TIO.hPutStrLn outTranslationh trLine
 
    -- read word forms csv file
---     wordForms <- parseWordFormFile wordFormFile
+   --  wordForms <- parseWordFormFile wordFormFile
 
         
      -- TODO: read words/WordForms.csv
@@ -409,7 +418,7 @@ generateScripturesCSV configFile path outPath = do
                bookName = show book'book
                lang = show   book'language
                dialect = show  book'dialect
-               translation = T.unpack $ translation'ID scripture'translation
+               translation = T.unpack scripture'translationID
 
            TIO.putStrLn [qc|Book text path: {bookDir}|]
 

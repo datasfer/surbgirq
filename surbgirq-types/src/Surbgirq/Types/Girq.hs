@@ -188,6 +188,9 @@ type ScriptureID = String
 data Translation = Translation
     { translation'ID      :: Text
     , translation'name    :: Text
+    , translation'version    :: Text
+    , translation'description    :: Text
+    , translation'language    :: Text
     , translation'from    :: Maybe ScriptureID
     , translation'year    :: Maybe Int
     , translation'dialect :: Maybe Dialect

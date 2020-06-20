@@ -23,6 +23,7 @@ import Data.Text  (Text)
 
 import Common.Aeson
 
+import Surbgirq.Shell.Store.ParseFile
 import Surbgirq.Types.Girq
 -------------------------------------------------------------------------------
 --
@@ -51,6 +52,7 @@ data RefType = RefBooks   [Text]
 
 data Corpora = Corpora
      { corpora'scripturesPath  :: FilePath
+     , corpora'translationsPath :: FilePath
      , corpora'grabar60kPath   :: FilePath
      } deriving (Show, Read)
 
@@ -58,7 +60,7 @@ data Scripture = Scripture
      { scripture'books   :: [Book]
      , scripture'Info   :: Text
      , scripture'dataFolder :: Text
-     , scripture'translation :: Translation
+     , scripture'translationID :: Text
      } deriving (Show, Read)
 
 

@@ -48,14 +48,14 @@ import Surbgirq.Shell.Store.SQLite.Selda
 main :: IO ()
 main = --  liftIO $ createDirectoryIfMissing True $ "db"
   withSQLite "db/ban.sqlite" $ do
-    createTable engLemma
-    createTable wordFrom
+    createTable engLemmaTable
+    createTable wordFormTable
 
     xs <- liftIO $ parseLemmaFile "data/txt/engLemmas.txt"
-    insert_ engLemma xs
+    insert_ engLemmaTable xs
 
     ys <- liftIO $ parseWordFormFile "data/txt/wordForms.txt"
-    insert_ wordFrom ys
+    insert_ wordFormTable ys
 
     return ()
 

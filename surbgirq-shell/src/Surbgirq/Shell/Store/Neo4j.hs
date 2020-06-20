@@ -8,11 +8,13 @@ module Surbgirq.Shell.Store.Neo4j where
 
 import Data.IORef
 import Database.Selda
+import Database.Selda.SQLite
 import System.Directory
 import System.FilePath
 import System.IO
 import Text.Printf
-
+import Control.Monad
+    
 import Control.Exception             (bracket)
 import Control.Monad                 (forM_, when)
 import Data.List                     (sortBy, splitAt)
@@ -28,7 +30,13 @@ import qualified Data.Text.IO        as TIO
 
 import Surbgirq.Shell.Store.ParseFile
 import Surbgirq.Shell.Types
+import Surbgirq.Shell.Store.SQLite.Selda
 
+-------------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------------
+
+    
 chunk :: Int -> [a] -> [[a]]
 chunk n xs = case splitAt n xs of
   (c,[]) -> [c]
@@ -100,7 +108,7 @@ wordFormsCypher wordFormFile outPath = do
 
 -- |
 -- generate csv file to
-wordFormsCSV :: FilePath -> FilePath -> IO ()
+-- wordFormsCSV :: FilePath -> FilePath -> IO ()
 wordFormsCSV wordFormFile outPath = do
 
   TIO.putStrLn "Words processing..."
@@ -131,34 +139,42 @@ wordFormsCSV wordFormFile outPath = do
       TIO.hPutStrLn outFormh  [qc|armatID:ID(ARMAT-ID){del}token{del}armat{del}tags|]
       TIO.hPutStrLn outArmath [qc|formID:ID(WORDFORM-ID){del}armat|]
       TIO.hPutStrLn outRelh   [qc|:START_ID(WORDFORM-ID){del}:END_ID(ARMAT-ID)|]
-
-      forM_ (sortBy (comparing armat) wordForms) $ \WordForm{..} -> do
-          hashMap <- readIORef hashMapRef
-          modifyIORef formRef (+1)
-          form_ID <- readIORef formRef
-
-
-          let formLine = [qc|{form_ID}{del}{form}{del}{armat}{del}{tags}|]
-          TIO.hPutStrLn outFormh formLine
-
-          let armatExists = HMap.lookup armat hashMap
-          when (isNothing armatExists) $ do
-              modifyIORef armatRef (+1)
-              headID <- readIORef armatRef
-
-              let m = HMap.insert armat headID hashMap
-              writeIORef hashMapRef m
-
-              -- add headWord only for fiurst accurance
-              let headWordLine = [qc|{headID}{del}{armat}|]
-              TIO.hPutStrLn outArmath headWordLine
+      
+      liftIO $ withSQLite "words.sqlite" $ do
+        createTable armatformTable
+        createTable armatTable
+        createTable wordFormTable
+        createTable engLemmaTable            
+                         
+        liftIO $ forM_ (sortBy (comparing armat) wordForms) $ \WordForm{..} -> do
+            hashMap <- readIORef hashMapRef
+            modifyIORef formRef (+1)
+            form_ID <- readIORef formRef
 
 
-          -- add relationship
-          aID <- readIORef armatRef
-          let armatRel = [qc|{aID}{del}{form_ID}|]
-          TIO.hPutStrLn outRelh armatRel
+            let formLine = [qc|{form_ID}{del}{form}{del}{armat}{del}{tags}|]
+            TIO.hPutStrLn outFormh formLine
+            -- _ <- insert wordFormTable $ [WordForm form_ID form armat tags] 
+                  
+            let armatExists = HMap.lookup armat hashMap
+            when (isNothing armatExists) $ do
+                modifyIORef armatRef (+1)
+                headID <- readIORef armatRef
+
+                let m = HMap.insert armat headID hashMap
+                writeIORef hashMapRef m
+
+                -- add headWord only for fiurst accurance
+                let headWordLine = [qc|{headID}{del}{armat}|]
+                TIO.hPutStrLn outArmath headWordLine
+
+
+            -- add relationship
+            aID <- readIORef armatRef
+            let armatRel = [qc|{aID}{del}{form_ID}|]
+            TIO.hPutStrLn outRelh armatRel
 
 
 
 
+-- csvReadWordForms :: FilePath -> 

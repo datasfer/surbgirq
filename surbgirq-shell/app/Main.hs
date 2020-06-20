@@ -76,6 +76,7 @@ main = do
                           TIO.putStrLn "Bible scriptures generation success!"
                    CSV -> do
                           TIO.putStrLn "CSV genererating starting ..."
+                          -- wordFormsCSV "./data/txt/wordForms.txt" "./data/csv/words"
                           generateScripturesCSV cmd'config cmd'inPath cmd'outPath
                           wordFormsCSV "./data/txt/wordForms.txt" "./data/csv/words"
                           TIO.putStrLn "CSV generation success!"
