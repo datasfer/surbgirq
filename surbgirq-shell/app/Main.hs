@@ -51,7 +51,7 @@ main1 = do
   TIO.putStrLn res
   TIO.putStrLn "Գիրք ծննդեան"
 
--- |  stack exec -- surbgirq-shell --bible --cypher -c ./data/yaml/books.yaml -i ./data/yaml -o ./data/cypher
+-- |  stack exec -- surbgirq-shell --bible --csv -c ./data/corpora.conf -i ./data/yaml -o ./data/csv
 main :: IO ()
 main = do
   cmd <- customExecParser (prefs showHelpOnError) $

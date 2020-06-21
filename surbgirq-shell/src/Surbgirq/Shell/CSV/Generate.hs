@@ -39,117 +39,9 @@ import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
 
 
-generateVerseCsv :: FilePath -> FilePath -> FilePath -> IO ()
-generateVerseCsv bookFile path outPath = do
-   let del = ';';
-       arrayDel = "|";
-   corpora :: Corpora <- readYaml bookFile
-
-   scriptures :: [Scripture] <- readYaml (corpora'scripturesPath corpora)
-
-   let books = let  (x:_) = scriptures in scripture'books x
-
-   -- Booksx
-   forM_ books $ \Book{..} -> do
-
-     let inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
-         bookDir = path </> (T.unpack inPath)
-
-         -- cypher out file
-         outCypherFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
-         outFile = outCypherFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.csv|]
-         outFileHeader = outCypherFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_header.csv|]
-
-         -- ref file
-         outRefFileRoot = outCypherFileRoot </> "refs"
-         outRefFile = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.ref|]
-
-         bookLabel = maybe (show book'book) ((show book'book) ++)  (T.unpack <$> book'labels)
-         bookTestament = show book'testament
-         bookName = T.toLower . T.pack  $ show book'book
-         lang = show book'language
-         dialect = show book'dialect
-
-
-
-     exists <- doesDirectoryExist bookDir
-     -- check if books input directory exists
-     when exists $ do
-       -- here no need to error check
-       createDirectoryIfMissing True outCypherFileRoot
-       createDirectoryIfMissing True outRefFileRoot
-       txtFiles <- listDirectory bookDir `catchError` \_ -> do
-                                      liftIO $ putStrLn (concat [bookDir, " does not exist."])
-                                      return []
-
-       bracket (do
-                  h1 <- openFile outFile WriteMode
-                  h2 <- openFile outFile WriteMode
-                  h3 <- openFile outRefFile WriteMode
-                  return (h1, h2, h3))
-                (\(h1, h2, h3) -> do
-                   hClose h1
-                   hClose h2
-                   hClose h3) $ \(outh, outhHeader, outRefh) -> do
-
-
-         TIO.hPutStrLn outhHeader ""
-
-         -- a file == a chapter
-         forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
-           ch@Chapeter{..} <- readChapter (bookDir </> file)
-           -- Sections
-           forM_ chapter'sections $ \Section{..} -> do
-              -- Paragraphs
-             forM_ section'paragraphs $ \Paragraph{..} -> do
-               -- Verses
-               forM_ paragraph'verses $ \v@Verse{..} -> do
-                 let verseLine = [qc|{bookLabel}{del} {chapter'number}{del} {section'number}{del} {paragraph'number}{del} {verse'verse}{del} {verse'content} |]
-                 TIO.hPutStrLn outh verseLine
-
-
-
-                 -- -- verse ref processing
-                 -- case verse'ref of
-                 --   Nothing -> return ()
-                 --   Just VerseRef{..} -> do
-                 --     case verseRef'type of
-                 --       RefText txt -> do
-                 --         let wordN = concat [verseName, del, "word", show verseRef'index]
-                 --             footnoteName = concat [wordN, del, "footnote", show verseRef'index]
-                 --             footnoteNode = [qc| ({footnoteName}:Footnote \{text: '{txt}', index: {verseRef'index}}),|]
-                 --             footnoteRel  = [qc| ({wordN})-[:REF_FOOTNOTE]->({footnoteName}),|]
-                 --         TIO.hPutStrLn outh footnoteNode
-                 --         TIO.hPutStrLn outh footnoteRel
-                 --       _ -> return ()
-
-
-  where
-    tail' :: [a] -> [a]
-    tail' []     = []
-    tail' (x:xs) = xs
-    doesFilenameMatch :: FilePath -> Bool
-    doesFilenameMatch path = takeExtension path `elem` [ ".yaml", ".yml"]
-    isDir :: FilePath -> Bool
-    isDir path = takeExtension path == ""
-    readChapter :: FilePath -> IO Chapter
-    readChapter file = do
-      book <- readYaml file
-      return book
-
-
 
 data FileHandlers =  FileHandlers
     {
-     -- * scriptures
-  --    outTranslationh :: Handle
-  --  , outDivisionh :: Handle
-  --  , outTestamenth :: Handle
-  --  , outScriptureBookRelth :: Handle
-    -- * book
-    -- ,  outBookh :: Handle
-    -- , outBookHeaderh :: Handle
-     
       outEntityBookRelh :: Handle
     -- * chapter
     , outChh :: Handle
@@ -157,180 +49,88 @@ data FileHandlers =  FileHandlers
     , outChVerseRelh :: Handle
     -- * section
     , outSech :: Handle
---    , outSecHeaderh :: Handle
     , outSecPrghRelh :: Handle
---    , outSecPrghRelHeaderh :: Handle
     -- * paragraph
     , outPrghh :: Handle
- --   , outPrghHeaderh :: Handle
     , outPrghVerseRelh :: Handle
-  --  , outPrghVerseRelHeaderh :: Handle
     -- * verse
     , outVerseh :: Handle
-   -- , outVerseHeaderh :: Handle
-      -- * word/tokens
+    -- * word/tokens
     , outWordsh :: Handle
-   -- , outWordsHeaderh :: Handle
     , outVerseWordRelh:: Handle
-  --  , outVerseWordRelHeaderh:: Handle
+    -- * footnotes
+    , outFootnotesh :: Handle
+    , outWordFootnoteRelh :: Handle
+    , outVerseFootnoteRelh :: Handle
     -- * refs
     , outRefsh :: Handle
-   -- , outRefsHeaderh :: Handle
     , outRefRelh :: Handle
-   -- , outRefRelHeaderh :: Handle
+
   }
     
 
 closeHs :: FileHandlers -> IO ()
 closeHs FileHandlers {..} = do
-
-  -- scriptures with headers
---  hClose outTranslationh
---  hClose outDivisionh       
---  hClose outTestamenth
---  hClose outScriptureBookRelth
-
-  -- books
-  -- hClose outBookh
-  -- hClose outBookHeaderh       
   hClose outEntityBookRelh
-  -- books
-  -- hClose outBookh
-  -- hClose outBookHeaderh       
-
   -- Chapters
   hClose outChh
   hClose outChVerseRelh       
   hClose outChSecRelh       
   -- sections
   hClose outSech
- -- hClose outSecHeaderh 
   hClose outSecPrghRelh
-  -- hClose outSecPrghRelHeaderh
-  -- paragraphs
   hClose outPrghh
-  -- hClose outPrghHeaderh 
   hClose outPrghVerseRelh
-  -- hClose outPrghVerseRelHeaderh
   -- verses
   hClose outVerseh
-  -- hClose outVerseHeaderh
   -- words         
   hClose outWordsh 
- --  hClose outWordsHeaderh 
   hClose outVerseWordRelh
-  -- hClose outVerseWordRelHeaderh
+  -- footnotes
+  hClose outFootnotesh
+  hClose outWordFootnoteRelh
+  hClose outVerseFootnoteRelh
   -- refs
   hClose outRefsh
-  -- hClose outRefsHeaderh
   hClose outRefRelh
- --  hClose outRefRelHeaderh
-
 
 
 openHs :: FilePath -> FilePath -> Book -> IO FileHandlers
 openHs outFileRoot outRefFileRoot Book{..} = do
-       let
-           -- Books
-           -- outBook = outFileRoot </> [qc|books.csv|]
-           -- outBookHeader = outFileRoot </> [qc|book_header.csv|]
 
+    outEntityBookRelh <- openFile (outFileRoot </> [qc|EntityBookRel.csv|]) WriteMode
 
-           outEntityBookRel = outFileRoot </> [qc|EntityBookRel.csv|]
+    -- chapter
+    outChh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_chapters.csv|]) WriteMode
+    outChSecRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterSectionRel.csv|]) WriteMode
+    outChVerseRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterVerseRel.csv|]) WriteMode
 
-                                     
-           -- Chapters
-           outCh = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_chapters.csv|]
+    -- section
+    outSech <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_sections.csv|]) WriteMode
+    outSecPrghRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_SectionPrghRel.csv|]) WriteMode
 
-           outChSecRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterSectionRel.csv|]
-           outChSecRelHeader = outFileRoot </> [qc|ChapterSectionRel_Header.csv|]
+    -- paragraph
+    outPrghh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_prghs.csv|]) WriteMode
+    outPrghVerseRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_PrghVerseRel.csv|]) WriteMode
 
-           outChVerseRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterVerseRel.csv|]
-           outChVerseRelHeader = outFileRoot </> [qc|ChapterVerseRel_Header.csv|]
+    -- veses
+    outVerseh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verses.csv|]) WriteMode
+    outVerseWordRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_VerseWordRel.csv|])  WriteMode
 
-           -- Sections
-           outSec = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_sections.csv|]
-           outSecHeader = outFileRoot </> [qc|section_header.csv|]
+    -- words
+    outWordsh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_words.csv|]) WriteMode
 
-           outSecPrghRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_SectionPrghRel.csv|]
-           outSecPrghRelHeader = outFileRoot </> [qc|SectionPrghRel_Header.csv|]
+    -- footnotes
+    outFootnotesh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_footnotes.csv|]) WriteMode
+    outWordFootnoteRelh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_word_footnote.csv|]) WriteMode
+    outVerseFootnoteRelh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verse_footnote.csv|]) WriteMode
 
-           -- Paragraphs
-           outPrgh = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_prghs.csv|]
-           outPrghHeader = outFileRoot </> [qc|prgh_header.csv|]
+    -- reference
+    outRefsh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_refs.csv|]) WriteMode
+    outRefRelh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_WordRefRel.csv|]) WriteMode
 
-           outPrghVerseRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_PrghVerseRel.csv|]
-           outPrghVerseRelHeader = outFileRoot </> [qc|PrghVerseRel_Header.csv|]
+    return  FileHandlers {..}  
 
-           -- Verses
-           outVerse = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verses.csv|]
-           outVerseHeader = outFileRoot </> [qc|verse_header.csv|]
-           outVerseWordRel = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_VerseWordRel.csv|]
-           outVerseWordRelHeader = outFileRoot </> [qc|VerseWordRel_Header.csv|]
-
-           -- Words
-           outWords = outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_words.csv|]
-           outWordsHeader = outFileRoot </> [qc|word_header.csv|]
-
-           -- ref file
-           outRefsHeader = outRefFileRoot </> [qc|ref_header.csv|]
-           outRefs = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_refs.csv|]
-           outRefRel = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_WordRefRel.csv|]
-           outRefRelHeader = outRefFileRoot </> [qc|WordRefRel_Header.csv|]
-
-       -- scriptures -- append
-
-           
-
-                             
-       -- books -- append
-
-       outEntityBookRelh <- openFile outEntityBookRel WriteMode
-
-       -- chapter
-       outChh <- openFile outCh WriteMode
---       outChHeaderh <- openFile outChHeader WriteMode
-       outChSecRelh <- openFile outChSecRel WriteMode
- --      outChSecRelHeaderh <- openFile outChSecRelHeader WriteMode
-       outChVerseRelh <- openFile outChVerseRel WriteMode
- --      outChVerseRelHeaderh <- openFile outChVerseRelHeader WriteMode
-
-       -- section
-       outSech <- openFile outSec WriteMode
-   --    outSecHeaderh <- openFile outSecHeader WriteMode
-       outSecPrghRelh <- openFile outSecPrghRel WriteMode
-     --  outSecPrghRelHeaderh <- openFile outSecPrghRelHeader WriteMode
-
-       -- paragraph
-       outPrghh <- openFile outPrgh WriteMode
-      -- outPrghHeaderh <- openFile outPrghHeader WriteMode
-       outPrghVerseRelh <- openFile outPrghVerseRel WriteMode
-      -- outPrghVerseRelHeaderh <- openFile outPrghVerseRelHeader WriteMode
-
-       -- veses
-       outVerseh <- openFile outVerse WriteMode
-      -- outVerseHeaderh <- openFile outVerseHeader WriteMode
-       outVerseWordRelh <- openFile outVerseWordRel  WriteMode
- --      outVerseWordRelHeaderh <- openFile outVerseWordRelHeader WriteMode
-
-       -- words
-       outWordsh <- openFile outWords WriteMode
---       outWordsHeaderh <- openFile outWordsHeader WriteMode
-
-       -- reference
-       outRefsh <- openFile outRefs WriteMode
-  --     outRefsHeaderh <- openFile outRefsHeader WriteMode
-       outRefRelh <- openFile outRefRel WriteMode
-    --   outRefRelHeaderh <- openFile outRefRelHeader WriteMode
-
-       return  FileHandlers {..}  
-
-
--- removeIfExists :: FilePath -> IO ()
--- removeIfExists fileName = removeFile fileName `catch` handleExists
---  where handleExists e
---          | isDoesNotExistError e = return ()
---          | otherwise = throwIO e
                         
 -- | Generate all possible csv file for a book
 -- to use with neo4j-import '* scheme'
@@ -512,9 +312,22 @@ generateScripturesCSV configFile path outPath = do
                                 let refWordID = concat [wordIDPrefix, "-", show verseRef'index]
                                     footnoteID = concat ["ref_", wordIDPrefix, "-", show verseRef'index]
                                     footnoteLine = [qc|{footnoteID}{del}{txt}{del}{verseRef'index}{del}Footnote|]
-                                    footnoteRel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
-                                TIO.hPutStrLn outRefsh footnoteLine
-                                TIO.hPutStrLn outRefRelh footnoteRel
+                                    word_footnote_rel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+                                    verse_footnote_rel  = [qc|{verseID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+
+                                TIO.hPutStrLn outFootnotesh footnoteLine
+
+                                -- TODO: re-think this ref types
+                                when (verseRef'index > 0) $ TIO.hPutStrLn outWordFootnoteRelh word_footnote_rel
+                                TIO.hPutStrLn outVerseFootnoteRelh  verse_footnote_rel
+                                   
+--                              RefVerse txt -> do
+--                                let refWordID = concat [wordIDPrefix, "-", show verseRef'index]
+--                                    footnoteID = concat ["ref_", wordIDPrefix, "-", show verseRef'index]
+--                                    footnoteLine = [qc|{footnoteID}{del}{txt}{del}{verseRef'index}{del}Footnote|]
+--                                    footnoteRel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+--                                TIO.hPutStrLn outRefsh footnoteLine
+--                                TIO.hPutStrLn outRefRelh footnoteRel
                               _ -> return ()
 
 
@@ -536,6 +349,7 @@ generateScripturesCSV configFile path outPath = do
     readChapter file = do
       book <- readYaml file
       return book
+
 
 
 
@@ -575,11 +389,14 @@ dumpCSVHeaders del root = do
            -- * Verse
            , mkHeader "Verse Header" "verse_header.csv" [qc|verseID:ID(VERSE-ID){del}book{del}chapter:int{del}section:int{del}paragraph:int{del}verse:int{del}verseText|]
            , mkHeader "Verse to Word Relation Header" "verse_word_header.csv" [qc|:START_ID(VERSE-ID){del}:END_ID(WORD-ID)|]
+           , mkHeader "Verse to FootNote  Header" "verse_footnote_header.csv" [qc|:START_ID(VERSE-ID){del}:END_ID(FOOTNOTE-ID){del}:TYPE|]
            -- * Word
            , mkHeader "Word Header" "word_header.csv"  [qc|wordID:ID(WORD-ID){del}word{del}book{del}chapter:int{del}section:int{del}paragraph:int{del}verse:int{del}token{del}versePos:int{del}:LABEL|]
-           , mkHeader "Word to Ref  Header" "word_ref_header.csv" [qc|:START_ID(WORD-ID){del}:END_ID(REF-ID){del}:TYPE|]
+           , mkHeader "Word to Footnote  Header" "word_footnote_header.csv" [qc|:START_ID(WORD-ID){del}:END_ID(FOOTNOTE-ID){del}:TYPE|]
+           -- * Footnote header
+           , mkHeader "Footnote Header" "footnote_header.csv"  [qc|footnoteID:ID(FOOTNOTE-ID){del}text{del}index:int{del}:LABEL|]
            -- * Ref header
-           , mkHeader "Reference Header" "ref_header.csv"  [qc|refID:ID(REF-ID){del}text{del}index:int{del}:LABEL|]
+           , mkHeader "Reference Header" "ref_header.csv"  [qc|refID:ID(FOOTNOTE-ID){del}text{del}index:int{del}:LABEL|]
             ]
 
   createDirectoryIfMissing True headerRoot
@@ -588,4 +405,134 @@ dumpCSVHeaders del root = do
     let fullPath = headerRoot </> csvHeader'file
     hFile <- openFile fullPath WriteMode
     TIO.hPutStrLn hFile csvHeader'header
+    TIO.putStrLn [qc|Created header: {csvHeader'name} - {fullPath}|]
     hClose hFile
+
+
+
+
+-- seems not used
+
+generateVerseCsv :: FilePath -> FilePath -> FilePath -> IO ()
+generateVerseCsv bookFile path outPath = do
+   let del = ';';
+       arrayDel = "|";
+   corpora :: Corpora <- readYaml bookFile
+
+   scriptures :: [Scripture] <- readYaml (corpora'scripturesPath corpora)
+
+   let books = let  (x:_) = scriptures in scripture'books x
+
+   -- Booksx
+   forM_ books $ \Book{..} -> do
+
+     let inPath = fromMaybe (T.toLower . T.pack $ show book'book ) book'input
+         bookDir = path </> (T.unpack inPath)
+
+         -- cypher out file
+         outCypherFileRoot = outPath </> (takeDirectory $ T.unpack inPath)
+         outFile = outCypherFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.csv|]
+         outFileHeader = outCypherFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_header.csv|]
+
+         -- ref file
+         outRefFileRoot = outCypherFileRoot </> "refs"
+         outRefFile = outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}.ref|]
+
+         bookLabel = maybe (show book'book) ((show book'book) ++)  (T.unpack <$> book'labels)
+         bookTestament = show book'testament
+         bookName = T.toLower . T.pack  $ show book'book
+         lang = show book'language
+         dialect = show book'dialect
+
+
+
+     exists <- doesDirectoryExist bookDir
+     -- check if books input directory exists
+     when exists $ do
+       -- here no need to error check
+       createDirectoryIfMissing True outCypherFileRoot
+       createDirectoryIfMissing True outRefFileRoot
+       txtFiles <- listDirectory bookDir `catchError` \_ -> do
+                                      liftIO $ putStrLn (concat [bookDir, " does not exist."])
+                                      return []
+
+       bracket (do
+                  h1 <- openFile outFile WriteMode
+                  h2 <- openFile outFile WriteMode
+                  h3 <- openFile outRefFile WriteMode
+                  return (h1, h2, h3))
+                (\(h1, h2, h3) -> do
+                   hClose h1
+                   hClose h2
+                   hClose h3) $ \(outh, outhHeader, outRefh) -> do
+
+
+         TIO.hPutStrLn outhHeader ""
+
+         -- a file == a chapter
+         forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
+           ch@Chapeter{..} <- readChapter (bookDir </> file)
+           -- Sections
+           forM_ chapter'sections $ \Section{..} -> do
+              -- Paragraphs
+             forM_ section'paragraphs $ \Paragraph{..} -> do
+               -- Verses
+               forM_ paragraph'verses $ \v@Verse{..} -> do
+                 let verseLine = [qc|{bookLabel}{del} {chapter'number}{del} {section'number}{del} {paragraph'number}{del} {verse'verse}{del} {verse'content} |]
+                 TIO.hPutStrLn outh verseLine
+
+
+
+                 -- -- verse ref processing
+                 -- case verse'ref of
+                 --   Nothing -> return ()
+                 --   Just VerseRef{..} -> do
+                 --     case verseRef'type of
+                 --       RefText txt -> do
+                 --         let wordN = concat [verseName, del, "word", show verseRef'index]
+                 --             footnoteName = concat [wordN, del, "footnote", show verseRef'index]
+                 --             footnoteNode = [qc| ({footnoteName}:Footnote \{text: '{txt}', index: {verseRef'index}}),|]
+                 --             footnoteRel  = [qc| ({wordN})-[:REF_FOOTNOTE]->({footnoteName}),|]
+                 --         TIO.hPutStrLn outh footnoteNode
+                 --         TIO.hPutStrLn outh footnoteRel
+                 --       _ -> return ()
+
+
+  where
+    tail' :: [a] -> [a]
+    tail' []     = []
+    tail' (x:xs) = xs
+    doesFilenameMatch :: FilePath -> Bool
+    doesFilenameMatch path = takeExtension path `elem` [ ".yaml", ".yml"]
+    isDir :: FilePath -> Bool
+    isDir path = takeExtension path == ""
+    readChapter :: FilePath -> IO Chapter
+    readChapter file = do
+      book <- readYaml file
+      return book
+
+
+
+-- | attempt to seperate verse processing
+-- there are a lot of paramteres from context
+refProcessing _ _ Nothing _ _  = return ()
+refProcessing del wordIDPrefix  (Just VerseRef{..}) outRefsh outRefRelh = do
+       case verseRef'type of
+         RefText txt -> do
+           let refWordID = concat [wordIDPrefix, "-", show verseRef'index]
+               footnoteID = concat ["ref_", wordIDPrefix, "-", show verseRef'index]
+               footnoteLine = [qc|{footnoteID}{del}{txt}{del}{verseRef'index}{del}Footnote|]
+               word_footnote_rel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+--               verse_footnote_rel  = [qc|{verseID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+
+           TIO.hPutStrLn outRefsh footnoteLine
+           TIO.hPutStrLn outRefRelh word_footnote_rel
+  --                              RefVerse txt -> do
+  --                                let refWordID = concat [wordIDPrefix, "-", show verseRef'index]
+  --                                    footnoteID = concat ["ref_", wordIDPrefix, "-", show verseRef'index]
+  --                                    footnoteLine = [qc|{footnoteID}{del}{txt}{del}{verseRef'index}{del}Footnote|]
+  --                                    footnoteRel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+  --                                TIO.hPutStrLn outRefsh footnoteLine
+  --                                TIO.hPutStrLn outRefRelh footnoteRel
+         _ -> return ()
+

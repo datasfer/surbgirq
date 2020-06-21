@@ -29,25 +29,6 @@ import Surbgirq.Types.Girq
 --
 
 
-type YtUrl         = Text
-type YtAuthor      = Text
-type YtTitle       = Text
-type YtDesc        = Text
-
-data RefTo = YouTube YtUrl YtAuthor YtTitle YtDesc
-           | ScriptureBible Text
-           | ScriptureMeknutyun Text
-             deriving (Show, Read)
-
-
-
-data RefType = RefBooks   [Text]
-             | RefChapter Int
-             | RefSection Int Int
-             | RefVerse   Text
-             | RefWord    Text
-             | RefText    Text
-               deriving (Show, Read)
 
 
 data Corpora = Corpora
@@ -143,6 +124,26 @@ data Ref = Ref
     { ref'From :: RefType
     , ref'To   :: [RefTo]
     } deriving (Show, Read)
+
+type YtUrl         = Text
+type YtAuthor      = Text
+type YtTitle       = Text
+type YtDesc        = Text
+
+data RefTo = YouTube YtUrl YtAuthor YtTitle YtDesc
+           | ScriptureBible Text
+           | ScriptureMeknutyun Text
+             deriving (Show, Read)
+
+
+
+data RefType = RefBooks   [Text]
+             | RefChapter Int
+             | RefSection Int Int
+             | RefVerse   Text
+             | RefWord    Text
+             | RefText    Text
+               deriving (Show, Read)
 
 
 $(deriveJSON dropPrefixOptions ''Corpora)
