@@ -59,6 +59,7 @@ data Corpora = Corpora
 data Scripture = Scripture
      { scripture'books   :: [Book]
      , scripture'Info   :: Text
+     , scripture'ID   :: Text
      , scripture'dataFolder :: Text
      , scripture'translationID :: Text
      } deriving (Show, Read)

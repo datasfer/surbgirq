@@ -1,0 +1,1 @@
+verseID:ID(VERSE-ID);book;chapter:int;section:int;paragraph:int;verse:int;verseText

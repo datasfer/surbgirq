@@ -1,0 +1,1 @@
+wordID:ID(WORD-ID);word;book;chapter:int;section:int;paragraph:int;verse:int;token;versePos:int;:LABEL
