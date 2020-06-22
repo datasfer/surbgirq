@@ -71,7 +71,7 @@ instance RecordValue Testament where
     exact (T tes) = return $ read $ T.unpack  tes
     exact x       = fail $ show x ++ " is not a Testament"
 
--- \{book: '{bookName}', title: '{book'title}', number: {book'number}, chapters: {book'chapters}, testament: {book'testament}, translation: {book'translation} } ),
+-- \{book: '{bookName}', title: '{book'title}', number: {book'orderNum}, chapters: {book'chapters}, testament: {book'testament}, translation: {book'translation} } ),
 
 
 -------------------------------------------------------------------------------

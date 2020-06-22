@@ -172,7 +172,7 @@ generateScripturesCSV configFile path outPath = do
              ) $ \(outBookh, outTranslationh, outDivisionh, outTestamenth, outScriptureh, outScriptureBookRelth, outBookChapterRelh) -> do
 
 
-     TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
+     TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
      TIO.hPutStrLn outTranslationh [qc|translationID:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
      TIO.hPutStrLn outScriptureh [qc|scriptureID:ID{del}title|]
      TIO.hPutStrLn outScriptureBookRelth [qc|:START_ID{del}:END_ID{del}:TYPE|]
@@ -242,8 +242,8 @@ generateScripturesCSV configFile path outPath = do
 
                -- book csv
                let bookNodeLabels = intercalate arrayDel [bookName, lang, dialect, bookLabel, bookTestament, "Book"]
-                   bookID = concat [T.unpack book'shortName, translationID, lang, show book'number]
-                   bookLine = [qc|{bookID}{del}{book'book}{del}{book'title}{del}{book'number}{del}{book'chapters}{del}{book'testament}{del}{book'translation}{del}{bookNodeLabels}|]
+                   bookID = concat [T.unpack book'shortName, translationID, lang, show book'orderNum]
+                   bookLine = [qc|{bookID}{del}{book'book}{del}{book'title}{del}{book'orderNum}{del}{book'chapters}{del}{book'testament}{del}{bookNodeLabels}|]
 
                TIO.hPutStrLn outBookh bookLine
 
@@ -375,7 +375,7 @@ dumpCSVHeaders del root = do
            , mkHeader "Scripture to Book relationship Header" "scripture_book_header.csv" [qc|:START_ID{del}:END_ID{del}:TYPE|]
            , mkHeader "Translation Header" "translation_header.csv" [qc|translationID:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
            -- * Book
-           , mkHeader "Book Header" "book_header.csv" [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}translation{del}:LABEL|]
+           , mkHeader "Book Header" "book_header.csv" [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
            , mkHeader "Book to Chapter return Header" "book_chapter_header.csv" [qc|:START_ID{del}:END_ID(CHAPTER-ID)|]
            -- * Chapter
            , mkHeader "Chapter Header" "chapter_header.csv" [qc|chapterID:ID(CHAPTER-ID){del}title{del}num:int{del}book|]

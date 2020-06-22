@@ -217,7 +217,7 @@ generateInitCypher bookFile path outPath = do
                    hClose h2) $ \(outh, outRefh) -> do
 
          TIO.hPutStrLn outh "CREATE"
-         TIO.hPutStrLn outh [qc| ({bookName}:{lang}:{dialect}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', num: {book'number}, chapters: {book'chapters}, testament: '{book'testament}', translation: '{book'translation}' } ),
+         TIO.hPutStrLn outh [qc| ({bookName}:{lang}:{dialect}:{bookLabel}:{bookTestament}:Book \{book: '{book'book}', title: '{book'title}', num: {book'orderNum}, chapters: {book'chapters}, testament: '{book'testament}' } ),
                              |]
 
          -- a file == a chapter

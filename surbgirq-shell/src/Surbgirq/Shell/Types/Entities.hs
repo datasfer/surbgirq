@@ -52,11 +52,11 @@ data Book = Book
   , book'labels      :: Maybe Text
   -- ^ neo4j node labels
   , book'shortName   :: Text
+  , book'microName   :: Text
   , book'title       :: Text
-  , book'number      :: Int
+  , book'orderNum      :: Int
   , book'chapters    :: Int
   , book'testament   :: Testament
-  , book'translation :: Text
   , book'language    :: Language
   , book'dialect     :: Dialect
   , book'ref         :: Maybe Text
