@@ -74,6 +74,9 @@ executable surbgirq-scraper
   build-depends: base >=4.7 && <5
                , surbgirq-shell
                , surbgirq-types
+               , scalpel >= 0.6.0
+               , hxt
+               , HandsomeSoup
                , common
                , text
                , aeson
