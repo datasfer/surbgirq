@@ -81,6 +81,10 @@ data LogSpec = LogSpec
   } deriving(Show)
 
 
+data LocalNeo4jApiConfig = LocalNeo4jApiConfig
+    { localNeo4jApiConfig'baseUrl :: Text
+    , localNeo4jApiConfig'port :: Int
+    } deriving(Show)
 
 -- | Surbgirq settings
 data SurbgirqSettings = SurbgirqSettings
@@ -90,6 +94,8 @@ data SurbgirqSettings = SurbgirqSettings
   -- ^ the logs settings
   , surbgirq'stores :: !StoreSpec
   -- ^ the storage settings
+  , surbgirq'localNeo4jApi :: !LocalNeo4jApiConfig
+  -- ^ the storage settings
   } deriving (Show)
 
 $(deriveFromJSON dropPrefixOptions ''SurbgirqSettings)
@@ -97,4 +103,5 @@ $(deriveJSON dropPrefixOptions     ''LogSpec)
 $(deriveFromJSON dropPrefixOptions ''ServerSettings)
 $(deriveJSON dropPrefixOptions     ''SqliteConfig)
 $(deriveJSON dropPrefixOptions     ''Neo4jConfig)
+$(deriveJSON dropPrefixOptions     ''LocalNeo4jApiConfig)
 $(deriveJSON dropPrefixOptions     ''StoreSpec)

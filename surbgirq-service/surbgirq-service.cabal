@@ -41,6 +41,7 @@ library
                , surbgirq-api
                , surbgirq-types
                , surbgirq-db
+               , surbgirq-neo4j-client
                , servant
                , servant-websockets
                , servant-server

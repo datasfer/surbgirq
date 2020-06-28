@@ -28,7 +28,7 @@ library
                    Surbgirq.Shell.Scraper.Hxt
                    Surbgirq.Shell.CSV.Generate
   other-modules: Paths_surbgirq_shell
-                 Surbgirq.Shell.Types.Entities
+                 Surbgirq.Shell.Types.Scripture
                  Surbgirq.Shell.Store.Types
   hs-source-dirs: src
   build-depends: base >=4.7 && <5

@@ -2,7 +2,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 
-module Surbgirq.Shell.Types.Entities (
+module Surbgirq.Shell.Types.Scripture (
    Corpora(..)
  , Scripture(..)
  , Book(..)

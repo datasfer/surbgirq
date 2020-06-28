@@ -2,6 +2,7 @@ packages:
   surbgirq-types
   surbgirq-service
   surbgirq-api/surbgirq-api
+  surbgirq-api/surbgirq-api-client
   surbgirq-api/surbgirq-neo4j-client
   surbgirq-shell
   surbgirq-db

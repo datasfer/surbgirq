@@ -4,7 +4,7 @@ module Surbgirq.Shell.Types ( module X
 
 
 import Surbgirq.Shell.Store.Types    as X
-import Surbgirq.Shell.Types.Entities as X
+import Surbgirq.Shell.Types.Scripture as X
 
 ------------------------------------------------------------
 --

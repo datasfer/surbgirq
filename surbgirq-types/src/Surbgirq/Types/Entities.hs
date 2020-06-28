@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
-
+{-# LANGUAGE RecordWildCards #-}
 
 module Surbgirq.Types.Entities (
    Book(..)
@@ -20,7 +20,7 @@ import Data.Text  (Text)
 import GHC.Generics
 
 import Common.Aeson
-
+import Data.Aeson
 import Surbgirq.Types.Girq
 
 
@@ -34,7 +34,11 @@ newtype SectionNum = SectionNum Int
 newtype VerseNum = VerseNum Int
   deriving (Show, Eq, Read, Ord, Generic)
 
-
+ -- "bookOrder": 1,
+ --  "testament": "New",
+ --  "chapters": 40,
+ --  "book": "Matthew",
+ --  "bookID": "ՄատթT1AM1"
 data Book = Book
     { book'id          :: Int
     , book'labels      :: [Text]
@@ -78,9 +82,25 @@ data Verse = Verse
     , verse'content       :: Text
     } deriving (Show, Eq, Generic)
 
-$(deriveJSON dropPrefixOptions ''Book)
+
 $(deriveJSON dropPrefixOptions ''Chapter)
 $(deriveJSON dropPrefixOptions ''Section)
 $(deriveJSON dropPrefixOptions ''Paragraph)
 $(deriveJSON dropPrefixOptions ''Verse)
+
+-- $(deriveJSON dropPrefixOptions ''Book)
+instance ToJSON Book
+instance FromJSON Book where
+  parseJSON = withObject "book" $ \o -> do
+    let book'id = 111 --  <- o .: "bookID"
+    book'book  <- o .: "book"
+    book'title  <- o .: "bookID"
+    book'number       <- o .: "bookOrder"
+    book'chapters       <- o .: "chapters"
+    book'testament       <- o .: "testament"
+    let book'translation = "translation"
+    let book'labels = ["Book"]
+
+    return Book{..}
+
 
