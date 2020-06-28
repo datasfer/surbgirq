@@ -37,7 +37,7 @@ main = do
       neo4jConfig = storeSpec'neo4j surbgirq'stores
 
   pool <- createPool (connect (boltCfg neo4jConfig)) close 4 500 1
-  putStrLn $ mconcat ["Start crosschain on port: ", show  port] -- , " with db: ", dbName]
+  putStrLn $ mconcat ["Start surbgirq on port: ", show  port] -- , " with db: ", dbName]
 --  state <- newTVarIO def
 --  withDatabase dbName $ \c ->
   Warp.run port $ staticPolicy (noDots >-> addBase staticPath) $ app (ServerEnv pool undefined)
