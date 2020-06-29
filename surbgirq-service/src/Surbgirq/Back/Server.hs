@@ -26,6 +26,10 @@ import Surbgirq.Back.Server.WebSocket
 
 surbgirqServer :: ServerT SurbgirqAPI AppM
 surbgirqServer = toServant bookServer :<|> toServant scriptureServer
+-- surbgirqServer = SurbgirqAPI
+--                  { bookApi  =  toServant bookServer
+--                  , scriptureAPI = toServant scriptureServer
+--                 } 
 
 
 

@@ -45,8 +45,11 @@ import Surbgirq.Back.App.Env
 
 type SwaggerAPI = SwaggerSchemaUI "docs" "swagger.json"
 
+-- surbgirqApi :: Proxy (ToServantApi SurbgirqAPI)
+-- surbgirqApi = genericApi (Proxy ::  Proxy SurbgirqAPI)
 
-type SurbgirqAPISwagger = SwaggerAPI :<|> SurbgirqAPI
+
+type SurbgirqAPISwagger = SwaggerAPI  :<|> SurbgirqAPI 
 
 
 

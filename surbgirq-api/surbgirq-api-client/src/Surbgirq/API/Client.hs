@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- | Client for the Surbgirq web API
 module Surbgirq.API.Client where
@@ -28,10 +29,26 @@ import Text.InterpolatedString.Perl6 (qc)
 import Network.HTTP.Client hiding (Proxy)
 
 import qualified Data.Text      as T
-import qualified Servant.Client as C
 
+
+import Servant.Client
+
+import Servant.API.Generic
+import Servant.Client.Generic
+-- import Servant.Server.Generic
+
+    
 import Surbgirq.API
 import Surbgirq.Types
 
+
+-------------------------------------------------------------------------------
+-- 
+-------------------------------------------------------------------------------
+
+       
+
+api :: Proxy (ToServantApi BookAPI)
+api = genericApi (Proxy :: Proxy BookAPI)
 
 

@@ -13,7 +13,7 @@ module Surbgirq.API.Rest (
    MetaAPI(..)
  , BookAPI(..)
  , ScriptureAPI(..)
- , SurbgirqAPI
+ , SurbgirqAPI(..)
  ,
   ) where
 
@@ -23,6 +23,7 @@ import GHC.Generics (Generic)
 
 import Servant.API
 import Servant.API.Generic
+import Servant.Swagger
 
 import Surbgirq.API.Types
 import Surbgirq.Types
@@ -33,6 +34,12 @@ import Surbgirq.Types
 
 type SurbgirqAPI = "api" :> ("book" :> ToServantApi BookAPI :<|> "scripture" :> ToServantApi ScriptureAPI)
 
+-- data SurbgirqAPI route = SurbgirqAPI
+--     { bookApi :: route :-  "book" :> ToServant BookAPI AsApi
+--     , scriptureAPI :: route :- "scripture" :> ToServant ScriptureAPI AsApi -- ToServantApi ScriptureAPI
+--     } deriving (Generic)
+
+    
 -- type SurbgirqAPI = "api" :> ("book" :> ToServantApi BookAPI :<|> "scripture" :> ToServantApi ScriptureAPI)
 
 
