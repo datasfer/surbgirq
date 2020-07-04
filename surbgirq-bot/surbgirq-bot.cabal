@@ -28,10 +28,13 @@ source-repository head
 library
   ghc-options:   -Wall -Werror
   exposed-modules: Surbgirq.Bot.Telegram
+                   Surbgirq.Bot.ApiClient
   other-modules: Paths_surbgirq_bot
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
                , aeson
+               , surbgirq-api-client
+               , surbgirq-types
                , http-api-data
                , http-client
                , http-client-tls

@@ -9,4 +9,4 @@ main = do
   putStrLn "Please, enter Telegram bot's API token:"
 --  getEnvToken "TELEGRAM_BOT_TOKEN" >>= run
   token <- T.pack <$> getLine
-  run token
+  run $ token

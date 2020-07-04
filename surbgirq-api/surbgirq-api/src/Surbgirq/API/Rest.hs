@@ -9,13 +9,7 @@ Description : REST API endpoints
 Web API Endpoints generic definition as ADT
 -}
 
-module Surbgirq.API.Rest (
-   MetaAPI(..)
- , BookAPI(..)
- , ScriptureAPI(..)
- , SurbgirqAPI(..)
- ,
-  ) where
+module Surbgirq.API.Rest where
 
 import Data.Int     (Int64)
 import Data.Text    (Text)
@@ -54,27 +48,19 @@ data MetaAPI route = MetaAPI {
 -- |
 -- Book descriptive and quantitive info
 data BookAPI route = BookAPI {
-      booksListEndpoint :: route :- "list" :> Summary "Get Available Books"
-                           :> Get '[JSON] [Book]
-
-    , bookChapterNumsEndpoint :: route :- "chapters" :> Summary "Get chapter nums"
-                                 :> Capture "girq" Girq
-                                 :> Get '[JSON] [(Int, Text)]
-
-    , bookChapterSectionNumsEndpoint :: route :- "sections" :> Summary "Get chapter section nums"
-                                 :> Capture "girq" Girq
-                                 :> Capture "chapter" ChapterNum
-                                 :> Get '[JSON] [(Int, Text)]
-
-    , bookChapterVerseNumsEndpoint :: route :- "verses" :> Summary "Get chapter verse nums"
-                                 :> Capture "girq" Girq
-                                 :> Capture "chapter" ChapterNum
-                                 :> Get '[JSON] [Int]
-
+      booksListEndpoint :: route :- GetBooks
+    , bookChapterNumsEndpoint :: route :- GetBookChaptersNum
+    , bookChapterSectionNumsEndpoint :: route :- GetChapterSectionsNum
+    , bookChapterVerseNumsEndpoint :: route :- GetChapterVersesNum
 } deriving (Generic)
 
 
+type GetBooks = "list" :> Summary "Get Available Books" :> Get '[JSON] [Book]
+type GetBookChaptersNum = "chapters" :> Summary "Get chapter nums" :> Capture "girq" Girq :> Get '[JSON] [(Int, Text)] 
+type GetChapterSectionsNum = "sections" :> Summary "Get chapter section nums" :> Capture "girq" Girq :> Capture "chapter" ChapterNum :> Get '[JSON] [(Int, Text)]
+type GetChapterVersesNum = "verses" :> Summary "Get chapter verse nums" :> Capture "girq" Girq :> Capture "chapter" ChapterNum :> Get '[JSON] [Int]
 
+                                    
 -- |
 -- Scriptures info
 data ScriptureAPI route = ScriptureAPI {

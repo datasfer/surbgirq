@@ -46,9 +46,31 @@ import Surbgirq.Types
 -- 
 -------------------------------------------------------------------------------
 
+type BookLocalAPI = GetBooks
+--    :<|> GetBookChaptersNum :<|> GetChapterSectionsNum :<|> GetChapterVersesNum
        
+-- TODO: convert all this staff using generic client generation
+-- api :: Proxy (ToServantApi BookAPI)
+-- api = genericApi (Proxy :: Proxy BookAPI)
 
-api :: Proxy (ToServantApi BookAPI)
-api = genericApi (Proxy :: Proxy BookAPI)
+
+
+bookAPI :: Proxy BookLocalAPI
+bookAPI = Proxy
+
+
+apiBaseUrl :: BaseUrl
+apiBaseUrl = BaseUrl Https "127.0.0.1" 33001 "/api"
+             
+getAllBooks' :: ClientM [Book]
+getAllBooks' = client bookAPI
+
+
+
+getAllBooks
+  :: Manager
+  -> IO (Either ClientError [Book])
+getAllBooks mgr = runClientM getAllBooks'
+                                   (ClientEnv mgr apiBaseUrl Nothing)               
 
 

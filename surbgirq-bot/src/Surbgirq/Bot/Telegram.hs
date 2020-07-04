@@ -1,9 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+
+-- | sample from doc, long polling approach
 module Surbgirq.Bot.Telegram where
 
 import           Data.Text (Text)
 import qualified Data.Text as T
+
+
 
 import           Telegram.Bot.API
 import qualified Telegram.Bot.API    as Telegram
@@ -14,13 +18,16 @@ import           Telegram.Bot.Simple
 import Telegram.Bot.Simple.UpdateParser
 
 
+-------------------------------------------------------------------------------
+--  
+-------------------------------------------------------------------------------
 
 type Model = ()
 
 data Action
   = NoOp
   | Echo Text
-  | Start
+  | Start 
 
 
 echoBot :: BotApp Model Action
@@ -52,6 +59,7 @@ handleAction action model = case action of
             (Telegram.SomeReplyKeyboardMarkup startMessageKeyboard)
         }
     return NoOp
+
 
 
 run :: Text -> IO ()
@@ -89,3 +97,10 @@ startMessageKeyboard = Telegram.ReplyKeyboardMarkup
   , Telegram.replyKeyboardMarkupOneTimeKeyboard = Just True
   , Telegram.replyKeyboardMarkupSelective = Just True
   }
+
+
+-- | Run bot using 'Telegram.Token' from @TELEGRAM_BOT_TOKEN@ environment.
+-- runBot :: IO ()
+-- runBot = getEnvToken "TELEGRAM_BOT_TOKEN" >>= run
+mkToken :: Text -> Token
+mkToken  = Token
