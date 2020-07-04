@@ -6,6 +6,6 @@ packages:
   surbgirq-api/surbgirq-neo4j-client
   surbgirq-shell
   surbgirq-db
-  surbgirq-bot
+  surbgirq-bot/surbgirq-bot-telegram
   common
   surbgirq

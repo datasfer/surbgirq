@@ -6,7 +6,7 @@ cabal-version: 1.12
 --
 -- hash: 3ab2068b902d39e1a527f8cdb4de220946e653488e9745f11d4fdd639512b072
 
-name:           surbgirq-bot
+name:           surbgirq-bot-telegram
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/arthurvard/surbgirq-bot#readme>
 homepage:       https://github.com/arthurvard/surbgirq-bot#readme
@@ -29,7 +29,7 @@ library
   ghc-options:   -Wall -Werror
   exposed-modules: Surbgirq.Bot.Telegram
                    Surbgirq.Bot.ApiClient
-  other-modules: Paths_surbgirq_bot
+  other-modules: Paths_surbgirq_bot_telegram
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
                , aeson
@@ -45,17 +45,17 @@ library
                , time
   default-language: Haskell2010
 
-executable surbgirq-bot
+executable surbgirq-telebot
   main-is: Main.hs
-  other-modules: Paths_surbgirq_bot
+  other-modules: Paths_surbgirq_bot_telegram
   hs-source-dirs: app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends: base >=4.7 && <5
-               , surbgirq-bot
+               , surbgirq-bot-telegram
                , text
   default-language: Haskell2010
 
-test-suite surbgirq-bot-test
+test-suite surbgirq-telebot-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules: Paths_surbgirq_bot
