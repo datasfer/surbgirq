@@ -37,9 +37,9 @@ extra-deps:
   - git: https://github.com/anpryl/telegram-bot-simple
     commit: 8e459a59efa9ca42d933119a28cb41b512445e68
   - o-clock-1.1.0@sha256:941ac2bc1732e6622b165831c4badb1a8e846f451620bd028064339f5b284224,5043
-  - parsec-3.1.14.0
-  - selda-sqlite-0.1.7.1
-  - sqlite-simple-0.4.18.0
+  - git: https://github.com/klappvisor/haskell-telegram-api.git                                                                                                                                                                               
+    commit: abbfd76c40f2783c113b660184a03cc94d58e751                    
+
 nix:
   enable: true
 #  shell-file: shell.nix
