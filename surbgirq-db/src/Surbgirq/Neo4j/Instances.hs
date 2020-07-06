@@ -56,8 +56,9 @@ instance RecordValue Book where
             translation <- exact =<< props `at` "translation"
             girq :: Girq <-  exact =<< props `at` "book"
             tes :: Testament <-  exact =<< props `at` "testament"
+            bookId  <-  exact =<< props `at` "bookId"
 
-            return $ Book i lbs girq title number numOfChatpters tes translation
+            return $ Book i bookId lbs girq title number numOfChatpters tes translation
     exact x = fail $ show x ++ " is not a Book"
 
 

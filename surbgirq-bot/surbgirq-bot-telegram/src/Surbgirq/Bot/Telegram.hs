@@ -11,34 +11,34 @@ module Surbgirq.Bot.Telegram
     ( startApp
     , app
     ) where
+import Control.Monad           (replicateM)
+import Data.Char               (isNumber)
+import Data.List               (intersperse)
+import Data.List.Split         (chunksOf)
+import Data.Text               (Text)
+import Data.Version            (makeVersion, showVersion)
+import GHC.Generics            hiding (from)
+import Network.HTTP.Client     (Manager, newManager)
+import Network.HTTP.Client.TLS (tlsManagerSettings)
 
--- import           Aphorisms                (eligeQuote, eligeQuoteByHuman,
---                                            eligeSentenceFromBlog)
--- import           Burgeon                  (evalInsult, hashUm, insultTemplate,
---                                            insultTemplates, wordGroupWords,
---                                            wordGroups)
-import           Control.Monad            (replicateM)
-import           Control.Monad.Except
-import           Control.Monad.Reader
-import           Data.Aeson
-import           Data.Char                (isNumber)
-import           Data.List                (intersperse)
-import           Data.List.Split          (chunksOf)
-import           Data.Maybe
-import           Data.Monoid
-import           Data.Text                (Text)
-import qualified Data.Text                as T
-import           Data.Version             (makeVersion, showVersion)
-import           GHC.Generics             hiding (from)
-import           Network.HTTP.Client      (Manager, newManager)
-import           Network.HTTP.Client.TLS  (tlsManagerSettings)
-import           Network.Wai
-import           Network.Wai.Handler.Warp
-import           Servant
-import           Servant.Server
-import           System.Environment
-import           Text.Regex.Posix
-import           Web.Telegram.API.Bot
+import qualified Data.Text as T
+
+import Control.Monad.Except
+import Control.Monad.Reader
+import Data.Aeson
+import Data.Maybe
+import Data.Monoid
+import Network.Wai
+import Network.Wai.Handler.Warp
+import Servant
+import Servant.Server
+import System.Environment
+import Text.Regex.Posix
+import Web.Telegram.API.Bot
+
+import Surbgirq.Bot.Server
+------------------------------------------------
+
 
 data Version = Version
   { version :: Text
@@ -57,7 +57,7 @@ botApi = Proxy
 
 startApp :: IO ()
 startApp = do
-  putStrLn "Martes Martes Bot is considering altering the universe"
+  putStrLn "Surbgirq bot started..."
   manager' <- newManager tlsManagerSettings
   let telegramToken' = "REMOVED-TELEGRAM-TOKEN"
       config = BotConfig
@@ -123,13 +123,14 @@ handleChannelPost msg = do
   let chatId = ChatId $ chat_id $ chat msg
       Just messageText = text msg
 
-      onCommand (T.stripPrefix "/help" -> Just _) = sendHelpMessage chatId
-      onCommand (T.stripPrefix "/goat" -> Just args) = sendAphorism chatId args
-      onCommand (T.stripPrefix "/its" -> Just args) = dishITemplates chatId args
+      onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
+      onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
+      onCommand (T.stripPrefix "/books" -> Just _)         = sendHelpMessage chatId
+      onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
       onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
-      onCommand (T.stripPrefix "/wgs" -> Just args) = dishWordGroups chatId args
+      onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
       onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
-      onCommand _ = return ()
+      onCommand _                                          = return ()
   liftIO $ putStrLn $ "Message id -> " ++ (show $ message_id msg)
   liftIO $ putStrLn $ "Message text -> " ++ (T.unpack messageText)
   liftIO $ putStrLn $ "Chat id -> " ++ (show $ chat_id $ chat msg)
@@ -195,7 +196,25 @@ sendAphorism chatId args = do
         Nothing -> 1
   let sentences = ["liftIO $ replicateM cantidad eligeSentenceFromBlog"]
   let requests = map (\s -> sendMessageRequest chatId (T.pack s)) sentences
+  _ <- ($) liftIO $ forM_ requests $ (\r -> sendMessage telegramToken r manager)
   return ()
+
+
+
+
+
+sendBooks :: ChatId -> Bot ()
+sendBooks chatId = do
+    BotConfig{..} <- ask
+    books <- liftIO getBooksHandler
+    let request = (\s -> sendMessageRequest chatId (T.pack s)) $ show books
+    _ <- ($) liftIO $ sendMessage telegramToken request manager
+    return ()
+  where
+    markupBooks []     = ""
+    markupBooks (b:bs) = ""
+
+
 
 parseChatCommandArgs :: Text -> [String]
 parseChatCommandArgs text = getAllTextMatches $ ((T.unpack text) :: String) =~ ("\\w+" :: String) :: [String]
@@ -303,13 +322,14 @@ handleMessage msg = do
   let chatId = ChatId $ chat_id $ chat msg
       Just messageText = text msg
 
-      onCommand (T.stripPrefix "/help" -> Just _) = sendHelpMessage chatId
-      onCommand (T.stripPrefix "/goat" -> Just args) = sendAphorism chatId args
-      onCommand (T.stripPrefix "/its" -> Just args) = dishITemplates chatId args
+      onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
+      onCommand (T.stripPrefix "/books" -> Just _)         = sendBooks chatId
+      onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
+      onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
       onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
-      onCommand (T.stripPrefix "/wgs" -> Just args) = dishWordGroups chatId args
+      onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
       onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
-      onCommand _ = sendHelpMessage chatId
+      onCommand _                                          = sendHelpMessage chatId
 
   liftIO $ putStrLn $ "Message id -> " ++ (show $ message_id msg)
   liftIO $ putStrLn $ "Message text -> " ++ (T.unpack messageText)
@@ -318,8 +338,9 @@ handleMessage msg = do
   onCommand messageText
 
 helpMessage :: ChatId -> SendMessageRequest
-helpMessage userId = sendMessageRequest userId $ T.unlines
+helpMessage userId =  sendMessageRequest userId $ T.unlines
     [ "/help - show this message and subsequently die the flame death"
+    , "/books - get a books"
     , "/goat - get a random aphorism taken from the GOAT LORD itself"
     , "/its || /itemplates - show insult templates"
     , "/wordgroups || /wgs - show word groups"

@@ -1,7 +1,7 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 -- | Client for the Surbgirq neo4j graph db web API
 module Surbgirq.API.GraphDBClient where
 
@@ -14,9 +14,9 @@ import Data.Monoid
 import Data.Proxy
 import GHC.Generics
 import Servant.API
-import Servant.Client 
+import Servant.Client
 
-import Data.Text (Text)
+import Data.Text           (Text)
 import Network.HTTP.Client (Manager)
 
 import qualified Data.Text    as T
@@ -39,8 +39,8 @@ graphDBAPI = Proxy
 
 
 neo4jApiBaseUrl :: BaseUrl
-neo4jApiBaseUrl = BaseUrl Https "127.0.0.1" 5001 "/api"
-             
+neo4jApiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
+
 getAllBooks' :: ClientM [Book]
 getAllBooks' = client graphDBAPI
 
@@ -50,7 +50,7 @@ getAllBooks
   :: Manager
   -> IO (Either ClientError [Book])
 getAllBooks mgr = runClientM getAllBooks'
-                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)               
+                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
 
 
 

@@ -18,17 +18,17 @@ import Control.Monad.Reader
 import Data.Time.Clock.POSIX
 
 -- import Control.Monad.Trans.Reader (ask)
-import Control.Monad.Trans (lift, liftIO)
-import Data.Maybe          (fromMaybe)
-import Data.Pool           (withResource)
-import Data.String         (IsString(..))
-import Data.Text           (Text, pack, unpack)
-import GHC.Int             (Int64)
-import Text.Read           (readMaybe)
-import Network.HTTP.Client (Manager, newManager, defaultManagerSettings)
+import Control.Monad.Trans     (lift, liftIO)
+import Data.Maybe              (fromMaybe)
+import Data.Pool               (withResource)
+import Data.String             (IsString(..))
+import Data.Text               (Text, pack, unpack)
+import GHC.Int                 (Int64)
+import Network.HTTP.Client     (Manager, defaultManagerSettings, newManager)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
-    
-import Servant.Client    
+import Text.Read               (readMaybe)
+
+import Servant.Client
 import Text.InterpolatedString.Perl6 (qc)
 
 import Database.Bolt hiding (pack)
@@ -44,7 +44,7 @@ import Surbgirq.Types
 
 import Surbgirq.API.GraphDBClient
 
-    
+
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
@@ -58,14 +58,24 @@ runQ act = do env <- ask
 -- | get all books from neo4j db
 getBooksHandler :: AppM [Book]
 getBooksHandler = do
-  env <- liftIO $ mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:5000"
+  env <- liftIO $ mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <- liftIO $ newManager tlsManagerSettings
-  mres <- liftIO $ flip runClientM env $ getAllBooks' -- mgr
+--  mres <- liftIO $ flip runClientM env $ getAllBooks'
+  mres <- liftIO $ getAllBooks  mgr
   case mres of
-    Left e -> error $ show e -- throwIO $ ClientError e
+    Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a
 -- runQ queryBooks
 
+-- +sendBooks :: ChatId -> Bot ()
+-- +sendBooks chatId = do
+-- +    BotConfig{..} <- ask
+-- +    books <- liftIO getBooksHandler
+-- +    let requests = map (\s -> sendMessageRequest chatId (T.pack s)) ["map", "show", " books"]
+-- +    return ()
+-- +  where
+-- +    markupBooks []     = ""
+-- +    markupBooks (b:bs) = ""
 
 
 -- runGraphDBClient :: MonadIO m => ClientM a -> AppM a

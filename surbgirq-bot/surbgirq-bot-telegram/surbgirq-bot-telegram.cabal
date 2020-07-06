@@ -28,7 +28,7 @@ source-repository head
 library
 --  ghc-options:   -Wall -Werror
   exposed-modules: Surbgirq.Bot.Telegram
-                   Surbgirq.Bot.ApiClient
+                   Surbgirq.Bot.Server
   other-modules: Paths_surbgirq_bot_telegram
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
@@ -48,7 +48,7 @@ library
                , warp
                , split
                , regex-posix
-               , surbgirq-api-client
+               , surbgirq-neo4j-client
                , surbgirq-types
   default-language: Haskell2010
 

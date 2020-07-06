@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds     #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies  #-}
+{-# LANGUAGE TypeOperators #-}
 
 -- | Client for the Surbgirq web API
 module Surbgirq.API.Client where
@@ -28,7 +28,7 @@ import Text.InterpolatedString.Perl6 (qc)
 
 import Network.HTTP.Client hiding (Proxy)
 
-import qualified Data.Text      as T
+import qualified Data.Text as T
 
 
 import Servant.Client
@@ -37,18 +37,18 @@ import Servant.API.Generic
 import Servant.Client.Generic
 -- import Servant.Server.Generic
 
-    
+
 import Surbgirq.API
 import Surbgirq.Types
 
 
 -------------------------------------------------------------------------------
--- 
+--
 -------------------------------------------------------------------------------
 
 type BookLocalAPI = GetBooks
 --    :<|> GetBookChaptersNum :<|> GetChapterSectionsNum :<|> GetChapterVersesNum
-       
+
 -- TODO: convert all this staff using generic client generation
 -- api :: Proxy (ToServantApi BookAPI)
 -- api = genericApi (Proxy :: Proxy BookAPI)
@@ -60,8 +60,8 @@ bookAPI = Proxy
 
 
 apiBaseUrl :: BaseUrl
-apiBaseUrl = BaseUrl Https "127.0.0.1" 33001 "/api"
-             
+apiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
+
 getAllBooks' :: ClientM [Book]
 getAllBooks' = client bookAPI
 
@@ -71,6 +71,6 @@ getAllBooks
   :: Manager
   -> IO (Either ClientError [Book])
 getAllBooks mgr = runClientM getAllBooks'
-                                   (ClientEnv mgr apiBaseUrl Nothing)               
+                                   (ClientEnv mgr apiBaseUrl Nothing)
 
 

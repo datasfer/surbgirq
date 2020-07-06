@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module Surbgirq.Types.Entities (
    Book(..)
@@ -16,6 +16,8 @@ module Surbgirq.Types.Entities (
 
 import Data.Aeson (Value)
 import Data.Text  (Text)
+
+import qualified Data.Text as T
 
 import GHC.Generics
 
@@ -40,7 +42,8 @@ newtype VerseNum = VerseNum Int
  --  "book": "Matthew",
  --  "bookID": "ՄատթT1AM1"
 data Book = Book
-    { book'id          :: Int
+    { book'Id          :: Int -- node <id>
+    , book'bookId      :: Text
     , book'labels      :: [Text]
     , book'book        :: Girq
     , book'title       :: Text
@@ -88,18 +91,24 @@ $(deriveJSON dropPrefixOptions ''Section)
 $(deriveJSON dropPrefixOptions ''Paragraph)
 $(deriveJSON dropPrefixOptions ''Verse)
 
+$(deriveToJSON dropPrefixOptions ''Book)
+
 -- $(deriveJSON dropPrefixOptions ''Book)
-instance ToJSON Book
+-- instance ToJSON Book
 instance FromJSON Book where
   parseJSON = withObject "book" $ \o -> do
-    let book'id = 111 --  <- o .: "bookID"
+    book'Id  <- o .: "<id>"
+    book'bookId  <- o .: "bookID"
     book'book  <- o .: "book"
-    book'title  <- o .: "bookID"
+    book'title  <- o .:? "title" .!= "no title"
     book'number       <- o .: "bookOrder"
     book'chapters       <- o .: "chapters"
     book'testament       <- o .: "testament"
     let book'translation = "translation"
-    let book'labels = ["Book"]
+    csvLables <- o .: "labels"
+    let ls = T.split (==',') csvLables
+
+    let book'labels = ls --  <- o .: "labels"
 
     return Book{..}
 

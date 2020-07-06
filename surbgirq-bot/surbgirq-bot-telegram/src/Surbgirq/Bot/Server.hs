@@ -7,7 +7,7 @@ Description : Provide high level information of the Book
 Implement Book meta info related endpoints handlers
 -}
 
-module Surbgirq.Bot.ApiClient (
+module Surbgirq.Bot.Server (
    getBooksHandler
  -- , bookChapterNums
  -- , bookChapterSectionNums
@@ -15,11 +15,15 @@ module Surbgirq.Bot.ApiClient (
  ) where
 
 
-import Network.HTTP.Client (Manager, newManager, defaultManagerSettings)
+import Network.HTTP.Client     (Manager, defaultManagerSettings, newManager)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
+import Servant.Client
 
 
-import Surbgirq.API.Client
+-- import Surbgirq.API.Client
+import Surbgirq.API.GraphDBClient
+
+import Surbgirq.Types
 
 
 
@@ -27,9 +31,9 @@ import Surbgirq.API.Client
 
 getBooksHandler :: IO [Book]
 getBooksHandler = do
-  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:5000"
+  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
   mres <- flip runClientM env $ getAllBooks' -- mgr
   case mres of
-    Left e -> error $ show e -- throwIO $ ClientError e
+    Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a

@@ -8,7 +8,7 @@ server:
       runMode: _env:BACKEND_RUN_MODE:NoAuth
 localNeo4jApi:
       baseUrl: "127.0.0.1"
-      port: 33002
+      port: 33011
 logs:
   logFiles :
     - type      : "ScribeJSON"
