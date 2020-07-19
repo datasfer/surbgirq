@@ -21,7 +21,10 @@ import GHC.Generics            hiding (from)
 import Network.HTTP.Client     (Manager, newManager)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 
-import qualified Data.Text as T
+import qualified Data.Text      as T
+import qualified Data.Text.Lazy as TL
+
+import Lucid
 
 import Control.Monad.Except
 import Control.Monad.Reader
@@ -36,6 +39,7 @@ import System.Environment
 import Text.Regex.Posix
 import Web.Telegram.API.Bot
 
+import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Server
 ------------------------------------------------
 
@@ -234,17 +238,24 @@ testHtml chatId = do
                       ]
 
 
-sendBooks :: ChatId -> Bot ()
-sendBooks chatId = do
+
+sendHtml :: ChatId -> Text -> Bot ()
+sendHtml chatId msg = do
     BotConfig{..} <- ask
-    books <- liftIO getBooksHandler
-    let request = (\s -> sendMessageRequest chatId (T.pack s)) $ show books
+    let request = SendMessageRequest chatId msg (Just HTML) Nothing Nothing Nothing Nothing
     _ <- ($) liftIO $ sendMessage telegramToken request manager
     return ()
-  where
-    markupBooks []     = ""
-    markupBooks (b:bs) = ""
 
+sendBooks :: ChatId -> Bot ()
+sendBooks chatId = do
+    books <- liftIO getBooksHandler
+    forM_ books $ \book -> let htmlText = TL.toStrict . renderText $ toHtml book in sendHtml chatId htmlText
+
+sendBooks_ :: ChatId -> Bot ()
+sendBooks_ chatId = do
+    books <- liftIO getBooksHandler
+    let booksHtml =  TL.toStrict . renderText $ toHtml books
+    sendHtml chatId  booksHtml
 
 
 parseChatCommandArgs :: Text -> [String]
@@ -355,6 +366,8 @@ handleMessage msg = do
 
       onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
       onCommand (T.stripPrefix "/books" -> Just _)         = sendBooks chatId
+      onCommand (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
+      onCommand (T.stripPrefix "/mihatov" -> Just _)       = sendBooks_ chatId
       onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
       onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
       onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args

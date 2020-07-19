@@ -29,6 +29,7 @@ library
 --  ghc-options:   -Wall -Werror
   exposed-modules: Surbgirq.Bot.Telegram
                    Surbgirq.Bot.Server
+                   Surbgirq.Bot.Lucid.Instances
   other-modules: Paths_surbgirq_bot_telegram
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
@@ -39,8 +40,9 @@ library
                , servant-client == 0.16                                                                                                                                                                                                  
                , http-client-tls                                                                                                                                                                                                         
                , http-client          
-               , mtl                                                                                                                                                                                                                     
                , http-api-data
+               , lucid
+               , mtl                                                                                                                                                                                                                     
                , telegram-bot-simple
                , text
                , time
