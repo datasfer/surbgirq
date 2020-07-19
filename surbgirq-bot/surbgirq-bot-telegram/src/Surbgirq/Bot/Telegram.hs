@@ -13,7 +13,7 @@ module Surbgirq.Bot.Telegram
     ) where
 import Control.Monad           (replicateM)
 import Data.Char               (isNumber)
-import Data.List               (intersperse)
+import Data.List               (intercalate, intersperse)
 import Data.List.Split         (chunksOf)
 import Data.Text               (Text)
 import Data.Version            (makeVersion, showVersion)
@@ -203,6 +203,37 @@ sendAphorism chatId args = do
 
 
 
+
+testMd :: ChatId -> Bot ()
+testMd chatId = do
+    BotConfig{..} <- ask
+    let request = SendMessageRequest chatId (T.pack formatText) (Just Markdown) Nothing Nothing Nothing Nothing
+    _ <- ($) liftIO $ sendMessage telegramToken request manager
+    return ()
+  where
+    formatText = "*boldtext* _italictext_ `fixed width font` [link]   (http://google.com)."
+
+
+testHtml :: ChatId -> Bot ()
+testHtml chatId = do
+    BotConfig{..} <- ask
+    let request = SendMessageRequest chatId (T.pack htmlText) (Just HTML) Nothing Nothing Nothing Nothing
+    _ <- ($) liftIO $ sendMessage telegramToken request manager
+    return ()
+  where
+    htmlText = intercalate "\n" [ "<b>bold</b>, <strong>bold</strong>"
+                      , "<i>italic</i>, <em>italic</em>"
+                      , "<u>underline</u>, <ins>underline</ins>"
+                      , "<s> strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>"
+                      , "<b> bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>"
+                      , "<a href='http://www.example.com/'>inline URL</a>"
+                      , "<a href='tg://user?id=123456789'>inline mention of a user</a>"
+                      , "<code>inline fixed-width code</code>"
+                      , "<pre>pre-formatted fixed-width code block</pre>"
+                      , "<pre><code class='language-python'>pre-formatted fixed-width code block written in the Python programming language</code></pre>"
+                      ]
+
+
 sendBooks :: ChatId -> Bot ()
 sendBooks chatId = do
     BotConfig{..} <- ask
@@ -324,6 +355,8 @@ handleMessage msg = do
 
       onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
       onCommand (T.stripPrefix "/books" -> Just _)         = sendBooks chatId
+      onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
+      onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
       onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
       onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
       onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
