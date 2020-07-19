@@ -16,7 +16,7 @@ import Control.Monad                 (replicateM)
 import Data.Char                     (isNumber)
 import Data.List                     (intercalate, intersperse)
 import Data.List.Split               (chunksOf)
-import Data.Text                     (Text)
+import Data.Text                     (Text, empty)
 import Data.Version                  (makeVersion, showVersion)
 import GHC.Generics                  hiding (from)
 import Network.HTTP.Client           (Manager, newManager)
@@ -233,17 +233,18 @@ testHtml chatId = do
     _ <- ($) liftIO $ sendMessage telegramToken request manager
     return ()
   where
-    htmlText = intercalate "\n" [ "<b>bold</b>, <strong>bold</strong>"
-                      , "<i>italic</i>, <em>italic</em>"
-                      , "<u>underline</u>, <ins>underline</ins>"
-                      , "<s> strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>"
-                      , "<b> bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>"
-                      , "<a href='http://www.example.com/'>inline URL</a>"
-                      , "<a href='tg://user?id=123456789'>inline mention of a user</a>"
-                      , "<code>inline fixed-width code</code>"
-                      , "<pre>pre-formatted fixed-width code block</pre>"
-                      , "<pre><code class='language-python'>pre-formatted fixed-width code block written in the Python programming language</code></pre>"
-                      ]
+    htmlText = intercalate "\n"
+               [ "<b>bold</b>, <strong>bold</strong>"
+               , "<i>italic</i>, <em>italic</em>"
+               , "<u>underline</u>, <ins>underline</ins>"
+               , "<s> strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>"
+               , "<b> bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>"
+               , "<a href='http://www.example.com/'>inline URL</a>"
+               , "<a href='tg://user?id=123456789'>inline mention of a user</a>"
+               , "<code>inline fixed-width code</code>"
+               , "<pre>pre-formatted fixed-width code block</pre>"
+               , "<pre><code class='language-python'>pre-formatted fixed-width code block written in the Python programming language</code></pre>"
+               ]
 
 
 
@@ -256,8 +257,9 @@ sendHtml chatId msg = do
 
 
 
-debugCmdArgs :: ChatId -> Text -> Bot ()
-debugCmdArgs chatId book = do
+sendBooks :: ChatId -> Text -> Bot ()
+sendBooks chatId book | T.null book = allBooks chatId
+                      | otherwise = do
     let girq = (readMaybe $ T.unpack  book) :: Maybe Girq
     case girq of
       Nothing -> sendHtml chatId  $ T.pack $ [qc|Unknown book name: <b>{book}</b>|]
@@ -266,8 +268,8 @@ debugCmdArgs chatId book = do
                 sendHtml chatId  $ T.pack $ show girq
 
 
-sendBooks :: ChatId -> Bot ()
-sendBooks chatId = do
+allBooks :: ChatId -> Bot ()
+allBooks chatId = do
     books <- liftIO getBooksHandler
     forM_ books $ \book -> let htmlText = TL.toStrict . renderText $ toHtml book in sendHtml chatId htmlText
 
@@ -394,19 +396,18 @@ handleMessage msg@Message{..} = do
     chatId = ChatId $ chat_id chat
     Just messageText = text
 
-    onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
-    onCommand (T.stripPrefix "/books" -> Just book)      = debugCmdArgs chatId book
-    onCommand (T.stripPrefix "/books" -> Just _)         = sendBooks chatId
-    onCommand (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
-    onCommand (T.stripPrefix "/mihatov" -> Just _)       = sendBooks_ chatId
-    onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
-    onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
-    onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
-    onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
-    onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
-    onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
-    onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
-    onCommand _                                          = sendHelpMessage chatId
+    onCommand (T.stripPrefix "/help" -> Just _)     = sendHelpMessage chatId
+    onCommand (T.stripPrefix "/books" -> Just book) = sendBooks chatId book
+    onCommand (T.stripPrefix "/_books" -> Just _)   = sendBooks_ chatId
+    onCommand (T.stripPrefix "/mihatov" -> Just _)  = sendBooks_ chatId
+    onCommand (T.stripPrefix "/md" -> Just _)       = testMd chatId
+    onCommand (T.stripPrefix "/html" -> Just _)     = testHtml chatId
+    -- onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
+    -- onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
+    -- onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
+    -- onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
+    -- onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
+    onCommand _                                     = sendHelpMessage chatId
 
 
 helpMessage :: ChatId -> SendMessageRequest
@@ -414,7 +415,6 @@ helpMessage userId =  sendMessageRequest userId $ T.unlines
     [ "/help - show this message and subsequently die the flame death"
     , "/books  - get a books"
     , "/_books - get a books one text block"
-    , "/goat - get a random aphorism taken from the GOAT LORD itself"
-    , "/its || /itemplates - show insult templates"
-    , "/wordgroups || /wgs - show word groups"
+    , "/md    -  markdown test"
+    , "/html  - html markdown test"
     ]
