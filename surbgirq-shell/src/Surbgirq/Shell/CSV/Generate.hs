@@ -8,14 +8,13 @@ module Surbgirq.Shell.CSV.Generate where
 
 import Control.Exception    (bracket)
 import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
-
-import Data.Aeson
-import Data.Char
+import System.FilePath.Posix         (takeBaseName, takeDirectory)
 import Data.Maybe (fromMaybe)
 import Data.Text  (Text, pack)
-import Prelude hiding (catch)
-import Control.Exception
+import Text.InterpolatedString.Perl6 (qc)
+
 import System.IO.Error hiding (catch)
+import Prelude hiding (catch)
     
 import qualified Data.Text               as T
 import qualified Data.Text.Encoding      as TE
@@ -24,11 +23,12 @@ import qualified Data.Text.Lazy          as TL
 import qualified Data.Text.Lazy.Builder  as TB
 import           Data.Text.Lazy.Encoding as TLE
 
+import Data.Aeson
+import Data.Char
+import Control.Exception
 import Options.Applicative
 import System.Directory
-import System.FilePath.Posix         (takeBaseName, takeDirectory)
 import System.IO
-import Text.InterpolatedString.Perl6 (qc)
 
 import Control.Monad
 import Data.List

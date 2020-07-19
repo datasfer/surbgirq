@@ -4,6 +4,7 @@
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE ViewPatterns               #-}
@@ -11,15 +12,17 @@ module Surbgirq.Bot.Telegram
     ( startApp
     , app
     ) where
-import Control.Monad           (replicateM)
-import Data.Char               (isNumber)
-import Data.List               (intercalate, intersperse)
-import Data.List.Split         (chunksOf)
-import Data.Text               (Text)
-import Data.Version            (makeVersion, showVersion)
-import GHC.Generics            hiding (from)
-import Network.HTTP.Client     (Manager, newManager)
-import Network.HTTP.Client.TLS (tlsManagerSettings)
+import Control.Monad                 (replicateM)
+import Data.Char                     (isNumber)
+import Data.List                     (intercalate, intersperse)
+import Data.List.Split               (chunksOf)
+import Data.Text                     (Text)
+import Data.Version                  (makeVersion, showVersion)
+import GHC.Generics                  hiding (from)
+import Network.HTTP.Client           (Manager, newManager)
+import Network.HTTP.Client.TLS       (tlsManagerSettings)
+import Text.InterpolatedString.Perl6 (qc)
+import Text.Read                     (readMaybe)
 
 import qualified Data.Text      as T
 import qualified Data.Text.Lazy as TL
@@ -41,6 +44,8 @@ import Web.Telegram.API.Bot
 
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Server
+import Surbgirq.Types
+
 ------------------------------------------------
 
 
@@ -122,24 +127,27 @@ handleUpdate update = do
 
 -- Anything that comes in on the channel, baby
 handleChannelPost :: Message -> Bot ()
-handleChannelPost msg = do
+handleChannelPost Message{..} = do
   BotConfig{..} <- ask
-  let chatId = ChatId $ chat_id $ chat msg
-      Just messageText = text msg
-
-      onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
-      onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
-      onCommand (T.stripPrefix "/books" -> Just _)         = sendHelpMessage chatId
-      onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
-      onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
-      onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
-      onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
-      onCommand _                                          = return ()
-  liftIO $ putStrLn $ "Message id -> " ++ (show $ message_id msg)
+  liftIO $ putStrLn $ "Message id -> " ++ (show $ message_id )
   liftIO $ putStrLn $ "Message text -> " ++ (T.unpack messageText)
-  liftIO $ putStrLn $ "Chat id -> " ++ (show $ chat_id $ chat msg)
+  liftIO $ putStrLn $ "Chat id -> " ++ (show $ chat_id chat)
 
   onCommand messageText
+  where
+    chatId = ChatId $ chat_id chat
+    Just messageText = text
+
+    onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
+    onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
+    onCommand (T.stripPrefix "/books" -> Just _)         = sendHelpMessage chatId
+    onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
+    onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
+    onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
+    onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
+    onCommand _                                          = return ()
+
+
 
 dishITemplates :: ChatId -> Text -> Bot ()
 dishITemplates iqId args = do
@@ -245,6 +253,18 @@ sendHtml chatId msg = do
     let request = SendMessageRequest chatId msg (Just HTML) Nothing Nothing Nothing Nothing
     _ <- ($) liftIO $ sendMessage telegramToken request manager
     return ()
+
+
+
+debugCmdArgs :: ChatId -> Text -> Bot ()
+debugCmdArgs chatId book = do
+    let girq = (readMaybe $ T.unpack  book) :: Maybe Girq
+    case girq of
+      Nothing -> sendHtml chatId  $ T.pack $ [qc|Unknown book name: <b>{book}</b>|]
+      Just girq -> do
+                liftIO $ print $ show girq
+                sendHtml chatId  $ T.pack $ show girq
+
 
 sendBooks :: ChatId -> Bot ()
 sendBooks chatId = do
@@ -359,34 +379,41 @@ inlineQuote qFn iqId args = do
 
 -- Anything that comes in on the channel, baby
 handleMessage :: Message -> Bot ()
-handleMessage msg = do
+handleMessage msg@Message{..} = do
   BotConfig{..} <- ask
-  let chatId = ChatId $ chat_id $ chat msg
-      Just messageText = text msg
+  -- liftIO $ putStrLn $ "Message id -> " ++ (show $ message_id msg)
+  -- liftIO $ putStrLn $ "Message text -> " ++ (T.unpack messageText)
+  -- liftIO $ putStrLn $ "Chat id -> " ++ (show $ chat_id $ chat msg)
+  liftIO $ putStrLn $ "Message: " ++ (show msg)
+  case text of
+    Nothing ->   do
+              liftIO $ putStrLn $ ">>>>>> Message text is null: \n" ++ (show msg)
+    Just messageText -> onCommand messageText
 
-      onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
-      onCommand (T.stripPrefix "/books" -> Just _)         = sendBooks chatId
-      onCommand (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
-      onCommand (T.stripPrefix "/mihatov" -> Just _)       = sendBooks_ chatId
-      onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
-      onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
-      onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
-      onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
-      onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
-      onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
-      onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
-      onCommand _                                          = sendHelpMessage chatId
+  where
+    chatId = ChatId $ chat_id chat
+    Just messageText = text
 
-  liftIO $ putStrLn $ "Message id -> " ++ (show $ message_id msg)
-  liftIO $ putStrLn $ "Message text -> " ++ (T.unpack messageText)
-  liftIO $ putStrLn $ "Chat id -> " ++ (show $ chat_id $ chat msg)
+    onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
+    onCommand (T.stripPrefix "/books" -> Just book)      = debugCmdArgs chatId book
+    onCommand (T.stripPrefix "/books" -> Just _)         = sendBooks chatId
+    onCommand (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
+    onCommand (T.stripPrefix "/mihatov" -> Just _)       = sendBooks_ chatId
+    onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
+    onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
+    onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
+    onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
+    onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
+    onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
+    onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
+    onCommand _                                          = sendHelpMessage chatId
 
-  onCommand messageText
 
 helpMessage :: ChatId -> SendMessageRequest
 helpMessage userId =  sendMessageRequest userId $ T.unlines
     [ "/help - show this message and subsequently die the flame death"
-    , "/books - get a books"
+    , "/books  - get a books"
+    , "/_books - get a books one text block"
     , "/goat - get a random aphorism taken from the GOAT LORD itself"
     , "/its || /itemplates - show insult templates"
     , "/wordgroups || /wgs - show word groups"

@@ -5,8 +5,11 @@
 
 module Surbgirq.Types.Girq where
 
-import Data.Aeson   (Value)
-import Data.Text    (Text)
+import Data.Aeson (Value)
+import Data.Text  (Text)
+
+import qualified Text.Read as T
+
 import GHC.Generics
 
 import Common.Aeson
@@ -127,7 +130,7 @@ data Girq =
           -- ^ 4. Ավետարան ըստ Հովհաննեսի
           | Acts
           -- ^ 5. Գործք առաքելոց
-            deriving(Show, Eq, Read, Generic, Enum)
+            deriving(Show, Eq, Generic, Enum, T.Read)
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին
 -- ^ Պողոս առաքյալի առաջին նամակը Կորնթացիներին (Ա Կորնթացիներ)
@@ -184,18 +187,18 @@ data Language = AM
                 deriving (Show, Eq, Read, Generic)
 
 type ScriptureID = String
-                         
+
 data Translation = Translation
-    { translation'ID      :: Text
-    , translation'name    :: Text
-    , translation'version    :: Text
-    , translation'description    :: Text
+    { translation'ID          :: Text
+    , translation'name        :: Text
+    , translation'version     :: Text
+    , translation'description :: Text
     , translation'language    :: Text
-    , translation'from    :: Maybe ScriptureID
-    , translation'year    :: Maybe Int
-    , translation'dialect :: Maybe Dialect
-    , translation'lang    :: Language
-    , translation'translators  :: [Text]
+    , translation'from        :: Maybe ScriptureID
+    , translation'year        :: Maybe Int
+    , translation'dialect     :: Maybe Dialect
+    , translation'lang        :: Language
+    , translation'translators :: [Text]
     } deriving (Show, Read)
 
 
