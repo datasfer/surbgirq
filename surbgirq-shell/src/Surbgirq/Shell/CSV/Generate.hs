@@ -261,7 +261,7 @@ generateScripturesCSV configFile path outPath = do
                  ch@Chapeter{..} <- readChapter (bookDir </> file)
                  let chapterID = concat [bookID, "-", show chapter'number ]
                      chNode = [qc|{chapterID}{del}Գլ. {chapter'number}{del}{chapter'number}{del}{show book'book}|]
-                     bookRel  = [qc|{bookID}{del}{chapterID}|]
+                     bookRel  = [qc|{bookID}{del}{chapter'number}{del}{chapterID}|]
 
                  TIO.hPutStrLn outChh chNode
                  TIO.hPutStrLn outBookChapterRelh bookRel
@@ -376,7 +376,7 @@ dumpCSVHeaders del root = do
            , mkHeader "Translation Header" "translation_header.csv" [qc|translationID:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
            -- * Book
            , mkHeader "Book Header" "book_header.csv" [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
-           , mkHeader "Book to Chapter return Header" "book_chapter_header.csv" [qc|:START_ID{del}:END_ID(CHAPTER-ID)|]
+           , mkHeader "Book to Chapter return Header" "book_chapter_header.csv" [qc|:START_ID{del}chapter{del}:END_ID(CHAPTER-ID)|]
            -- * Chapter
            , mkHeader "Chapter Header" "chapter_header.csv" [qc|chapterID:ID(CHAPTER-ID){del}title{del}num:int{del}book|]
            , mkHeader "Chapter to Verse Relation Header" "chapter_verse_header.csv" [qc|:START_ID(CHAPTER-ID){del}:END_ID(VERSE-ID)|]
