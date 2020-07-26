@@ -273,7 +273,7 @@ sendBooks chatId book | T.null book = allBooks chatId
 sendVerse :: ChatId -> Text -> Bot ()
 sendVerse chatId verseRef = 
     let res = parseVerseRef verseRef
-    qcase res of
+    in case res of
       Left e -> sendHtml chatId e
       Right vRef -> do
                 liftIO $ print $ show vRef
@@ -409,7 +409,7 @@ handleMessage msg@Message{..} = do
     Just messageText = text
 
     onCommand (T.stripPrefix "/help" -> Just _)         = sendHelpMessage chatId
-    onCommand (T.stripPrefix "/verse" -> Just verseRef) = sendBooks chatId book
+    onCommand (T.stripPrefix "/verse" -> Just verseRef) = sendVerse chatId verseRef
     onCommand (T.stripPrefix "/books" -> Just book)     = sendBooks chatId book
     onCommand (T.stripPrefix "/_books" -> Just _)       = sendBooks_ chatId
     onCommand (T.stripPrefix "/mihatov" -> Just _)      = sendBooks_ chatId
