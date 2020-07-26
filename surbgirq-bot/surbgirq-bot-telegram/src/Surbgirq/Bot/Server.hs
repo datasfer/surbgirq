@@ -41,11 +41,11 @@ getBooksHandler = do
 
 
 
-getVerseRangeHandler :: Girq -> ChapterNum -> VerseNum -> VerseNum -> IO [Verse]
-getVerseRangeHandler girq ch v1 v2 = do
+getVerseRangeHandler :: Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> IO [Verse]
+getVerseRangeHandler dialect girq ch v1 v2 = do
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getVerseRange' girq ch v1 v2 -- mgr
+  mres <- flip runClientM env $ getVerseRange' dialect girq ch v1 v2 -- mgr
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a

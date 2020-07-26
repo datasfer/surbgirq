@@ -276,7 +276,7 @@ sendVerse chatId verseRef =
     in case res of
       Left e -> sendHtml chatId e
       Right vRef@VerseReference{..} -> do
-                  vs <- liftIO $ getVerseRangeHandler verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum 10)
+                  vs <- liftIO $ getVerseRangeHandler Grabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) Nothing --  (JVerseNum 10)
                   liftIO $ print $ show vRef
                   sendHtml chatId  $ T.pack $ show vs
 
