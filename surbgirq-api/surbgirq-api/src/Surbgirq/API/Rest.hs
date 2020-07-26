@@ -54,58 +54,61 @@ data BookAPI route = BookAPI {
     , bookChapterVerseNumsEndpoint :: route :- GetChapterVersesNum
 } deriving (Generic)
 
+-- |
+-- Scriptures info
+data ScriptureAPI route = ScriptureAPI {
+      scriptureChapterEndpoint :: route :- GetChapter
+    , scriptureChapterAllSectionsEndpoint :: route :- GetChapterAllSection
+    , scriptureChapterSectionEndpoint :: route :- GetChapterSection
+    -- | Verses endpoints
+    , scriptureChapterAllVersesEndpoint :: route :- GetChapterAllVerses
+    , scriptureVerseEndpoint :: route :- GetVerse
+    , scriptureVerseFromToEndpoint :: route :- GetVerseRange
+    , scriptureVerseByRefTextEndpoint :: route :- GetVerseByRefText
 
+} deriving (Generic)
+
+           
 type GetBooks = "list" :> Summary "Get Available Books" :> Get '[JSON] [Book]
 type GetBookChaptersNum = "chapters" :> Summary "Get chapter nums" :> Capture "girq" Girq :> Get '[JSON] [(Int, Text)] 
 type GetChapterSectionsNum = "sections" :> Summary "Get chapter section nums" :> Capture "girq" Girq :> Capture "chapter" ChapterNum :> Get '[JSON] [(Int, Text)]
 type GetChapterVersesNum = "verses" :> Summary "Get chapter verse nums" :> Capture "girq" Girq :> Capture "chapter" ChapterNum :> Get '[JSON] [Int]
 
-                                    
--- |
--- Scriptures info
-data ScriptureAPI route = ScriptureAPI {
 
-      scriptureChapterEndpoint :: route :- "chapter" :> Summary "Get Chapter"
-                                  :> Capture "girq" Girq
-                                  :> Capture "ch" ChapterNum
-                                  :> Get '[JSON] [Chapter]
-
-    , scriptureChapterAllSectionsEndpoint :: route :- "chapter" :> "sections"   :> Summary "Get Sections of Chapter"
+-- | ScriptureAPI endpoint description
+type GetChapter = "chapter" :> Summary "Get Chapter" :> Capture "girq" Girq :> Capture "ch" ChapterNum :> Get '[JSON] [Chapter]                                    
+type GetChapterAllSection = "chapter" :> "sections"   :> Summary "Get Sections of Chapter"
                                        :> Capture "girq" Girq
                                        :> Capture "ch" ChapterNum
                                        :> Get '[JSON] [Section]
-
-    , scriptureChapterSectionEndpoint :: route :- "section"   :> Summary "Get the Section"
+                                          
+type GetChapterSection = "section"   :> Summary "Get the Section"
                                   :> Capture "girq" Girq
                                   :> Capture "ch"   ChapterNum
                                   :> Capture "sec"  SectionNum
                                   :> Get '[JSON] [Section]
 
 
-    -- | Verses endpoints
-    , scriptureChapterAllVersesEndpoint :: route :- "chapter" :> "verses" :> Summary "Get all Verses of Chapter"
+type GetChapterAllVerses =  "chapter" :> "verses" :> Summary "Get all Verses of Chapter"
                                         :> Capture "girq" Girq
                                         :> Capture "ch" ChapterNum
                                         :> Get '[JSON] [Verse]
 
-    , scriptureVerseEndpoint :: route :- "chapter" :> "verse"   :> Summary "Get Verse by chapter and verse number"
+type GetVerse = "chapter" :> "verse"   :> Summary "Get Verse by chapter and verse number"
                                 :> Capture "girq" Girq
                                 :> Capture "ch" ChapterNum
                                 :> Capture "verse" VerseNum
                                 :> Get '[JSON] [Verse]
 
-    , scriptureVerseFromToEndpoint :: route :- "chapter" :> "verse" :> Summary "Get Verse by verse numver [From, Tp]"
+type GetVerseRange = "chapter" :> "verse" :> Summary "Get Verse by verse numver [From, Tp]"
                                       :> Capture "girq" Girq
                                       :> Capture "ch" ChapterNum
                                       :> Capture "verseFrom" VerseNum
                                       :> Capture "verseTo" VerseNum
                                       :> Get '[JSON] [Verse]
-
-    , scriptureVerseByRefTextEndpoint :: route :- "verse" :> Summary "Get Verse by ref text 'Book chnum.v1-v2' "
+type GetVerseByRefText = "verse" :> Summary "Get Verse by ref text 'Book chnum.v1-v2' "
                                          :> Capture "verseRef" Text
-                                         :> Get '[JSON] [Verse]
-
-} deriving (Generic)
+                                         :> Get '[JSON] [Verse]                                         
 
 
 

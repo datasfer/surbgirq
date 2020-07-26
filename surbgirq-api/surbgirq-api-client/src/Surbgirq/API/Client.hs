@@ -46,7 +46,7 @@ import Surbgirq.Types
 --
 -------------------------------------------------------------------------------
 
-type BookLocalAPI = GetBooks
+type BookLocalAPI = GetBooks :<|> GetVerseRange
 --    :<|> GetBookChaptersNum :<|> GetChapterSectionsNum :<|> GetChapterVersesNum
 
 -- TODO: convert all this staff using generic client generation
@@ -63,7 +63,9 @@ apiBaseUrl :: BaseUrl
 apiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
 
 getAllBooks' :: ClientM [Book]
-getAllBooks' = client bookAPI
+getVerseRange' :: Girq -> ChapterNum -> VerseNum -> VerseNum -> ClientM [Verse]
+
+(getAllBooks' :<|> getVerseRange') = client bookAPI
 
 
 
@@ -71,6 +73,14 @@ getAllBooks
   :: Manager
   -> IO (Either ClientError [Book])
 getAllBooks mgr = runClientM getAllBooks'
+                                   (ClientEnv mgr apiBaseUrl Nothing)
+
+
+getVerseRange
+  :: Manager
+  -> Girq -> ChapterNum -> VerseNum -> VerseNum 
+  -> IO (Either ClientError [Verse])
+getVerseRange mgr girq ch from to = runClientM (getVerseRange' girq ch from to) 
                                    (ClientEnv mgr apiBaseUrl Nothing)
 
 

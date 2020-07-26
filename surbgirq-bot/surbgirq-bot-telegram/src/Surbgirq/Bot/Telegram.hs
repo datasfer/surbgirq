@@ -409,7 +409,7 @@ handleMessage msg@Message{..} = do
     Just messageText = text
 
     onCommand (T.stripPrefix "/help" -> Just _)         = sendHelpMessage chatId
-    onCommand (T.stripPrefix "/verse" -> Just verseRef) = sendVerse chatId verseRef
+    onCommand (T.stripPrefix "/verse" -> Just verseRef) = sendVerseq chatId verseRef
     onCommand (T.stripPrefix "/books" -> Just book)     = sendBooks chatId book
     onCommand (T.stripPrefix "/_books" -> Just _)       = sendBooks_ chatId
     onCommand (T.stripPrefix "/mihatov" -> Just _)      = sendBooks_ chatId
