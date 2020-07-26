@@ -52,7 +52,7 @@ data VerseReference = VerseReference
     { verseRef'book    :: Girq
     , verseRef'chapter :: Int
     , verseRef'from    :: Int
-    , verseRef'To      :: Maybe Int
+    , verseRef'to      :: Maybe Int
     } deriving (Show, Read)
 
 

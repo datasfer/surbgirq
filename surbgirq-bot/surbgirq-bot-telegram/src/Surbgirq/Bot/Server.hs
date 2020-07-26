@@ -9,6 +9,7 @@ Implement Book meta info related endpoints handlers
 
 module Surbgirq.Bot.Server (
    getBooksHandler
+ , getVerseRangeHandler
  -- , bookChapterNums
  -- , bookChapterSectionNums
  -- , bookChapterVerseNums
@@ -34,6 +35,17 @@ getBooksHandler = do
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
   mres <- flip runClientM env $ getAllBooks' -- mgr
+  case mres of
+    Left e  -> error $ show e -- throwIO $ ClientError e
+    Right a -> pure a
+
+
+
+getVerseRangeHandler :: Girq -> ChapterNum -> VerseNum -> VerseNum -> IO [Verse]
+getVerseRangeHandler girq ch v1 v2 = do
+  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
+  mgr <-  newManager tlsManagerSettings
+  mres <- flip runClientM env $ getVerseRange' girq ch v1 v2 -- mgr
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a
