@@ -2,6 +2,7 @@ resolver: lts-14.23
 
 packages:
 - surbgirq-types
+- surbgirq-utils
 - surbgirq-service
 - surbgirq-api/surbgirq-api
 - surbgirq-api/surbgirq-api-client
@@ -41,7 +42,7 @@ extra-deps:
     commit: abbfd76c40f2783c113b660184a03cc94d58e751                    
 
 nix:
-  enable: true
+#  enable: true
 #  shell-file: shell.nix
   pure: false
   packages:

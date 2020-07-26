@@ -24,6 +24,7 @@ import GHC.Generics
 import Common.Aeson
 import Data.Aeson
 import Surbgirq.Types.Girq
+import Surbgirq.Types.Scripture
 
 
 
@@ -37,10 +38,10 @@ newtype VerseNum = VerseNum Int
   deriving (Show, Eq, Read, Ord, Generic)
 
  -- "bookOrder": 1,
- --  "testament": "New",
- --  "chapters": 40,
- --  "book": "Matthew",
- --  "bookID": "ՄատթT1AM1"
+ -- "testament": "New",
+ -- "chapters": 40,
+ -- "book": "Matthew",
+ -- "bookID": "ՄատթT1AM1"
 data Book = Book
     { book'Id          :: Int -- node <id>
     , book'bookId      :: Text

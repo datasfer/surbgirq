@@ -1,5 +1,7 @@
 packages:
   surbgirq-types
+  surbgirq-utils
+  
   surbgirq-service
   surbgirq-api/surbgirq-api
   surbgirq-api/surbgirq-api-client

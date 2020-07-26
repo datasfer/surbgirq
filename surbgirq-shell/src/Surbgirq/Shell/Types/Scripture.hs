@@ -25,6 +25,7 @@ import Common.Aeson
 
 import Surbgirq.Shell.Store.ParseFile
 import Surbgirq.Types.Girq
+import Surbgirq.Types.Scripture
 -------------------------------------------------------------------------------
 --
 
@@ -32,42 +33,42 @@ import Surbgirq.Types.Girq
 
 
 data Corpora = Corpora
-     { corpora'scripturesPath  :: FilePath
+     { corpora'scripturesPath   :: FilePath
      , corpora'translationsPath :: FilePath
-     , corpora'grabar60kPath   :: FilePath
+     , corpora'grabar60kPath    :: FilePath
      } deriving (Show, Read)
 
 data Scripture = Scripture
-     { scripture'books   :: [Book]
-     , scripture'Info   :: Text
-     , scripture'ID   :: Text
-     , scripture'dataFolder :: Text
+     { scripture'books         :: [Book]
+     , scripture'Info          :: Text
+     , scripture'ID            :: Text
+     , scripture'dataFolder    :: Text
      , scripture'translationID :: Text
      } deriving (Show, Read)
 
 
 -- |
 data Book = Book
-  { book'book        :: Girq
-  , book'labels      :: Maybe Text
+  { book'book      :: Girq
+  , book'labels    :: Maybe Text
   -- ^ neo4j node labels
-  , book'shortName   :: Text
-  , book'microName   :: Text
-  , book'title       :: Text
-  , book'orderNum      :: Int
-  , book'chapters    :: Int
-  , book'testament   :: Testament
-  , book'language    :: Language
-  , book'dialect     :: Dialect
-  , book'ref         :: Maybe Text
-  , book'input       :: Maybe Text
+  , book'shortName :: Text
+  , book'microName :: Text
+  , book'title     :: Text
+  , book'orderNum  :: Int
+  , book'chapters  :: Int
+  , book'testament :: Testament
+  , book'language  :: Language
+  , book'dialect   :: Dialect
+  , book'ref       :: Maybe Text
+  , book'input     :: Maybe Text
 --                             , scripture'Year   :: Int
  --    , scripture'Author :: Text
 
     -- ^ the path to text files to process, if nothing then take the path = toLower  $ show book'book
-  , book'inputRef    :: Maybe Text
+  , book'inputRef  :: Maybe Text
   -- ^ the ref file
-  , book'output      :: Maybe Text
+  , book'output    :: Maybe Text
   -- ^ the path to store processed result
   } deriving (Show, Read)
 
@@ -94,12 +95,12 @@ data Paragraph = Paragraph
 
 
 data Verse = Verse
-  { verse'verse   :: Int
-  , verse'content :: Text
+  { verse'verse       :: Int
+  , verse'content     :: Text
   , verse'seperatedBy :: Maybe Int
   -- ^ next part of this verse should go to next section or prgh
 --   , verse'grabar    :: Text
-  , verse'ref     :: Maybe VerseRef
+  , verse'ref         :: Maybe VerseRef
   } deriving (Show)
 
 

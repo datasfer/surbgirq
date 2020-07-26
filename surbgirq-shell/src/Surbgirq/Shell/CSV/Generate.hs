@@ -37,6 +37,7 @@ import System.FilePath
 import Common.Yaml
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
+import Surbgirq.Types.Scripture
 
 
 

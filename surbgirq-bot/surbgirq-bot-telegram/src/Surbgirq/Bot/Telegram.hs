@@ -45,8 +45,10 @@ import Web.Telegram.API.Bot
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Server
 import Surbgirq.Types
+import Surbgirq.Utils
 
 ------------------------------------------------
+
 
 
 data Version = Version
@@ -268,6 +270,16 @@ sendBooks chatId book | T.null book = allBooks chatId
                 sendHtml chatId  $ T.pack $ show girq
 
 
+sendVerse :: ChatId -> Text -> Bot ()
+sendVerse chatId verseRef = 
+    let res = parseVerseRef verseRef
+    qcase res of
+      Left e -> sendHtml chatId e
+      Right vRef -> do
+                liftIO $ print $ show vRef
+                sendHtml chatId  $ T.pack $ show vRef
+
+
 allBooks :: ChatId -> Bot ()
 allBooks chatId = do
     books <- liftIO getBooksHandler
@@ -396,25 +408,28 @@ handleMessage msg@Message{..} = do
     chatId = ChatId $ chat_id chat
     Just messageText = text
 
-    onCommand (T.stripPrefix "/help" -> Just _)     = sendHelpMessage chatId
-    onCommand (T.stripPrefix "/books" -> Just book) = sendBooks chatId book
-    onCommand (T.stripPrefix "/_books" -> Just _)   = sendBooks_ chatId
-    onCommand (T.stripPrefix "/mihatov" -> Just _)  = sendBooks_ chatId
-    onCommand (T.stripPrefix "/md" -> Just _)       = testMd chatId
-    onCommand (T.stripPrefix "/html" -> Just _)     = testHtml chatId
+    onCommand (T.stripPrefix "/help" -> Just _)         = sendHelpMessage chatId
+    onCommand (T.stripPrefix "/verse" -> Just verseRef) = sendBooks chatId book
+    onCommand (T.stripPrefix "/books" -> Just book)     = sendBooks chatId book
+    onCommand (T.stripPrefix "/_books" -> Just _)       = sendBooks_ chatId
+    onCommand (T.stripPrefix "/mihatov" -> Just _)      = sendBooks_ chatId
+    onCommand (T.stripPrefix "/md" -> Just _)           = testMd chatId
+    onCommand (T.stripPrefix "/html" -> Just _)         = testHtml chatId
     -- onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
     -- onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
     -- onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
     -- onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
     -- onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
-    onCommand _                                     = sendHelpMessage chatId
+    onCommand _                                         = sendHelpMessage chatId
 
 
 helpMessage :: ChatId -> SendMessageRequest
 helpMessage userId =  sendMessageRequest userId $ T.unlines
     [ "/help - show this message and subsequently die the flame death"
     , "/books  - get a books"
+    , "/books book  - get a book"
     , "/_books - get a books one text block"
+    , "/verse ref  - get a verse, e.g. ref = Ղուկ. 6.20-23 or ref = Luk. 6.20-23"
     , "/md    -  markdown test"
     , "/html  - html markdown test"
     ]
