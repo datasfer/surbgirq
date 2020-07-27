@@ -18,10 +18,10 @@ import Web.HttpApiData
 
 
 instance ToHttpApiData Girq where
-  toUrlPiece = pack . lowerized . show
+  toUrlPiece = pack . capitalized .show
 
 instance ToHttpApiData Dialect where
-  toUrlPiece = pack . lowerized . show
+  toUrlPiece = pack . capitalized . show
 
 instance FromHttpApiData Girq where
   parseUrlPiece = bimap pack id . readEither . capitalized . unpack

@@ -41,6 +41,20 @@ instance ToHtml Book  where
     toHtmlRaw = toHtml
 
 
+instance ToHtml [Verse]  where
+    toHtml [] = mempty
+    toHtml xs = mapM_ toHtml xs
+    toHtmlRaw = toHtml
+
+
+instance ToHtml Verse  where
+    toHtml Verse{..} = do
+        let space2 = addSpace 2
+            b = (toHtml . pack $ show verse'verse) <> space2 <> (bold_ $ toHtml verse'content) <> space2 <> (toHtml $ pack  $ show verse'book)
+        withNewLine b
+    toHtmlRaw = toHtml
+
+
 
 
 -- | Telegram support html tags list

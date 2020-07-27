@@ -77,6 +77,8 @@ data Paragraph = Paragraph
 
 data Verse = Verse
     { verse'id            :: Int
+    , verse'verseID       :: Text
+    , verse'labels        :: [Text]
     , verse'book          :: Girq
     , verse'chapter       :: Int
     , verse'sectionNumber :: Int
@@ -90,7 +92,7 @@ data Verse = Verse
 $(deriveJSON dropPrefixOptions ''Chapter)
 $(deriveJSON dropPrefixOptions ''Section)
 $(deriveJSON dropPrefixOptions ''Paragraph)
-$(deriveJSON dropPrefixOptions ''Verse)
+$(deriveToJSON dropPrefixOptions ''Verse)
 
 $(deriveToJSON dropPrefixOptions ''Book)
 
@@ -114,3 +116,33 @@ instance FromJSON Book where
     return Book{..}
 
 
+
+instance FromJSON Verse where
+  parseJSON = withObject "verse" $ \o -> do
+    verse'id  <- o .: "<id>"
+    verse'verseID  <- o .: "verseID"
+    verse'book  <- o .: "book"
+    verse'sectionTitle  <- o .:? "title" .!= "no title"
+    verse'sectionNumber <- o .: "section"
+    verse'chapter       <- o .: "chapter"
+    verse'paragraph       <- o .: "paragraph"
+--    verse'testament     <- o .: "testament"
+    verse'content       <- o .: "verseText"
+    verse'verse         <- o .: "verse"
+    let book'translation = "translation"
+    csvLables <- o .: "labels"
+    let ls = T.split (==',') csvLables
+
+    let verse'labels = ls
+
+    return Verse{..}
+
+
+--     { verse'id            :: Int
+--     , verse'book          :: Girq
+--     , verse'chapter       :: Int
+--     , verse'sectionNumber :: Int
+--     , verse'sectionTitle  :: Text
+--     , verse'paragraph     :: Int
+--     , verse'verse         :: Int
+--     , verse'content       :: Text

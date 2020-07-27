@@ -257,6 +257,13 @@ sendHtml chatId msg = do
     _ <- ($) liftIO $ sendMessage telegramToken request manager
     return ()
 
+sendText :: ChatId -> Text -> Bot ()
+sendText chatId msg = do
+    BotConfig{..} <- ask
+    let request = SendMessageRequest chatId msg Nothing Nothing Nothing Nothing Nothing
+    _ <- ($) liftIO $ sendMessage telegramToken request manager
+    return ()
+
 
 
 sendBooks :: ChatId -> Text -> Bot ()
@@ -271,14 +278,17 @@ sendBooks chatId book | T.null book = allBooks chatId
 
 
 sendVerse :: ChatId -> Text -> Bot ()
-sendVerse chatId verseRef = 
+sendVerse chatId verseRef =
     let res = parseVerseRef verseRef
     in case res of
       Left e -> sendHtml chatId e
       Right vRef@VerseReference{..} -> do
-                  vs <- liftIO $ getVerseRangeHandler Grabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) Nothing --  (JVerseNum 10)
+                  vs <- liftIO $ getVerseRangeHandler Grabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> verseRef'to)
                   liftIO $ print $ show vRef
-                  sendHtml chatId  $ T.pack $ show vs
+                  liftIO $ print $ show vs
+                  forM_ vs $ \verse -> let htmlText = TL.toStrict . renderText $ toHtml verse in sendHtml chatId htmlText
+
+                  -- sendText chatId  $ T.pack $ show vs
 
 
 

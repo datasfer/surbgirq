@@ -22,8 +22,8 @@ import Network.HTTP.Client (Manager)
 import qualified Data.Text    as T
 import qualified Data.Text.IO as T
 
-import Surbgirq.Types
 import Surbgirq.API
+import Surbgirq.Types
 
 -------------------------------------------------------------------------------
 --
@@ -38,10 +38,10 @@ type GraphDBLocalAPI =
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "verses" :> Capture "verseFrom" VerseNum
 --                 :> "to" :> Capture "verseTo" VerseNum
-                 :> QueryParam "to" VerseNum
+                 :> QueryParam "v2" VerseNum
                  :> Get '[JSON] [Verse]
 
-  
+
 --    :<|> "chapters" :> Get '[JSON] [Chapter]
  --   :<|> "chapter" :> Capture "num" ChapterNum :> Get '[JSON] Chapter
 
@@ -56,7 +56,7 @@ neo4jApiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
 
 getAllBooks' :: ClientM [Book]
 getVerseRange' :: Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> ClientM [Verse]
-                
+
 
 (getAllBooks' :<|> getVerseRange') = client graphDBAPI
 
@@ -73,7 +73,7 @@ getAllBooks mgr = runClientM getAllBooks'
 
 getVerseRange
   :: Manager
-  -> Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum 
+  -> Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum
   -> IO (Either ClientError [Verse])
-getVerseRange mgr dialect girq ch from to = runClientM (getVerseRange' dialect girq ch from to) 
+getVerseRange mgr dialect girq ch from to = runClientM (getVerseRange' dialect girq ch from to)
                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)
