@@ -48,10 +48,12 @@ library
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
                , aeson
-               , telegram-api                                                                                                                                                                                                            
+               , telegram-api
+               , fbmessenger-api
+               , fb
                , servant >= 0.16                                                                                                                                                                                                         
                , servant-server                                                                                                                                                                                                          
-               , servant-client == 0.16                                                                                                                                                                                                  
+               , servant-client >= 0.16                                                                                                                                                                                                  
                , http-client-tls                                                                                                                                                                                                         
                , http-client          
                , http-api-data
