@@ -36,9 +36,3 @@ abbr = [ (["Մատթ.", "Մատթ", "Մտ", "Mt", "Mat", "Matt","mat", "matt"], 
        ]
 
 
--- (  Մատթ. 3.1-12, Ղուկ. 3.1-18, Յովհ. 1.19-28
-abbrBooks :: Map Text Girq -- AbbrMap
-abbrBooks = Map.fromList
-            [ ("Մատթ.", Matthew)
-            , ("Ղուկ.", Mark)
-            , ("Յովհ.", John)]

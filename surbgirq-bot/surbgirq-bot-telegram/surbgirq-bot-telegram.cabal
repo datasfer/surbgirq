@@ -28,8 +28,11 @@ source-repository head
 library
 --  ghc-options:   -Wall -Werror
   exposed-modules: Surbgirq.Bot.Telegram
+                   Surbgirq.Bot.Help
                    Surbgirq.Bot.Server
                    Surbgirq.Bot.Lucid.Instances
+                   Surbgirq.Bot.FB.Facebook
+
   other-modules: Paths_surbgirq_bot_telegram
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
@@ -50,6 +53,7 @@ library
                , wai
                , warp
                , split
+               , containers
                , regex-posix
                , surbgirq-neo4j-client
                , surbgirq-types

@@ -40,6 +40,11 @@ type GraphDBLocalAPI =
 --                 :> "to" :> Capture "verseTo" VerseNum
                  :> QueryParam "v2" VerseNum
                  :> Get '[JSON] [Verse]
+       :<|> "scripture" :> Capture "dialect" Dialect
+                 :> "books" :> Capture "girq" Girq
+                 :> "chapters" :> Capture "ch" ChapterNum
+                 :> "oneverse" :> Capture "verseNum" VerseNum
+                 :> Get '[JSON] [Verse]
 
 
 --    :<|> "chapters" :> Get '[JSON] [Chapter]
@@ -56,9 +61,10 @@ neo4jApiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
 
 getAllBooks' :: ClientM [Book]
 getVerseRange' :: Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> ClientM [Verse]
+getOneVerse' :: Dialect -> Girq -> ChapterNum -> VerseNum -> ClientM [Verse]
 
 
-(getAllBooks' :<|> getVerseRange') = client graphDBAPI
+(getAllBooks' :<|> getVerseRange' :<|> getOneVerse') = client graphDBAPI
 
 
 
@@ -76,4 +82,12 @@ getVerseRange
   -> Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum
   -> IO (Either ClientError [Verse])
 getVerseRange mgr dialect girq ch from to = runClientM (getVerseRange' dialect girq ch from to)
+                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+
+
+getOneVerse
+  :: Manager
+  -> Dialect -> Girq -> ChapterNum -> VerseNum
+  -> IO (Either ClientError [Verse])
+getOneVerse mgr dialect girq ch from = runClientM (getOneVerse' dialect girq ch from)
                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)

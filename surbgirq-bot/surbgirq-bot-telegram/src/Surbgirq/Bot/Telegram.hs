@@ -42,14 +42,14 @@ import System.Environment
 import Text.Regex.Posix
 import Web.Telegram.API.Bot
 
+import Surbgirq.Bot.Help
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Server
 import Surbgirq.Types
 import Surbgirq.Utils
-
-------------------------------------------------
-
-
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 data Version = Version
   { version :: Text
@@ -120,6 +120,7 @@ botServer = returnVersion :<|> handleWebhook
 
 handleUpdate :: Update -> Bot ()
 handleUpdate update = do
+    liftIO $ putStrLn $ "update from bot -> " ++ (show $ update)
     case update of
       Update { message = Just msg } -> handleMessage msg
       Update { channel_post = Just msg } -> handleChannelPost msg
@@ -283,12 +284,40 @@ sendVerse chatId verseRef =
     in case res of
       Left e -> sendHtml chatId e
       Right vRef@VerseReference{..} -> do
-                  vs <- liftIO $ getVerseRangeHandler Grabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> verseRef'to)
+                  vs <- liftIO $ case verseRef'to of
+                                  Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
+                                  Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
                   liftIO $ print $ show vRef
                   liftIO $ print $ show vs
                   forM_ vs $ \verse -> let htmlText = TL.toStrict . renderText $ toHtml verse in sendHtml chatId htmlText
+                  let verseRefHtml =  TL.toStrict . renderText $ toHtml vRef
+                  sendHtml chatId  verseRefHtml
+
+sendVerse' :: ChatId -> VerseReference -> Bot ()
+sendVerse' chatId vRef@VerseReference{..} = do
+                  vs <- liftIO $ case verseRef'to of
+                                  Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
+                                  Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
+                  liftIO $ print $ show vRef
+                  liftIO $ print $ show vs
+                  forM_ vs $ \verse -> let htmlText = TL.toStrict . renderText $ toHtml verse in sendHtml chatId htmlText
+                  let verseRefHtml =  TL.toStrict . renderText $ toHtml vRef
+                  sendHtml chatId  verseRefHtml
 
                   -- sendText chatId  $ T.pack $ show vs
+
+
+sendVerse_ :: ChatId -> Text -> Bot ()
+sendVerse_ chatId verseRef =
+    let res = parseVerseRef verseRef
+    in case res of
+      Left e -> sendHtml chatId e
+      Right vRef@VerseReference{..} -> do
+                  vs <- liftIO $ case verseRef'to of
+                                  Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
+                                  Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
+                  let verseHtml =  TL.toStrict . renderText $ (toHtml vs <> toHtml vRef)
+                  sendHtml chatId  verseHtml
 
 
 
@@ -350,7 +379,8 @@ handleInlineQuery iq = do
 --                                    | cmd == "its" || cmd == "itemplates" || cmd == "insulttemplates" -> dishITemplates iqId args
                                     | otherwise -> return ()
                     Nothing -> return ()
-  -- liftIO $ putStrLn $ "Inline query -> " ++ (show iq)
+  liftIO $ putStrLn $ "inline query args -> " ++ (show cmdArgs)
+  liftIO $ putStrLn $ "Inline query -> " ++ (show iq)
   onCommand
 
 parseInlineQuery :: Text -> Maybe (String,[String])
@@ -412,7 +442,7 @@ handleMessage msg@Message{..} = do
   -- liftIO $ putStrLn $ "Chat id -> " ++ (show $ chat_id $ chat msg)
   liftIO $ putStrLn $ "Message: " ++ (show msg)
   case text of
-    Nothing ->   do
+    Nothing -> do
               liftIO $ putStrLn $ ">>>>>> Message text is null: \n" ++ (show msg)
     Just messageText -> onCommand messageText
 
@@ -420,28 +450,15 @@ handleMessage msg@Message{..} = do
     chatId = ChatId $ chat_id chat
     Just messageText = text
 
-    onCommand (T.stripPrefix "/help" -> Just _)         = sendHelpMessage chatId
-    onCommand (T.stripPrefix "/verse" -> Just verseRef) = sendVerse chatId verseRef
-    onCommand (T.stripPrefix "/books" -> Just book)     = sendBooks chatId book
-    onCommand (T.stripPrefix "/_books" -> Just _)       = sendBooks_ chatId
-    onCommand (T.stripPrefix "/mihatov" -> Just _)      = sendBooks_ chatId
-    onCommand (T.stripPrefix "/md" -> Just _)           = testMd chatId
-    onCommand (T.stripPrefix "/html" -> Just _)         = testHtml chatId
-    -- onCommand (T.stripPrefix "/goat" -> Just args)       = sendAphorism chatId args
-    -- onCommand (T.stripPrefix "/its" -> Just args)        = dishITemplates chatId args
-    -- onCommand (T.stripPrefix "/itemplates" -> Just args) = dishITemplates chatId args
-    -- onCommand (T.stripPrefix "/wgs" -> Just args)        = dishWordGroups chatId args
-    -- onCommand (T.stripPrefix "/wordgroups" -> Just args) = dishWordGroups chatId args
-    onCommand _                                         = sendHelpMessage chatId
+    onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
+    onCommand (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse chatId verseRef
+    onCommand (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse_ chatId verseRef
+    onCommand (T.stripPrefix "/books" -> Just book)      = sendBooks chatId book
+    onCommand (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
+    onCommand (T.stripPrefix "/mihatov" -> Just _)       = sendBooks_ chatId
+    onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
+    onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
+    onCommand (parseVerseRef  -> Right verseRef)         = sendVerse' chatId verseRef
+    onCommand _                                          = sendHelpMessage chatId
 
 
-helpMessage :: ChatId -> SendMessageRequest
-helpMessage userId =  sendMessageRequest userId $ T.unlines
-    [ "/help - show this message and subsequently die the flame death"
-    , "/books  - get a books"
-    , "/books book  - get a book"
-    , "/_books - get a books one text block"
-    , "/verse ref  - get a verse, e.g. ref = Ղուկ. 6.20-23 or ref = Luk. 6.20-23"
-    , "/md    -  markdown test"
-    , "/html  - html markdown test"
-    ]

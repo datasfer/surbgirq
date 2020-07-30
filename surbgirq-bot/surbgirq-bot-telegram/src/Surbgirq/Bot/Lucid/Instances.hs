@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Surbgirq.Bot.Lucid.Instances where
@@ -7,13 +8,18 @@ module Surbgirq.Bot.Lucid.Instances where
 import Data.List
 import Lucid
 
-import Data.Text (append, pack, unpack)
+import Data.Text                     (append, pack, unpack)
+import Text.InterpolatedString.Perl6 (qc)
 
-import qualified Data.Aeson as A
+import qualified Data.Aeson      as A
+import qualified Data.Map.Strict as Map
 
 
 import Surbgirq.Types
 
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 
 instance ToHtml [Book]  where
@@ -24,8 +30,7 @@ instance ToHtml [Book]  where
 
 instance ToHtml Book  where
     toHtml Book{..} = do
-        let space2 = addSpace 2
-            b = (toHtml . pack $ show book'number) <> space2 <> (bold_ $ toHtml book'title) <> space2 <> (toHtml $ pack  $ show book'book)
+        let b = (bold_ . toHtml . pack $ show book'number) <> space2 <> (bold_ $ toHtml book'title) <> space2 <> (toHtml $ pack  $ show book'book)
         withNewLine b
     --   _b
     -- { book'Id          :: Int -- node <id>
@@ -49,8 +54,21 @@ instance ToHtml [Verse]  where
 
 instance ToHtml Verse  where
     toHtml Verse{..} = do
-        let space2 = addSpace 2
-            b = (toHtml . pack $ show verse'verse) <> space2 <> (bold_ $ toHtml verse'content) <> space2 <> (toHtml $ pack  $ show verse'book)
+        let b = (bold_ . toHtml . pack $ show verse'verse) <> space2 <> (toHtml verse'content)
+        withNewLine b
+    toHtmlRaw = toHtml
+
+
+instance ToHtml VerseReference  where
+    toHtml VerseReference{..} = do
+        let girq = case Map.lookup verseRef'book abbrBooksAm of
+                     Nothing -> show verseRef'book
+                     Just g  -> g
+        let s = case verseRef'to of
+                  Nothing -> [qc|{girq} {verseRef'chapter}.{verseRef'from}|]
+                  Just v  -> [qc|{girq} {verseRef'chapter}.{verseRef'from}-{v}|]
+
+            b = (bold_ s)
         withNewLine b
     toHtmlRaw = toHtml
 
@@ -87,7 +105,13 @@ bold_ :: Term arg result => arg -> result
 bold_ = term "b"
 
 
-
+addSpace :: Monad m => Int -> HtmlT m ()
 addSpace n = (toHtml $ pack $ replicate n ' ')
+
+space2 :: Monad m => HtmlT m ()
+space2 = addSpace 2
+
+space1 :: Monad m => HtmlT m ()
+space1 = addSpace 1
 
 withNewLine t = t <> (toHtml $ pack  "\n")

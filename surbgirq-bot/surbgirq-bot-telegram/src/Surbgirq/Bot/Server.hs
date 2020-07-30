@@ -1,15 +1,17 @@
 {-# LANGUAGE DataKinds #-}
 
 {-|
-Module      : Surbgirq.Back.Server.Rest.Book
-Description : Provide high level information of the Book
+Module      : Surbgirq.Bot.Server
+Description : endpoint handlers to call the local neo4j db acccess api
 
-Implement Book meta info related endpoints handlers
+Implement local api call endpoints handlers
 -}
 
 module Surbgirq.Bot.Server (
    getBooksHandler
  , getVerseRangeHandler
+ , getOneVerseHandler
+
  -- , bookChapterNums
  -- , bookChapterSectionNums
  -- , bookChapterVerseNums
@@ -23,11 +25,11 @@ import Servant.Client
 
 -- import Surbgirq.API.Client
 import Surbgirq.API.GraphDBClient
-
 import Surbgirq.Types
 
-
-
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 
 getBooksHandler :: IO [Book]
@@ -46,6 +48,16 @@ getVerseRangeHandler dialect girq ch v1 v2 = do
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
   mres <- flip runClientM env $ getVerseRange' dialect girq ch v1 v2 -- mgr
+  case mres of
+    Left e  -> error $ show e -- throwIO $ ClientError e
+    Right a -> pure a
+
+
+getOneVerseHandler :: Dialect -> Girq -> ChapterNum -> VerseNum -> IO [Verse]
+getOneVerseHandler dialect girq ch v1 = do
+  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
+  mgr <-  newManager tlsManagerSettings
+  mres <- flip runClientM env $ getOneVerse' dialect girq ch v1
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a

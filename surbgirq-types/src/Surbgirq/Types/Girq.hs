@@ -130,7 +130,7 @@ data Girq =
           -- ^ 4. Ավետարան ըստ Հովհաննեսի
           | Acts
           -- ^ 5. Գործք առաքելոց
-            deriving(Show, Eq, Generic, Enum, T.Read)
+            deriving(Show, Eq, Generic, Enum, T.Read, Ord)
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին
 -- ^ Պողոս առաքյալի առաջին նամակը Կորնթացիներին (Ա Կորնթացիներ)
@@ -168,7 +168,7 @@ data Group = Pentateuch
             | OtherBook
               -- ^ Պողոս առաքյալի թղթերը
               -- ^ Թղթեր
-              deriving (Show, Eq)
+              deriving (Show, Eq, Ord)
 
 
 -- | Book -> Scripture -> Chapter -> Section -> Paragraph -> Verse -> Words
