@@ -24,8 +24,8 @@ library
   exposed-modules: Surbgirq.Utils
   other-modules: Paths_surbgirq_utils
                  Surbgirq.Utils.Scripture.Helpers
+                 Surbgirq.Utils.Scripture.Numerals
                  Surbgirq.Utils.Scripture.Abbr
-
   build-depends: base >=4.7 && <5
                , surbgirq-types
                , common
