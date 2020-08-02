@@ -73,6 +73,17 @@ instance ToHtml VerseReference  where
     toHtmlRaw = toHtml
 
 
+instance ToHtml [Section]  where
+    toHtml [] = mempty
+    toHtml xs = mapM_ toHtml xs
+    toHtmlRaw = toHtml
+
+
+instance ToHtml Section  where
+    toHtml Section{..} = do
+        let b = (bold_ . toHtml . pack $ show section'num) <> space2 <> (toHtml section'title)
+        withNewLine b
+    toHtmlRaw = toHtml
 
 
 -- | Telegram support html tags list

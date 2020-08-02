@@ -102,9 +102,12 @@ instance RecordValue Section where
         do
             title <- exact =<< props `at` "title"
             number <- exact =<< props `at` "num"
+            chapter <- exact =<< props `at` "chapter"
 --            girq :: Girq <-  exact =<< props `at` "book"
+            lbs   <- traverse exact labels
+            sectionID  <-  exact =<< props `at` "sectionID"
 
-            return $ Section i number title
+            return $ Section i sectionID lbs chapter number title
     exact x = fail $ show x ++ " is not a Section Node"
 
 

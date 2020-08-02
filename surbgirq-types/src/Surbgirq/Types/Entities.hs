@@ -63,12 +63,14 @@ data Chapter = Chapter
 
 
 data Section = Section
-    { section'id     :: Int
---    , section'book  :: Girq
-    , section'number :: Int
-    , section'title  :: Text
+    { section'id        :: Int
+    , section'sectionID :: Text
+    , section'labels    :: [Text]
+--    , section'book      :: Girq
+    , section'chater    :: Int
+    , section'num       :: Int
+    , section'title     :: Text
     } deriving (Show, Eq, Generic)
-
 
 data Paragraph = Paragraph
     { paragraph'title  :: Text
@@ -90,7 +92,7 @@ data Verse = Verse
 
 
 $(deriveJSON dropPrefixOptions ''Chapter)
-$(deriveJSON dropPrefixOptions ''Section)
+$(deriveToJSON dropPrefixOptions ''Section)
 $(deriveJSON dropPrefixOptions ''Paragraph)
 $(deriveToJSON dropPrefixOptions ''Verse)
 
@@ -131,9 +133,7 @@ instance FromJSON Verse where
     verse'verse         <- o .: "verse"
     let book'translation = "translation"
     csvLables <- o .: "labels"
-    let ls = T.split (==',') csvLables
-
-    let verse'labels = ls
+    let verse'labels = T.split (==',') csvLables
 
     return Verse{..}
 
@@ -146,3 +146,16 @@ instance FromJSON Verse where
 --     , verse'paragraph     :: Int
 --     , verse'verse         :: Int
 --     , verse'content       :: Text
+
+
+instance FromJSON Section where
+  parseJSON = withObject "section" $ \o -> do
+    section'id  <- o .: "<id>"
+    section'sectionID  <- o .: "sectionID"
+    csvLables <- o .: "labels"
+    let section'labels = T.split (==',') csvLables
+    section'chater <- o .: "chapter"
+    section'num    <- o .: "num"
+    section'title  <- o .: "title"
+    return Section{..}
+

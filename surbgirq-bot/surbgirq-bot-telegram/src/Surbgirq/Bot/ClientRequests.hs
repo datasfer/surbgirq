@@ -11,6 +11,9 @@ module Surbgirq.Bot.ClientRequests (
    getBooksHandler
  , getVerseRangeHandler
  , getOneVerseHandler
+ , getBookSectionsHandler
+ , getChapterSectionsHandler
+ , getChapterOneSectionHandler
 
  -- , bookChapterNums
  -- , bookChapterSectionNums
@@ -60,3 +63,39 @@ getOneVerseHandler dialect girq ch v1 = do
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a
+
+
+
+-- | Sections
+getBookSectionsHandler :: Dialect -> Girq -> IO [Section]
+getBookSectionsHandler dialect girq = do
+  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
+  mgr <-  newManager tlsManagerSettings
+  mres <- flip runClientM env $ getBookSections' dialect girq
+  case mres of
+    Left e  -> error $ show e -- throwIO $ ClientError e
+    Right a -> pure a
+
+getChapterSectionsHandler :: Dialect -> Girq -> ChapterNum -> IO [Section]
+getChapterSectionsHandler dialect girq ch = do
+  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
+  mgr <-  newManager tlsManagerSettings
+  mres <- flip runClientM env $ getChapterSections' dialect girq ch
+  case mres of
+    Left e  -> error $ show e -- throwIO $ ClientError e
+    Right a -> pure a
+
+
+getChapterOneSectionHandler :: Dialect -> Girq -> ChapterNum -> SectionNum -> IO [Section]
+getChapterOneSectionHandler dialect girq ch sec = do
+  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
+  mgr <-  newManager tlsManagerSettings
+  mres <- flip runClientM env $ getChapterOneSection' dialect girq ch sec
+  case mres of
+    Left e  -> error $ show e -- throwIO $ ClientError e
+    Right a -> pure a
+
+
+
+
+

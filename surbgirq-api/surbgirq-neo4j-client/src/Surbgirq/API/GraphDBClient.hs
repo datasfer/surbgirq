@@ -45,6 +45,20 @@ type GraphDBLocalAPI =
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "oneverse" :> Capture "verseNum" VerseNum
                  :> Get '[JSON] [Verse]
+       :<|> "scripture" :> Capture "dialect" Dialect :> Summary "Get chapter's sections"
+                 :> "books" :> Capture "girq" Girq
+                 :> "chapters" :> Capture "ch" ChapterNum
+                 :> "sections"
+                 :> Get '[JSON] [Section]
+       :<|> "scripture" :> Capture "dialect" Dialect :> Summary "Get chapter's sections by sec num"
+                 :> "books" :> Capture "girq" Girq
+                 :> "chapters" :> Capture "ch" ChapterNum
+                 :> "sections" :> Capture "secNum" SectionNum
+                 :> Get '[JSON] [Section]
+       :<|> "scripture" :> Capture "dialect" Dialect :> Summary "Get Book's section"
+                 :> "books" :> Capture "girq" Girq
+                 :> "sections"
+                 :> Get '[JSON] [Section]
 
 
 --    :<|> "chapters" :> Get '[JSON] [Chapter]
@@ -62,9 +76,12 @@ neo4jApiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
 getAllBooks' :: ClientM [Book]
 getVerseRange' :: Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> ClientM [Verse]
 getOneVerse' :: Dialect -> Girq -> ChapterNum -> VerseNum -> ClientM [Verse]
+getChapterSections' :: Dialect -> Girq -> ChapterNum -> ClientM [Section]
+getChapterOneSection' :: Dialect -> Girq -> ChapterNum -> SectionNum -> ClientM [Section]
+getBookSections' :: Dialect -> Girq ->  ClientM [Section]
 
 
-(getAllBooks' :<|> getVerseRange' :<|> getOneVerse') = client graphDBAPI
+(getAllBooks' :<|> getVerseRange' :<|> getOneVerse' :<|> getChapterSections' :<|> getChapterOneSection' :<|> getBookSections') = client graphDBAPI
 
 
 
@@ -90,4 +107,27 @@ getOneVerse
   -> Dialect -> Girq -> ChapterNum -> VerseNum
   -> IO (Either ClientError [Verse])
 getOneVerse mgr dialect girq ch from = runClientM (getOneVerse' dialect girq ch from)
+                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+
+
+
+getBookSections
+  :: Manager
+  -> Dialect -> Girq
+  -> IO (Either ClientError [Section])
+getBookSections mgr dialect girq = runClientM (getBookSections' dialect girq)
+                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+
+getChapterSections
+  :: Manager
+  -> Dialect -> Girq -> ChapterNum
+  -> IO (Either ClientError [Section])
+getChapterSections mgr dialect girq ch = runClientM (getChapterSections' dialect girq ch)
+                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+
+getChapterOneSection
+  :: Manager
+  -> Dialect -> Girq -> ChapterNum -> SectionNum
+  -> IO (Either ClientError [Section])
+getChapterOneSection mgr dialect girq ch sec = runClientM (getChapterOneSection' dialect girq ch sec)
                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)

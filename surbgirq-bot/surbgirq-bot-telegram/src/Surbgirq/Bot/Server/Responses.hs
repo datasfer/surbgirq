@@ -133,7 +133,33 @@ sendBooks_ chatId = do
 
 parseChatCommandArgs :: Text -> [String]
 parseChatCommandArgs text = getAllTextMatches $ ((T.unpack text) :: String) =~ ("\\w+" :: String) :: [String]
+
 getHeadNumber :: [String] -> Maybe Int
 getHeadNumber args = do
   arg <- if null args then Nothing else Just $ head args
   if all isNumber arg then Just $ read arg else Nothing
+
+
+-- | Sections
+sendChapterSections :: ChatId -> Text -> Bot ()
+sendChapterSections chatId argString = do
+  let args = parseChatCommandArgs argString
+      (book, chapter, section) =
+          case args of
+            (a:b:c:_) -> (a, b, c)
+            [a, b]    -> (a, b, "")
+            [a]       -> (a, "", "")
+            _         -> ("", "", "")
+
+      bookRes = (readMaybe  book) :: Maybe Girq
+      chRes = ChapterNum <$> readMaybe chapter :: Maybe ChapterNum
+      secRes = SectionNum <$>  readMaybe section :: Maybe SectionNum
+      dialect = Ashxarhabar
+  secs <- liftIO $ case (bookRes, chRes, secRes) of
+    (Just girq, Just chapter, Just section) -> getChapterOneSectionHandler dialect girq chapter section
+    (Just girq, Just chapter, Nothing) -> getChapterSectionsHandler dialect girq chapter
+    (Just girq, Nothing, Nothing) -> getBookSectionsHandler dialect girq
+    (Nothing, _, _) ->  error [qc|Failed parse book: {book}|]
+  forM_ secs $ \sec -> let htmlText = TL.toStrict . renderText $ toHtml sec in sendHtml chatId htmlText
+
+
