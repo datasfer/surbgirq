@@ -39,8 +39,8 @@ handleMessage msg@Message{..} = do
     Just messageText = text
 
     onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
-    onCommand (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse chatId verseRef
-    onCommand (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse_ chatId verseRef
+    onCommand (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse False chatId verseRef
+    onCommand (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse True chatId verseRef
     onCommand (T.stripPrefix "/chapter" -> Just args)    = sendChapterSections chatId args
     onCommand (T.stripPrefix "/books" -> Just book)      = sendBooks chatId book
     onCommand (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
@@ -49,7 +49,7 @@ handleMessage msg@Message{..} = do
     onCommand (T.stripPrefix "/random" -> Just _)        = sendBooks_ chatId
     onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
     onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
-    onCommand (parseVerseRef  -> Right verseRef)         = sendVerse' chatId verseRef
+    onCommand (parseVerseRef  -> Right verseRef)         = sendVerse' False chatId verseRef
     onCommand _                                          = sendHelpMessage chatId
 
 
