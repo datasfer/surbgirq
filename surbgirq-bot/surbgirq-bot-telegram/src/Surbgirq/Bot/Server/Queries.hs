@@ -200,12 +200,12 @@ inlineVerse' iqId verseRef@VerseReference{..} = do
              Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
              Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
 
-  let inlineQueryResults = map (\(a,idx) ->
-                                    InlineQueryResultArticle (toId idx)
+  let inlineQueryResults = map (\(verse, vRef) ->
+                                    InlineQueryResultArticle (toId vRef)
                                                              -- ^ Unique identifier for this result
-                                                             (Just $ T.pack $ show idx)
+                                                             (Just $ T.pack $ show vRef)
                                                              -- ^ Title of the result
-                                                             (Just $ InputTextMessageContent (html2Text a) (Just HTML) Nothing)
+                                                             (Just $ InputTextMessageContent (html2Text' verse vRef) (Just HTML) Nothing)
                                                              -- ^ Content of the message to be sent
                                                              Nothing
                                                              -- ^ Inline keyboard attached to the message
@@ -213,7 +213,7 @@ inlineVerse' iqId verseRef@VerseReference{..} = do
                                                              -- ^ URL of the result
                                                              Nothing
                                                              -- ^ Pass True, if you don't want the URL to be shown in the message
-                                                             (Just $ T.take 50 . T.drop 10 $  html2Text  a)
+                                                             (Just $ T.take 50 . T.drop 10 $  html2Text  verse)
                                                              -- ^ Short description of the result
                                                              Nothing
                                                              -- ^ Url of the thumbnail for the result
@@ -233,3 +233,4 @@ inlineVerse' iqId verseRef@VerseReference{..} = do
       return ()
   where
     html2Text = TL.toStrict . renderText . toHtml
+    html2Text' a b = TL.toStrict . renderText $ (toHtml a <> toHtml b)

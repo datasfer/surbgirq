@@ -65,7 +65,7 @@ instance ToHtml VerseReference  where
                      Nothing -> show verseRef'book
                      Just g  -> g
         let s = case verseRef'to of
-                  Nothing -> [qc|{girq} {verseRef'chapter}.{verseRef'from}|]
+                  Nothing -> [qc|{girq} {verseRef'chapter}:{verseRef'from}|]
                   Just v  -> [qc|{girq} {verseRef'chapter}.{verseRef'from}-{v}|]
 
             b = (bold_ s)
