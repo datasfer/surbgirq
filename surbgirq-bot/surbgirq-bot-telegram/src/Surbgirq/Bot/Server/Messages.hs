@@ -50,7 +50,10 @@ handleMessage msg@Message{..} = do
     onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
     onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
     onCommand (parseVerseRef  -> Right verseRef)         = sendVerse' False chatId verseRef
-    onCommand _                                          = sendHelpMessage chatId
+    onCommand str                                        = do
+                                  liftIO $ print $ T.append "=================== Unknown Command"  str
+                                  return ()
+                                    -- sendHelpMessage chatId
 
 
 

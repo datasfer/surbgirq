@@ -1,12 +1,16 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
+
 
 
 module Surbgirq.Types.Scripture where
 
-import Data.Aeson (Value)
-import Data.Text  (Text)
+import Data.Aeson                    (Value)
+import Data.Text                     (Text)
+import Text.InterpolatedString.Perl6 (qc)
 
 import qualified Text.Read as T
 
@@ -17,7 +21,8 @@ import Surbgirq.Types.Girq
 
 
 
-
+class HasId a where
+    toId :: a -> Text
 
 data Testament = Old
                | New
@@ -53,9 +58,19 @@ data VerseReference = VerseReference
     , verseRef'chapter :: Int
     , verseRef'from    :: Int
     , verseRef'to      :: Maybe Int
-    } deriving (Show, Read)
+    } deriving (Read)
 
+instance Show VerseReference where
+    show VerseReference{..}  =
+        case verseRef'to of
+          Nothing -> [qc|{verseRef'book} {verseRef'chapter}:{verseRef'from}|]
+          Just to -> [qc|{verseRef'book} {verseRef'chapter}.{verseRef'from}-{to}|]
 
+instance HasId VerseReference where
+    toId VerseReference{..}  =
+        case verseRef'to of
+          Nothing -> [qc|{verseRef'book}_{verseRef'chapter}_{verseRef'from}|]
+          Just to -> [qc|{verseRef'book}_{verseRef'chapter}.{verseRef'from}_{to}|]
 
 $(deriveJSON dropPrefixOptions ''Testament)
 $(deriveJSON dropPrefixOptions ''Dialect)

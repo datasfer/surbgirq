@@ -22,6 +22,7 @@ module Surbgirq.Bot.Server.Queries where
 import Control.Monad                 (replicateM)
 import Data.Char                     (isNumber)
 import Data.List                     (intercalate, intersperse)
+import Data.List                     (intercalate, intersperse)
 import Data.List.Split               (chunksOf)
 import Data.Text                     (Text, empty)
 import Data.Version                  (makeVersion, showVersion)
@@ -49,6 +50,7 @@ import System.Environment
 import Text.Regex.Posix
 import Web.Telegram.API.Bot
 
+import Surbgirq.Bot.ClientRequests
 import Surbgirq.Bot.Help
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Monad
@@ -71,6 +73,7 @@ handleInlineQuery iq = do
 
       onCommand = case cmdArgs of
                     Just (cmd,args) | cmd == "goat" -> inlineAphorisms iqId args False
+                                    | cmd == "verse" -> inlineVerse iqId args
                                     | cmd == "koza" -> inlineAphorisms iqId args True
                                     | cmd == "qb" || cmd == "quote" || cmd == "quotebook" -> inlineQuote (return "eligeQuote") iqId args
                                     | cmd == "qsearch" -> inlineQuoteSearch (\str -> pure "eligeQuoteByHuman") iqId args
@@ -150,7 +153,10 @@ inlineQuote qFn iqId args = do
   BotConfig{..} <- ask
   let n = if null args then 3 else (read . head) args
   quotes <- liftIO $ replicateM n qFn
-  let inlineQueryResults = map (\(a,idx) -> InlineQueryResultArticle (T.pack $ "quote" ++ show idx) (Just $ T.pack $ "quote #" ++ show idx) (Just $ InputTextMessageContent (T.pack a) Nothing Nothing) Nothing Nothing Nothing (Just $ T.pack a) Nothing Nothing Nothing) (zip quotes [1..n])
+  let inlineQueryResults = map (\(a,idx) ->
+                                    InlineQueryResultArticle (T.pack $ "quote" ++ show idx)
+                                                             (Just $ T.pack $ "quote #" ++ show idx)
+                                                             (Just $ InputTextMessageContent (T.pack a) Nothing Nothing) Nothing Nothing Nothing (Just $ T.pack a) Nothing Nothing Nothing) (zip quotes [1..n])
       request = AnswerInlineQueryRequest iqId inlineQueryResults (Just 1) Nothing Nothing Nothing Nothing
   res <- ($) liftIO $ answerInlineQuery telegramToken request manager
   case res of
@@ -161,3 +167,57 @@ inlineQuote qFn iqId args = do
       _ <- liftIO $ putStrLn $ "Response: " ++ (show r)
       return ()
 
+
+
+
+-- | Surbgirq inline queries
+
+
+inlineVerse :: Text -> [String] -> Bot ()
+inlineVerse iqId args = do
+  BotConfig{..} <- ask
+  let arg = intercalate " " args
+      vRef = parseVerseRef $ T.pack arg
+  vs <- case vRef of
+    Left e ->  do
+              _ <- liftIO $ putStrLn $ "Verse Reference parse error: " ++ (show e)
+              return []
+
+    Right verseRef@VerseReference{..} -> do
+                         liftIO $ case verseRef'to of
+                                          Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
+                                          Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
+
+  let inlineQueryResults = map (\(a,idx) ->
+                                    InlineQueryResultArticle (toId idx)
+                                                             -- ^ Unique identifier for this result
+                                                             (Just $ T.pack $ show idx)
+                                                             -- ^ Title of the result
+                                                             (Just $ InputTextMessageContent (html2Text a) (Just HTML) Nothing)
+                                                             -- ^ Content of the message to be sent
+                                                             Nothing
+                                                             -- ^ Inline keyboard attached to the message
+                                                             Nothing
+                                                             -- ^ URL of the result
+                                                             Nothing
+                                                             -- ^ Pass True, if you don't want the URL to be shown in the message
+                                                             (Just $ T.take 50 . T.drop 10 $  html2Text  a)
+                                                             -- ^ Short description of the result
+                                                             Nothing
+                                                             -- ^ Url of the thumbnail for the result
+                                                             Nothing
+                                                             -- ^ Thumbnail width
+                                                             Nothing
+                                                             -- ^ Thumbnail height
+                                                              ) (zip vs (either (const []) verseRefRange vRef))
+      request = AnswerInlineQueryRequest iqId inlineQueryResults (Just 1) Nothing Nothing Nothing Nothing
+  res <- ($) liftIO $ answerInlineQuery telegramToken request manager
+  case res of
+    Left e -> do
+      _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
+      return ()
+    Right r -> do
+      _ <- liftIO $ putStrLn $ "Response: " ++ (show r)
+      return ()
+  where
+    html2Text = TL.toStrict . renderText . toHtml
