@@ -68,21 +68,31 @@ import Surbgirq.Utils
 
 handleInlineQuery :: InlineQuery -> Bot ()
 handleInlineQuery iq = do
-  let cmdArgs = parseInlineQuery $ query_query iq
-      iqId = query_id iq
-
-      onCommand = case cmdArgs of
-                    Just (cmd,args) | cmd == "goat" -> inlineAphorisms iqId args False
-                                    | cmd == "verse" -> inlineVerse iqId args
-                                    | cmd == "koza" -> inlineAphorisms iqId args True
-                                    | cmd == "qb" || cmd == "quote" || cmd == "quotebook" -> inlineQuote (return "eligeQuote") iqId args
-                                    | cmd == "qsearch" -> inlineQuoteSearch (\str -> pure "eligeQuoteByHuman") iqId args
---                                    | cmd == "its" || cmd == "itemplates" || cmd == "insulttemplates" -> dishITemplates iqId args
-                                    | otherwise -> return ()
-                    Nothing -> return ()
-  liftIO $ putStrLn $ "inline query args -> " ++ (show cmdArgs)
+  let iqId = query_id iq
+--   liftIO $ putStrLn $ "inline query args -> " ++ (show cmdArgs)
   liftIO $ putStrLn $ "Inline query -> " ++ (show iq)
-  onCommand
+  onCommand $ query_query iq
+
+  where
+    iqId = query_id iq
+    onCommand (T.stripPrefix "/random" -> Just _)        = return ()
+    onCommand (parseVerseRef  -> Right verseRef)        = inlineVerse' iqId verseRef
+    onCommand str                                       = do
+                                  liftIO $ print $ T.append "=================== Unknown Command"  str
+                                  return ()
+
+   --  cmdArgs = parseInlineQuery $ query_query iq
+--     iqId = query_id iq
+
+--     onCommand = case cmdArgs of
+--                     Just (cmd,args) | cmd == "goat" -> inlineAphorisms iqId args False
+--                                     | cmd == "verse" -> inlineVerse iqId args
+--                                     | cmd == "koza" -> inlineAphorisms iqId args True
+--                                     | cmd == "qb" || cmd == "quote" || cmd == "quotebook" -> inlineQuote (return "eligeQuote") iqId args
+--                                     | cmd == "qsearch" -> inlineQuoteSearch (\str -> pure "eligeQuoteByHuman") iqId args
+-- --                                    | cmd == "its" || cmd == "itemplates" || cmd == "insulttemplates" -> dishITemplates iqId args
+--                                     | otherwise -> return ()
+--                     Nothing -> return ()
 
 
 handleCallbackQuery :: CallbackQuery -> Bot ()
@@ -175,18 +185,20 @@ inlineQuote qFn iqId args = do
 
 inlineVerse :: Text -> [String] -> Bot ()
 inlineVerse iqId args = do
-  BotConfig{..} <- ask
   let arg = intercalate " " args
       vRef = parseVerseRef $ T.pack arg
-  vs <- case vRef of
+  case vRef of
     Left e ->  do
               _ <- liftIO $ putStrLn $ "Verse Reference parse error: " ++ (show e)
-              return []
+              return ()
+    Right vRef -> inlineVerse' iqId vRef
 
-    Right verseRef@VerseReference{..} -> do
-                         liftIO $ case verseRef'to of
-                                          Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
-                                          Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
+inlineVerse' :: Text -> VerseReference -> Bot ()
+inlineVerse' iqId verseRef@VerseReference{..} = do
+  BotConfig{..} <- ask
+  vs <- liftIO $ case verseRef'to of
+             Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
+             Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
 
   let inlineQueryResults = map (\(a,idx) ->
                                     InlineQueryResultArticle (toId idx)
@@ -209,7 +221,7 @@ inlineVerse iqId args = do
                                                              -- ^ Thumbnail width
                                                              Nothing
                                                              -- ^ Thumbnail height
-                                                              ) (zip vs (either (const []) verseRefRange vRef))
+                                                              ) (zip vs (verseRefRange verseRef))
       request = AnswerInlineQueryRequest iqId inlineQueryResults (Just 1) Nothing Nothing Nothing Nothing
   res <- ($) liftIO $ answerInlineQuery telegramToken request manager
   case res of
