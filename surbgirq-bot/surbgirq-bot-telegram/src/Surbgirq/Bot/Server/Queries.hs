@@ -196,9 +196,10 @@ inlineVerse iqId args = do
 inlineVerse' :: Text -> VerseReference -> Bot ()
 inlineVerse' iqId verseRef@VerseReference{..} = do
   BotConfig{..} <- ask
-  vs <- liftIO $ case verseRef'to of
-             Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
-             Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
+  vs <- liftIO $ getVerses Ashxarhabar verseRef
+         -- liftIO $ case verseRef'to of
+         --     Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum <$> verseRef'from)
+         --     Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
 
   let inlineQueryResults = map (\(verse, vRef) ->
                                     InlineQueryResultArticle (toId vRef)

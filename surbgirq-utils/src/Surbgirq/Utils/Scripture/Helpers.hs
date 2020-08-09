@@ -29,8 +29,9 @@ parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text
            [] -> Left [qc|Unknown book name: {verseRange}|]
            (girq:_) -> case ns of
                          []        -> Left "Failed parse verse numbers"
-                         (a:b:c:_) -> Right $ VerseReference girq a b (Just c)
-                         (a:b:_)   -> Right $ VerseReference girq a b Nothing
+                         (a:b:c:_) -> Right $ VerseReference girq a (Just b) (Just c)
+                         (a:b:_)   -> Right $ VerseReference girq a (Just b) Nothing
+                         (a:_)     -> Right $ VerseReference girq a Nothing Nothing
                          _         -> Left "Failed parse verse numbers"
 
 
@@ -45,6 +46,10 @@ readGirqs  = catMaybes . map findByAbbr . T.groupBy (\x y -> isAlpha x && isAlph
 
 verseRefRange :: VerseReference -> [VerseReference]
 verseRefRange vRef@VerseReference{..} =
-  case verseRef'to of
-    Nothing -> [vRef]
-    Just to -> [ VerseReference  verseRef'book verseRef'chapter verseRef'from (Just toV) | toV <- [verseRef'from..to]]
+  case (verseRef'from, verseRef'to) of
+    (Nothing, Nothing) -> [ VerseReference  verseRef'book verseRef'chapter (Just v) Nothing | v <- [1..200]]
+                          -- ^ all verses from the chapter
+    (Just from, Nothing) -> [vRef]
+    (Nothing, Just to) -> [ VerseReference  verseRef'book verseRef'chapter (Just v) Nothing | v <- [1..to]]
+    (Just from, Just to) -> [ VerseReference  verseRef'book verseRef'chapter (Just v) Nothing | v <- [from..to]]
+

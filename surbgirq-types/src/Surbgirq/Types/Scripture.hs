@@ -12,13 +12,14 @@ import Data.Aeson                    (Value)
 import Data.Text                     (Text)
 import Text.InterpolatedString.Perl6 (qc)
 
-import qualified Text.Read as T
+import qualified Data.Map.Strict as Map
+import qualified Text.Read       as T
 
 import Common.Aeson
 import GHC.Generics
 
+import Surbgirq.Types.Abbr
 import Surbgirq.Types.Girq
-
 
 
 class HasId a where
@@ -56,21 +57,29 @@ data Translation = Translation
 data VerseReference = VerseReference
     { verseRef'book    :: Girq
     , verseRef'chapter :: Int
-    , verseRef'from    :: Int
+    , verseRef'from    :: Maybe Int
     , verseRef'to      :: Maybe Int
     } deriving (Read)
 
 instance Show VerseReference where
     show VerseReference{..}  =
-        case verseRef'to of
-          Nothing -> [qc|{verseRef'book} {verseRef'chapter}:{verseRef'from}|]
-          Just to -> [qc|{verseRef'book} {verseRef'chapter}.{verseRef'from}-{to}|]
+        let girq = case Map.lookup verseRef'book abbrBooksAm of
+                     Nothing -> [qc|{verseRef'book}|]
+                     Just g  -> g
+        in case (verseRef'from, verseRef'to) of
+             (Nothing, Nothing)   -> [qc|{girq} {verseRef'chapter}|]
+             (Just from, Nothing) -> [qc|{girq} {verseRef'chapter}:{from}|]
+             (Just from, Just to) -> [qc|{girq} {verseRef'chapter}.{from}-{to}|]
+             (Nothing, Just to)   ->  [qc|{girq} {verseRef'chapter}:{to}|]
 
 instance HasId VerseReference where
     toId VerseReference{..}  =
-        case verseRef'to of
-          Nothing -> [qc|{verseRef'book}_{verseRef'chapter}_{verseRef'from}|]
-          Just to -> [qc|{verseRef'book}_{verseRef'chapter}.{verseRef'from}_{to}|]
+        case (verseRef'from, verseRef'to) of
+          (Nothing, Nothing)   -> [qc|{verseRef'book}_{verseRef'chapter}|]
+          (Just from, Nothing) -> [qc|{verseRef'book}_{verseRef'chapter}_{from}|]
+          (Just from, Just to) -> [qc|{verseRef'book}_{verseRef'chapter}_{from}_{to}||]
+          (Nothing, Just to)   -> [qc|{verseRef'book}_{verseRef'chapter}_{to}|]
+
 
 $(deriveJSON dropPrefixOptions ''Testament)
 $(deriveJSON dropPrefixOptions ''Dialect)

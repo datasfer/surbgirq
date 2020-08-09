@@ -32,16 +32,6 @@ instance ToHtml Book  where
     toHtml Book{..} = do
         let b = (bold_ . toHtml . pack $ show book'number) <> space2 <> (bold_ $ toHtml book'title) <> space2 <> (toHtml $ pack  $ show book'book)
         withNewLine b
-    --   _b
-    -- { book'Id          :: Int -- node <id>
-    -- , book'bookId      :: Text
-    -- , book'labels      :: [Text]
-    -- , book'book        :: Girq
-    -- , book'title       :: Text
-    -- , book'number      :: Int
-    -- , book'chapters    :: Int
-    -- , book'testament   :: Testament
-    -- , book'translation :: Text
 
     toHtmlRaw = toHtml
 
@@ -60,15 +50,8 @@ instance ToHtml Verse  where
 
 
 instance ToHtml VerseReference  where
-    toHtml VerseReference{..} = do
-        let girq = case Map.lookup verseRef'book abbrBooksAm of
-                     Nothing -> show verseRef'book
-                     Just g  -> g
-        let s = case verseRef'to of
-                  Nothing -> [qc|{girq} {verseRef'chapter}:{verseRef'from}|]
-                  Just v  -> [qc|{girq} {verseRef'chapter}.{verseRef'from}-{v}|]
-
-            b = (bold_ s)
+    toHtml vRef@VerseReference{..} = do
+        let b = (bold_ $ toHtml $ show vRef)
         withNewLine b
     toHtmlRaw = toHtml
 

@@ -108,17 +108,24 @@ sendVerse sendAtOnce chatId verseRef =
 
 sendVerse' :: Bool -> ChatId -> VerseReference -> Bot ()
 sendVerse' sendAtOnce chatId vRef@VerseReference{..} = do
-                  vs <- liftIO $ case verseRef'to of
-                                  Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from)
-                                  Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
-
+                  vs <- liftIO $ getVerses Ashxarhabar vRef
                   if sendAtOnce
                   then let verseHtml =  TL.toStrict . renderText $ (toHtml vs <> toHtml vRef)
                        in sendHtml chatId  verseHtml
                   else do
                     sendAsParts chatId vs
                     let verseRefHtml =  TL.toStrict . renderText $ toHtml vRef
-                    sendHtml chatId  verseRefHtml
+                    sendHtml chatId verseRefHtml
+
+
+getVerses :: Dialect -> VerseReference -> IO [Verse]
+getVerses dialect vRef@VerseReference{..} = do
+  case (verseRef'from, verseRef'to) of
+    (Nothing, Nothing)   -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just 200)
+    (Just from, Nothing) -> getOneVerseHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)
+    (Just from, Just to) -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum from) (VerseNum <$> Just  to)
+    (Nothing, Just to)   -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just to)
+
 
 
 
