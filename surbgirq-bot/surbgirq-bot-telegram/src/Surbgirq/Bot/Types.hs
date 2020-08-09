@@ -18,7 +18,7 @@ import Data.Aeson
 data BotConfig = BotConfig
   { telegramToken       :: Token
   , facebookVerifyToken :: Text
-  , facebookChallange   :: Text
+  , facebookPageToken   :: Text
   , manager             :: Manager
   , facebookManager     :: Manager
 

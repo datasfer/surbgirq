@@ -19,14 +19,14 @@ import Surbgirq.Bot.Types
 ------------------------------------------------------------
 
 type WebHookAPI = "version" :> Get '[JSON] Version
-              :<|> "goat"
+              :<|> "tg-webhook"
                        -- :> Capture "secret" Text
                   :> ReqBody '[JSON] Update
                   :> Post '[JSON] ()
-              :<|> "webhook" :>
+              :<|> "fb-webhook" :>
                    QueryParam "hub.verify_token" Text :>
                    QueryParam "hub.challenge" Text :>
                    Get '[PlainText] Text
-              :<|> "webhook" :>
+              :<|> "fb-webhook" :>
                    ReqBody '[JSON] RemoteEventList :>
                    Post '[PlainText,JSON] Text

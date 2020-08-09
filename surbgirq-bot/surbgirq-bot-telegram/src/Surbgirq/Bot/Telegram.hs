@@ -56,12 +56,12 @@ startApp = do
   manager' <- newManager tlsManagerSettings
   fbManager <- newManager tlsManagerSettings
   let telegramToken' = "REMOVED-TELEGRAM-TOKEN"
-      fbVerifyToken = ""
-      fbChallange = ""
+      fbVerifyToken = "123456"
+      fbPageToken = "REMOVED-FACEBOOK-TOKEN"
       config = BotConfig
         { telegramToken = Token $ T.pack $ "bot" <> telegramToken'
         , facebookVerifyToken = fbVerifyToken
-        , facebookChallange = fbChallange
+        , facebookPageToken = fbPageToken
         , manager = manager'
         , facebookManager = fbManager
         }
