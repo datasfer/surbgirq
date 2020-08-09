@@ -43,7 +43,7 @@ library
                    Surbgirq.Bot.WebhookAPI
                    Surbgirq.Bot.Lucid.Instances
                    Surbgirq.Bot.FB.Facebook
-
+                   Surbgirq.Bot.FB.Server.Webhook
   other-modules: Paths_surbgirq_bot_telegram
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
@@ -58,7 +58,8 @@ library
                , http-client          
                , http-api-data
                , lucid
-               , mtl                                                                                                                                                                                                                     
+               , mtl
+               , bytestring
                , telegram-bot-simple
                , text
                , interpolatedstring-perl6

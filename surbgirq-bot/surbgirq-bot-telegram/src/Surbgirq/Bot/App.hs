@@ -1,5 +1,4 @@
-
-
+{-# LANGUAGE RecordWildCards #-}
 
 module Surbgirq.Bot.App where
 
@@ -25,7 +24,8 @@ nt s = flip runReaderT s . runBot
 
 
 initBotServer :: BotConfig -> Server WebHookAPI
-initBotServer config = hoistServer botApi (nt config) botServer
+initBotServer config@BotConfig{..} = hoistServer botApi (nt config) (botServer facebookVerifyToken facebookChallange)
+
     -- where transform :: BotConfig -> Bot -> Handler
     --       transform config = NT (flip runReaderT config . runBot)
 

@@ -54,9 +54,15 @@ startApp :: IO ()
 startApp = do
   putStrLn "Surbgirq bot started..."
   manager' <- newManager tlsManagerSettings
+  fbManager <- newManager tlsManagerSettings
   let telegramToken' = "REMOVED-TELEGRAM-TOKEN"
+      fbVerifyToken = ""
+      fbChallange = ""
       config = BotConfig
         { telegramToken = Token $ T.pack $ "bot" <> telegramToken'
+        , facebookVerifyToken = fbVerifyToken
+        , facebookChallange = fbChallange
         , manager = manager'
+        , facebookManager = fbManager
         }
   run 5000 $ app config
