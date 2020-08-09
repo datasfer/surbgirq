@@ -24,13 +24,13 @@ nt :: BotConfig -> Bot a -> Handler a
 nt s = flip runReaderT s . runBot
 
 
-initBotServer :: BotConfig -> Server BotAPI
+initBotServer :: BotConfig -> Server WebHookAPI
 initBotServer config = hoistServer botApi (nt config) botServer
     -- where transform :: BotConfig -> Bot -> Handler
     --       transform config = NT (flip runReaderT config . runBot)
 
 
-botApi :: Proxy BotAPI
+botApi :: Proxy WebHookAPI
 botApi = Proxy
 
 

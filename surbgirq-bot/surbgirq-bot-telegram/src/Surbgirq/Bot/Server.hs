@@ -30,7 +30,7 @@ import Surbgirq.Bot.WebhookAPI
 --
 ------------------------------------------------------------
 
-botServer :: ServerT BotAPI Bot
+botServer :: ServerT WebHookAPI Bot
 botServer = returnVersion :<|> handleWebhook
 
 

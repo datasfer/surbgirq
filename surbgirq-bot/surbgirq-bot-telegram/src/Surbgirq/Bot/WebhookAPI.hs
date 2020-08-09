@@ -14,7 +14,7 @@ import Surbgirq.Bot.Types
 --
 ------------------------------------------------------------
 
-type BotAPI = "version" :> Get '[JSON] Version
+type WebHookAPI = "version" :> Get '[JSON] Version
               :<|> "goat"
 --              :> Capture "secret" Text
               :> ReqBody '[JSON] Update

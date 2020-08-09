@@ -4,6 +4,7 @@
 - https://medium.com/the-hooray-media/telegram-bot-the-new-user-interface-e96047615109
 ** Haskell sample
    https://github.com/inhortte/MartesMartesBot/blob/41a4abdbde82af9a2ca8b7a049594c09080a24fb/thurk/src/Gruel.hs
+   https://github.com/airalab/habit/tree/master/src/Web/Bot
 
 * Facebook Bot
 
