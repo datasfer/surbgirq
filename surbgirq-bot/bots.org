@@ -6,6 +6,19 @@
    https://github.com/inhortte/MartesMartesBot/blob/41a4abdbde82af9a2ca8b7a049594c09080a24fb/thurk/src/Gruel.hs
    https://github.com/airalab/habit/tree/master/src/Web/Bot
 
+**  User State
+
+    create_table :users do |t|
+      t.string :telegram_id
+      -- ^
+      validates_uniqueness_of :telegram_id
+      t.string :first_name
+      t.string :last_name
+      t.jsonb :bot_command_data, default: {}
+
+      t.timestamps null: false
+
+   
 * Facebook Bot
 
 ** fb api
@@ -21,7 +34,7 @@ https://medium.com/driven-by-code/facebook-messenger-bot-using-webhooks-e481218e
 - https://hackage.haskell.org/package/fbmessenger-api
 - https://github.com/psibi/fb
 
-
+  
 * Discrod bot
 
 ** sample in haskell

@@ -2,6 +2,7 @@
 
 module Surbgirq.Bot.Types where
 
+import Data.IORef
 
 import Data.Text            (Text)
 import GHC.Generics         (Generic)
@@ -21,7 +22,7 @@ data BotConfig = BotConfig
   , facebookPageToken   :: Text
   , manager             :: Manager
   , facebookManager     :: Manager
-
+  , ref                 :: IORef Int
   }
 
 data Version = Version

@@ -1,5 +1,6 @@
-{-# LANGUAGE QuasiQuotes     #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 
 module Surbgirq.Bot.Server.Responses where
@@ -14,6 +15,8 @@ import Text.Regex.Posix              (getAllTextMatches, (=~))
 
 import qualified Data.Text      as T
 import qualified Data.Text.Lazy as TL
+
+import Data.IORef
 
 import Control.Monad.Reader
 import Lucid
@@ -148,6 +151,52 @@ sendText chatId msg = do
     _ <- ($) liftIO $ sendMessage telegramToken request manager
     return ()
 
+-- | send text with reply keybords
+sendTextReplyKb :: ReplyKeyboard -> ChatId -> Text -> Bot ()
+sendTextReplyKb keyborad chatId msg = do
+    BotConfig{..} <- ask
+    let request = SendMessageRequest chatId msg Nothing Nothing Nothing Nothing (Just keyborad)
+    res <- ($) liftIO $ sendMessage telegramToken request manager
+    liftIO $ putStrLn $ show res
+    let id_ = case res of
+                Right rm -> message_id $ result rm
+                Left e   -> error $ show e
+    liftIO $ writeIORef ref id_
+
+    return ()
+
+
+-- | send text with inline reply keybords
+sendTextInlineReplyKb :: InlineKeyboardMarkup  -> ChatId -> Text -> Bot ()
+sendTextInlineReplyKb keyboard chatId msg = do
+    BotConfig{..} <- ask
+    let inlineQuery = InlineQueryResultArticle  "inlineSettingButton"
+                                -- ^ Unique identifier for this result
+                                (Just "Settings")
+                                -- ^ Title of the result
+                                (Just $ InputTextMessageContent ("button") Nothing Nothing)
+                                -- ^ Content of the message to be sent
+                                (Just keyboard)
+                                -- ^ Inline keyboard attached to the message
+                                Nothing
+                                -- ^ URL of the result
+                                Nothing
+                                -- ^ Pass True, if you don't want the URL to be shown in the message
+                                Nothing
+                                -- ^ Short description of the result
+                                Nothing
+                                -- ^ Url of the thumbnail for the result
+                                Nothing
+                                -- ^ Thumbnail width
+                                Nothing
+                                -- ^ Thumbnail height
+
+            -- SendMessageRequest chatId msg Nothing Nothing Nothing Nothing (Just keyborad)
+        request = AnswerInlineQueryRequest msg [inlineQuery] (Just 1) Nothing Nothing Nothing Nothing
+    res <- ($) liftIO $ answerInlineQuery telegramToken request manager
+    liftIO $ putStrLn $ show res
+    return ()
+
 parseChatCommandArgs :: Text -> [String]
 parseChatCommandArgs text = getAllTextMatches $ ((T.unpack text) :: String) =~ ("\\w+" :: String) :: [String]
 
@@ -168,3 +217,29 @@ sendAphorism chatId args = do
   let requests = map (\s -> sendMessageRequest chatId (T.pack s)) sentences
   _ <- ($) liftIO $ forM_ requests $ (\r -> sendMessage telegramToken r manager)
   return ()
+
+
+
+---
+buttons0 = replyKeyboardMarkup [[keyboardButton "🎰 Магазин"], [keyboardButton "➕ Добавить бота"]]
+buttons0' = inlineKeyboardMarkup [[inlineKeyboardButton "🎰 Магазин"], [inlineKeyboardButton "➕ Добавить бота"]]
+
+cancel_button = replyKeyboardMarkup [[keyboardButton "🅾️ Отмена"]]
+
+category_buttons = replyKeyboardMarkup [[keyboardButton "💰 ТОП Платных", keyboardButton "💥 ТОП Бесплатных"], [keyboardButton "🎮 Игры", keyboardButton "📕 Образование"], [keyboardButton "🚑 Здоровье", keyboardButton "🎶 Музыка"], [keyboardButton "🎲 Другое", keyboardButton "🎯 Спорт"],
+                                                                                                                 [keyboardButton "<-"]]
+
+choose_category_buttons = replyKeyboardMarkup [[keyboardButton "🎮 Игры", keyboardButton "📕 Образование"], [keyboardButton "🚑 Здоровье", keyboardButton "🎶 Музыка"], [keyboardButton "🎲 Другое", keyboardButton "🎯 Спорт"],
+                                                                                                              [keyboardButton "🅾️ Отмена"]]
+
+bot_type_buttons = ReplyInlineKeyboardMarkup  [[inlineKeyboardButton "Key 1", inlineKeyboardButton "Key 2"], [inlineKeyboardButton "Cancel"]]
+
+in_btn =  ReplyInlineKeyboardMarkup  [[classifyButton, classifyButton1, classifyButton], [classifyButton1, classifyButton], [classifyButton]]
+
+inlineBtns = InlineKeyboardMarkup [ [classifyButton, classifyButton, classifyButton], [classifyButton, classifyButton] ]
+
+
+classifyButton = InlineKeyboardButton (T.pack "Settings") Nothing (Just "settings#") Nothing Nothing (Just "query") Nothing
+classifyButton1 = InlineKeyboardButton (T.pack "Btn _1") Nothing (Just "template#") Nothing Nothing (Just "query") Nothing
+
+

@@ -37,6 +37,7 @@ library
                    Surbgirq.Bot.Server.Queries
                    Surbgirq.Bot.Server.Messages
                    Surbgirq.Bot.Server.Webhook
+                   Surbgirq.Bot.Server.SettingsInline
                    Surbgirq.Bot.Monad
                    Surbgirq.Bot.ClientRequests
                    Surbgirq.Bot.App

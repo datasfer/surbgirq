@@ -21,6 +21,7 @@ module Surbgirq.Bot.Server.Queries where
 
 import Control.Monad                 (replicateM)
 import Data.Char                     (isNumber)
+import Data.Char                     (isSpace)
 import Data.List                     (intercalate, intersperse)
 import Data.List                     (intercalate, intersperse)
 import Data.List.Split               (chunksOf)
@@ -31,6 +32,9 @@ import Network.HTTP.Client           (Manager, newManager)
 import Network.HTTP.Client.TLS       (tlsManagerSettings)
 import Text.InterpolatedString.Perl6 (qc)
 import Text.Read                     (readMaybe)
+
+import Data.IORef
+
 
 import qualified Data.Text      as T
 import qualified Data.Text.Lazy as TL
@@ -49,16 +53,18 @@ import Servant.Server
 import System.Environment
 import Text.Regex.Posix
 import Web.Telegram.API.Bot
+import Web.Telegram.API.Bot.API.Edit
+
 
 import Surbgirq.Bot.ClientRequests
 import Surbgirq.Bot.Help
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
+import Surbgirq.Bot.Server.SettingsInline
 import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
-
 
 
 ------------------------------------------------------------
@@ -75,9 +81,10 @@ handleInlineQuery iq = do
 
   where
     iqId = query_id iq
-    onCommand (T.stripPrefix "/random" -> Just _)        = return ()
+    onCommand (T.stripPrefix "/random" -> Just _)      = return ()
     onCommand (parseVerseRef  -> Right verseRef)        = inlineVerse' iqId verseRef
-    onCommand str                                       = do
+    onCommand (all isSpace . T.unpack   -> True)                       = inlineSettings iqId
+    onCommand str                                      = do
                                   liftIO $ print $ T.append "=================== Unknown Command"  str
                                   return ()
 
@@ -96,31 +103,62 @@ handleInlineQuery iq = do
 
 
 handleCallbackQuery :: CallbackQuery -> Bot ()
-handleCallbackQuery cbq = do
+handleCallbackQuery CallbackQuery{..} = do
   BotConfig{..} <- ask
-  let cqId = cq_id cbq
-      Just cqMessage = cq_message cbq
-      chatId = ChatId $ chat_id $ chat cqMessage
-      tCommand = cq_data cbq
-
-      respuesta :: ChatId -> Token -> Manager -> String -> Bot ()
-      respuesta chatId telegramToken manager details = do
-        let request = SendMessageRequest chatId (T.pack details) Nothing Nothing Nothing Nothing Nothing
-        res <- ($) liftIO $ sendMessage telegramToken request manager
-        return ()
-
-      onCommand (T.stripPrefix "template#" -> Just tName) = do
-        let insult = "<- liftIO $ insultTemplate (T.unpack tName) >>= evalInsult"
-        respuesta chatId telegramToken manager insult
-      onCommand (T.stripPrefix "wordgroup#" -> Just wgName) = do
-        let ws = ["liftIO $ wordGroupWords", "(T.unpack wgName)"]
-        respuesta chatId telegramToken manager $ concat $ intersperse ", " ws
-      onCommand _ = return ()
-
-  case tCommand of
+  case cq_data of
     Just tc -> onCommand tc
     Nothing -> return ()
 
+  where
+      cqId = cq_id
+      Just cqMessage = cq_message
+      chatId = case cq_message of
+        Just cqMessage -> ChatId $ chat_id $ chat cqMessage
+        Nothing        -> ChatId $ fromIntegral $ user_id cq_from
+
+      onCommand (T.stripPrefix "settings#" -> Just _) = editRespuesta chatId "Settings for surbgirq bot" $ Just settingsKeyboardMarkup
+      onCommand (T.stripPrefix "parallel-langs#" -> Just _) = editRespuesta chatId "Parallel bible reading setting" $ Just parallelsKeyboardMarkup
+      onCommand (T.stripPrefix "languages#" -> Just _) = editRespuesta chatId "Set default Language" $ Just languagesKeyboardMarkup
+      onCommand (T.stripPrefix "dialects#" -> Just _) = editRespuesta chatId "Choose Dialect" $ Just dialectsKeyboardMarkup
+
+      -- onCommand (T.stripPrefix "template#" -> Just tName) = do
+      --   let insult = "<- liftIO $ insultTemplate (T.unpack tName) >>= evalInsult"
+      --   respuesta chatId telegramToken manager insult
+      -- onCommand (T.stripPrefix "wordgroup#" -> Just wgName) = do
+      --   let ws = ["liftIO $ wordGroupWords", "(T.unpack wgName)"]
+      --   respuesta chatId telegramToken manager $ concat $ intersperse ", " ws
+      onCommand _                                     = return ()
+
+
+respuesta :: ChatId -> String -> Maybe ReplyKeyboard -> Bot ()
+respuesta chatId  msg keyborad = do
+  BotConfig{..} <- ask
+  let request = SendMessageRequest chatId (T.pack msg) Nothing Nothing Nothing Nothing keyborad
+  res <- ($) liftIO $ sendMessage telegramToken request manager
+  liftIO $ putStrLn "response: --------------------"
+  liftIO $ putStrLn $ show res
+
+  let id_ = case res of
+              Right rm -> message_id $ result rm
+              Left e   -> error $ show e
+  liftIO $ writeIORef ref id_
+  return ()
+
+editRespuesta :: ChatId -> String -> Maybe InlineKeyboardMarkup -> Bot ()
+editRespuesta chatId  msg keyborad = do
+  BotConfig{..} <- ask
+  msgId <- liftIO $ readIORef ref
+  liftIO $ putStrLn $ show msgId
+
+  let request = EditMessageTextRequest (Just chatId) (Just msgId) Nothing (T.pack msg) Nothing Nothing keyborad
+  res <- ($) liftIO $ editMessageText telegramToken request manager
+  liftIO $ putStrLn $ show res
+  let id_ = case res of
+              Right rm -> message_id $ result rm
+              Left e   -> error $ show e
+  liftIO $ putStrLn $ show id_
+  liftIO $ writeIORef ref id_
+  return ()
 
 
 -- | Helpers
@@ -142,7 +180,7 @@ inlineAphorisms iqId args askToClassify = do
   -- _ <- liftIO $ putStrLn (show sentences)
   -- _ <- liftIO $ hashUm sentences
 
-  let classifyButton = InlineKeyboardButton (T.pack "classify aphorism") Nothing (Just "classify") Nothing Nothing Nothing Nothing
+  let classifyButton = InlineKeyboardButton (T.pack "classify aphorism") Nothing (Just "settings#") Nothing Nothing Nothing Nothing
       keyboard = InlineKeyboardMarkup [ [classifyButton] ]
       inlineQueryResults = map (\(a,idx) -> InlineQueryResultArticle (T.pack $ "aphorism" ++ show idx) (Just $ T.pack $ "aphorism #" ++ show idx) (Just $ InputTextMessageContent (T.pack a) Nothing Nothing) (if askToClassify then (Just keyboard) else Nothing) Nothing Nothing (Just $ T.pack a) Nothing Nothing Nothing) (zip sentences [1..n])
       request = AnswerInlineQueryRequest iqId inlineQueryResults (Just 1) Nothing Nothing Nothing Nothing
@@ -192,6 +230,47 @@ inlineVerse iqId args = do
               _ <- liftIO $ putStrLn $ "Verse Reference parse error: " ++ (show e)
               return ()
     Right vRef -> inlineVerse' iqId vRef
+
+
+inlineSettings :: Text -> Bot ()
+inlineSettings iqId = do
+  BotConfig{..} <- ask
+  liftIO $ putStrLn "space command"
+  let settingsButton = InlineKeyboardButton (T.pack "Settings") Nothing (Just "settings#") Nothing Nothing Nothing Nothing
+      keyboard = InlineKeyboardMarkup [ [settingsButton --  { ikb_url = Just "http://telegram.me/surbgirqbot" }
+                                        ] ]
+      inlineSettingResult = InlineQueryResultArticle  "inlineSettingButton"
+                                -- ^ Unique identifier for this result
+                                (Just "Settings")
+                                -- ^ Title of the result
+                                (Just $ InputTextMessageContent ("Settings for Surbgirq bot:") Nothing Nothing)
+                                -- ^ Content of the message to be sent
+                                (Just keyboard)
+                                -- ^ Inline keyboard attached to the message
+                                Nothing
+                                -- ^ URL of the result
+                                Nothing
+                                -- ^ Pass True, if you don't want the URL to be shown in the message
+                                Nothing
+                                -- ^ Short description of the result
+                                Nothing
+                                -- ^ Url of the thumbnail for the result
+                                Nothing
+                                -- ^ Thumbnail width
+                                Nothing
+                                -- ^ Thumbnail height
+
+      request = AnswerInlineQueryRequest iqId [inlineSettingResult] (Just 1) Nothing Nothing Nothing Nothing
+  res <- ($) liftIO $ answerInlineQuery telegramToken request manager
+  case res of
+    Left e -> do
+      _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
+      return ()
+    Right r -> do
+      _ <- liftIO $ putStrLn $ "Response: " ++ (show r)
+      return ()
+
+
 
 inlineVerse' :: Text -> VerseReference -> Bot ()
 inlineVerse' iqId verseRef@VerseReference{..} = do

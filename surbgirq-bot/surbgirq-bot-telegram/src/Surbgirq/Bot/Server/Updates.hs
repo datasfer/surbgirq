@@ -22,6 +22,7 @@ import Surbgirq.Bot.Server.Queries
 handleUpdate :: Update -> Bot ()
 handleUpdate update = do
     liftIO $ putStrLn $ "update from bot -> " ++ (show $ update)
+
     case update of
       Update { message = Just msg } -> handleMessage msg
       Update { channel_post = Just msg } -> handleChannelPost msg

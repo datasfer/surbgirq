@@ -30,6 +30,7 @@ startMessage = T.unlines
 helpMessage :: ChatId -> SendMessageRequest
 helpMessage userId =  sendMessageRequest userId $ T.unlines
     [ "/help - show this message and subsequently die the flame death"
+    , "/settings  - Settings for bot"
     , "/books  - get a books"
     , "/books book  - get a book"
     , "/_books - get a books one text block"
@@ -46,8 +47,3 @@ helpMessage userId =  sendMessageRequest userId $ T.unlines
 
 
 
--- | A settings keyboard
-settingsKeyboard =
-     [ ("Dialect", ["Grabar", "Ashxarhabar" ])
-     , ("Parallel Scriptures", [ "Grabar", "Russian" ])
-     ]

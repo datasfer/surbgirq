@@ -24,6 +24,8 @@ import Network.HTTP.Client.TLS       (tlsManagerSettings)
 import Text.InterpolatedString.Perl6 (qc)
 import Text.Read                     (readMaybe)
 
+import Data.IORef
+
 import qualified Data.Text      as T
 import qualified Data.Text.Lazy as TL
 
@@ -55,14 +57,18 @@ startApp = do
   putStrLn "Surbgirq bot started..."
   manager' <- newManager tlsManagerSettings
   fbManager <- newManager tlsManagerSettings
+  ref <- liftIO $ newIORef (0 :: Int)
+
   let telegramToken' = "REMOVED-TELEGRAM-TOKEN"
       fbVerifyToken = "123456"
       fbPageToken = "REMOVED-FACEBOOK-TOKEN"
+
       config = BotConfig
         { telegramToken = Token $ T.pack $ "bot" <> telegramToken'
         , facebookVerifyToken = fbVerifyToken
         , facebookPageToken = fbPageToken
         , manager = manager'
         , facebookManager = fbManager
+        , ref = ref
         }
   run 5000 $ app config

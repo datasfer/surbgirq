@@ -9,6 +9,8 @@ import Control.Monad.Except
 import Control.Monad.Reader
 import Servant.Server
 
+import Data.IORef
+
 import qualified Data.ByteString.Lazy.Char8 as C
 import qualified Data.Text                  as T
 
@@ -29,6 +31,7 @@ returnVersion = return version'
 handleWebhook :: Update -> Bot ()
 handleWebhook update = do
               liftIO $ print "Hook comes"
+
               Token token <- asks telegramToken
               let b = True -- (EQ == compare secret token)
               liftIO $ print $ show b
