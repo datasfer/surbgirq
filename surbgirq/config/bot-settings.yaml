@@ -1,0 +1,3 @@
+bots:
+  telegram:
+    dbName: "db/telebot"

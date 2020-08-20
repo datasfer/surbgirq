@@ -103,8 +103,9 @@ handleInlineQuery iq = do
 
 
 handleCallbackQuery :: CallbackQuery -> Bot ()
-handleCallbackQuery CallbackQuery{..} = do
+handleCallbackQuery cqy@CallbackQuery{..} = do
   BotConfig{..} <- ask
+  liftIO $ putStrLn [qc|=========== callback Query {cqy}|]
   case cq_data of
     Just tc -> onCommand tc
     Nothing -> return ()
@@ -236,8 +237,8 @@ inlineSettings :: Text -> Bot ()
 inlineSettings iqId = do
   BotConfig{..} <- ask
   liftIO $ putStrLn "space command"
-  let settingsButton = InlineKeyboardButton (T.pack "Settings") Nothing (Just "settings#") Nothing Nothing Nothing Nothing
-      keyboard = InlineKeyboardMarkup [ [settingsButton --  { ikb_url = Just "http://telegram.me/surbgirqbot" }
+  let settingsButton = InlineKeyboardButton (T.pack "Settings-1") Nothing (Just "settings#") Nothing Nothing Nothing Nothing
+      keyboard = InlineKeyboardMarkup [ [settingsButton { ikb_url = Just "http://telegram.me/surbgirqbot" }
                                         ] ]
       inlineSettingResult = InlineQueryResultArticle  "inlineSettingButton"
                                 -- ^ Unique identifier for this result
@@ -260,7 +261,8 @@ inlineSettings iqId = do
                                 Nothing
                                 -- ^ Thumbnail height
 
-      request = AnswerInlineQueryRequest iqId [inlineSettingResult] (Just 1) Nothing Nothing Nothing Nothing
+      request = AnswerInlineQueryRequest iqId [] -- [inlineSettingResult]
+                                              (Just 1) Nothing Nothing  (Just "Settings") ( Just "settings")
   res <- ($) liftIO $ answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
