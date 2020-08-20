@@ -31,9 +31,11 @@ import qualified Data.Text.Lazy as TL
 
 import Lucid
 
+import Control.Concurrent.STM
 import Control.Monad.Except
 import Control.Monad.Reader
 import Data.Aeson
+import Data.Default
 import Data.Maybe
 import Data.Monoid
 import Network.Wai
@@ -52,12 +54,13 @@ import Surbgirq.Bot.Types
 ------------------------------------------------------------
 
 
-startApp :: IO ()
-startApp = do
+startApp :: String -> IO ()
+startApp dbName = do
   putStrLn "Surbgirq bot started..."
   manager' <- newManager tlsManagerSettings
   fbManager <- newManager tlsManagerSettings
   ref <- liftIO $ newIORef (0 :: Int)
+  state <- newTVarIO def
 
   let telegramToken' = "REMOVED-TELEGRAM-TOKEN"
       fbVerifyToken = "123456"
@@ -70,5 +73,6 @@ startApp = do
         , manager = manager'
         , facebookManager = fbManager
         , ref = ref
+        , state = state
         }
   run 5000 $ app config

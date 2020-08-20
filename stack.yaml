@@ -10,6 +10,7 @@ packages:
 - surbgirq-shell
 - surbgirq-db
 - surbgirq-bot/surbgirq-bot-telegram
+- surbgirq-bot/surbgirq-bot-state
 - common
 - surbgirq
 

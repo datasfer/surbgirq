@@ -2,6 +2,7 @@
 
 module Surbgirq.Bot.Types where
 
+import Control.Concurrent.STM
 import Data.IORef
 
 import Data.Text            (Text)
@@ -11,10 +12,12 @@ import Web.Telegram.API.Bot (Token)
 
 import Data.Aeson
 
+import Surbgirq.Bot.State
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
 
+type State = TVar BotState
 
 data BotConfig = BotConfig
   { telegramToken       :: Token
@@ -23,6 +26,7 @@ data BotConfig = BotConfig
   , manager             :: Manager
   , facebookManager     :: Manager
   , ref                 :: IORef Int
+  , state               :: State
   }
 
 data Version = Version

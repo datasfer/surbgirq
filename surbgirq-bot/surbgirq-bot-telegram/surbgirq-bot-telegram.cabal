@@ -67,11 +67,14 @@ library
                , time
                , wai
                , warp
+               , stm
                , split
+               , data-default
                , containers
                , regex-posix
                , surbgirq-neo4j-client
                , surbgirq-types
+               , surbgirq-bot-state
                , surbgirq-utils
   default-language: Haskell2010
 

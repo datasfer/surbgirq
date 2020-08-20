@@ -16,10 +16,9 @@ import Common.Yaml
 import Sigterm
 import Surbgirq.Bot.Telegram
 import Types.BotSettings
--------------------------------------------------------------------------------
---
+
 ------------------------------------------------------------
--- Start REST API
+-- Start Telegram bot webhook
 ------------------------------------------------------------
 
 main :: IO ()
@@ -33,7 +32,7 @@ main = do
   putStrLn $ show bot
 --  getEnvToken "TELEGRAM_BOT_TOKEN" >>= run
 --  token <- T.pack <$> getLine
-  startApp -- run $ token
+  startApp dbName -- run $ token
 
 
 data CmdOptions = CmdOptions
