@@ -112,15 +112,31 @@ handleCallbackQuery cqy@CallbackQuery{..} = do
 
   where
       cqId = cq_id
-      Just cqMessage = cq_message
       chatId = case cq_message of
         Just cqMessage -> ChatId $ chat_id $ chat cqMessage
         Nothing        -> ChatId $ fromIntegral $ user_id cq_from
+      msg_id = case cq_message of
+        Just cqMessage -> message_id cqMessage
+        Nothing        -> 0
 
-      onCommand (T.stripPrefix "settings#" -> Just _) = editRespuesta chatId "Settings for surbgirq bot" $ Just settingsKeyboardMarkup
-      onCommand (T.stripPrefix "parallel-langs#" -> Just _) = editRespuesta chatId "Parallel bible reading setting" $ Just parallelsKeyboardMarkup
-      onCommand (T.stripPrefix "languages#" -> Just _) = editRespuesta chatId "Set default Language" $ Just languagesKeyboardMarkup
-      onCommand (T.stripPrefix "dialects#" -> Just _) = editRespuesta chatId "Choose Dialect" $ Just dialectsKeyboardMarkup
+      onCommand (T.stripPrefix "settings#" -> Just _) = editRespuesta chatId msg_id "Settings for surbgirq bot" $ Just settingsKeyboardMarkup
+      -- onCommand (T.stripPrefix "subscribe-bible#" -> Just _) = editRespuesta chatId msg_id "Parallel bible reading setting" $ Just parallelsKeyboardMarkup
+      -- onCommand (T.stripPrefix "languages#" -> Just _) = editRespuesta chatId msg_id "Set default Language" $ Just languagesKeyboardMarkup
+      -- onCommand (T.stripPrefix "dialects#" -> Just _) = editRespuesta chatId msg_id "Choose Dialect" $ Just dialectsKeyboardMarkup
+
+      -- sub menus
+      onCommand (T.stripPrefix "bibles#" -> Just _) = editRespuesta chatId msg_id "Bibles" $ Just biblesKeyboardMarkup
+      onCommand (T.stripPrefix "parallel-armBible#" -> Just _) = editRespuesta chatId msg_id "Parallel Armenian Bibles config" $ Just armBiblesKeyboardMarkup
+      onCommand (T.stripPrefix "ruBible#" -> Just _) = editRespuesta chatId msg_id "Russian Bibles" $ Just ruBiblesKeyboardMarkup
+      onCommand (T.stripPrefix "parallel-ruBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just ruBiblesKeyboardMarkup
+      onCommand (T.stripPrefix "enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just enBiblesKeyboardMarkup
+      onCommand (T.stripPrefix "parallel-enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just enBiblesKeyboardMarkup
+      onCommand (T.stripPrefix "narek#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just nareksKeyboardMarkup
+      onCommand (T.stripPrefix "parallel-narek#" -> Just _) = editRespuesta chatId msg_id "Parallel Narek config" $ Just parallelNareksKeyboardMarkup
+      onCommand (T.stripPrefix "parallel-bible#" -> Just _) = editRespuesta chatId msg_id "Parallel Bibles config" $ Just parallelBiblesKeyboardMarkup
+      onCommand (T.stripPrefix "menu-amlang#" -> Just _) = editRespuesta chatId msg_id "Arm Settings for surbgirq bot" $ Just amSettingsKeyboardMarkup
+      onCommand (T.stripPrefix "menu-enlang#" -> Just _) = editRespuesta chatId msg_id "Settings for surbgirq bot" $ Just settingsKeyboardMarkup
+      onCommand (T.stripPrefix "subscribe-bible#" -> Just _) = editRespuesta chatId msg_id "Daily bible subscribtion is currently <b>enabled</b>" $ Just subscriptionKeyboardMarkup
 
       -- onCommand (T.stripPrefix "template#" -> Just tName) = do
       --   let insult = "<- liftIO $ insultTemplate (T.unpack tName) >>= evalInsult"
@@ -145,13 +161,15 @@ respuesta chatId  msg keyborad = do
   liftIO $ writeIORef ref id_
   return ()
 
-editRespuesta :: ChatId -> String -> Maybe InlineKeyboardMarkup -> Bot ()
-editRespuesta chatId  msg keyborad = do
+editRespuesta :: ChatId -> Int -> String -> Maybe InlineKeyboardMarkup -> Bot ()
+editRespuesta chatId  msgId msg keyborad = do
   BotConfig{..} <- ask
-  msgId <- liftIO $ readIORef ref
+ -- msgId <- liftIO $ readIORef ref
   liftIO $ putStrLn $ show msgId
 
-  let request = EditMessageTextRequest (Just chatId) (Just msgId) Nothing (T.pack msg) Nothing Nothing keyborad
+  let request = EditMessageTextRequest (Just chatId) (Just msgId) Nothing (T.pack msg)
+                (Just HTML)
+                Nothing keyborad
   res <- ($) liftIO $ editMessageText telegramToken request manager
   liftIO $ putStrLn $ show res
   let id_ = case res of

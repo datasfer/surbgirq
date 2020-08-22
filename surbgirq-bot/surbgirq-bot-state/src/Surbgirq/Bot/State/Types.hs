@@ -9,6 +9,8 @@ import Data.Map.Strict (Map)
 import Data.Text       (Text)
 import GHC.Generics    (Generic)
 
+import qualified Data.Map.Strict as Map
+
 import Common.Aeson
 import Data.Aeson
 import Data.Default
@@ -19,16 +21,33 @@ import Surbgirq.Types
 ------------------------------------------------------------
 
 data BotState = BotState
- { state'users :: [BotUser]
+ { state'users :: [User]
  } deriving (Show, Generic)
 
-data BotUser = BotUser
- { id :: Int
+data User = User
+ { user_id   :: Int
+ , firstName :: String
+ , lastName  :: String
  } deriving (Show, Generic)
 
 
-instance FromJSON BotUser
-instance ToJSON BotUser
+data UserSetting = UserSetting
+ {
+   armScripture :: ArmScriptureConfig
+ , menuLanguage :: Language
+ } deriving (Show, Generic)
+
+
+data ArmScriptureConfig = ArmScriptureConfig
+ {
+   translation_id :: Text
+ , language       :: Language
+ , dialect        :: Dialect
+ } deriving (Show, Generic)
+
+
+instance FromJSON User
+instance ToJSON User
 
 $(deriveJSON dropPrefixOptions ''BotState)
 
