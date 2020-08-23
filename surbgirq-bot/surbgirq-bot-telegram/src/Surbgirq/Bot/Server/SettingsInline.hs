@@ -226,11 +226,11 @@ data Menu = Menu
 -- | Menu and sub menu titles and schema
 -- http://www.biblesociety.am/main.php?testament_id=5&book_id=150&chapter_id=2621&submit=%3E%3E&lang=a&content=bible&page-id=8&subpage-id=3
 booksBible :: [ [(Text,Text)] ]
-booksBible = [ [("Գրաբար 1895", "grabar1895#"), ("Գրաբար 1905", "grabar1905#")]
-             , [("«Էջմիածին» թարգմանություն 1994", "ejmiacin1994#")]
-             , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "ejmiacin2004#")]
+booksBible = [ [("Գրաբար 1805", "v1805-T"), ("Գրաբար 1905", "grabar1905#")]
+             , [("«Էջմիածին» թարգմանություն 1994", "e1994-T")]
+             , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "e2004-T")]
              , [("Sinodial", "ruSinodial#")]
-             , [("KJV", "kjvBible#"), ("EVN", "envBible#")]
+             , [("KJV", "kjv-T"), ("EVN", "envBible#")]
              ]
 
 booksNarek :: [ [(Text,Text)] ]

@@ -173,8 +173,9 @@ generateScripturesCSV configFile path outPath = do
              ) $ \(outBookh, outTranslationh, outDivisionh, outTestamenth, outScriptureh, outScriptureBookRelth, outBookChapterRelh) -> do
 
 
+     -- here the entityies which headers included with data in the same file
      TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
-     TIO.hPutStrLn outTranslationh [qc|translationID:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
+     TIO.hPutStrLn outTranslationh [qc|id:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
      TIO.hPutStrLn outScriptureh [qc|scriptureID:ID{del}title|]
      TIO.hPutStrLn outScriptureBookRelth [qc|:START_ID{del}:END_ID{del}:TYPE|]
 
@@ -374,7 +375,9 @@ dumpCSVHeaders del root = do
   let headerRoot = root </> "headers"
       hs = [ mkHeader "Scripture Header" "scripture_header.csv" [qc|scriptureID:ID{del}title|]
            , mkHeader "Scripture to Book relationship Header" "scripture_book_header.csv" [qc|:START_ID{del}:END_ID{del}:TYPE|]
-           , mkHeader "Translation Header" "translation_header.csv" [qc|id:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
+
+           -- not used, merge the header and data in the one file for some entity
+           -- , mkHeader "Translation Header" "translation_header.csv" [qc|id:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
            -- * Book
            , mkHeader "Book Header" "book_header.csv" [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
            , mkHeader "Book to Chapter return Header" "book_chapter_header.csv" [qc|:START_ID{del}chapter{del}:END_ID(CHAPTER-ID)|]
