@@ -10,13 +10,18 @@ TAGS
 dist-newstyle/
 front/girq-front/result*
 data/databases/
-./data/dbms/
-./data/databases/*
-./data/dbms/*
-./data/cypher/#*#
-./data/cypher/#*
-./data/cypher/~*
-./data/cypher/*~
+data/dbms/*
+data/databases/*
+data/dbms/*
+data/cypher/#*#
+data/cypher/#*
+data/cypher/~*
+data/cypher/*~
+data/debug.log
+data/query.log
+data/security.log
+data/transactions/
+
 
 .#*
 #*
