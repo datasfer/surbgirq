@@ -29,7 +29,7 @@ import Surbgirq.Types
 --
 ------------------------------------------------------------
 
-getUserConfig :: (MonadReader BotConfig m, MonadIO m) => UserId ->  m UserSetting
+getUserConfig :: (MonadReader BotConfig m, MonadIO m) => UserId ->  m UserSettings
 getUserConfig uId = do
   tvar <- asks state
   st@BotState{..} <- liftIO $ readTVarIO tvar
@@ -40,7 +40,7 @@ getUserConfig uId = do
 
 
 
-modifyUserConfig :: (MonadReader BotConfig m, MonadIO m) => UserId -> UserSetting ->  m UserSetting
+modifyUserConfig :: (MonadReader BotConfig m, MonadIO m) => UserId -> UserSettings ->  m UserSettings
 modifyUserConfig uId cfg = do
   tvar <- asks state
   liftIO $ atomically $ do

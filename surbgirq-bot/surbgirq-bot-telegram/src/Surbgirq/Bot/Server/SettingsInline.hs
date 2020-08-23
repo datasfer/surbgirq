@@ -20,8 +20,11 @@ module Surbgirq.Bot.Server.SettingsInline where
 
 import Web.Telegram.API.Bot
 
+import Data.Set                      (Set)
 import Data.Text                     (Text)
 import Text.InterpolatedString.Perl6 (qc)
+
+import qualified Data.Set as Set
 
 import Surbgirq.Types
 
@@ -47,8 +50,8 @@ settingsKeyboard =
         -- ruBible = mkInlineBtn "Библия" "ruBible#"
         -- enBible = mkInlineBtn "Bible" "enBible#"
         narek = mkInlineBtn "Narek" "narek#"
-        parallelNarek = mkInlineBtn "Parallel Narek" "parallel-narek#"
-        parallelBible = mkInlineBtn "Parallel Bible" "parallel-bible#"
+        parallelNarek = mkInlineBtn "Parallel Narek" "parallelNarek#"
+        parallelBible = mkInlineBtn "Parallel Bible" "parallelBible#"
         subscribe = mkInlineBtn "Subscribe" "subscribe-bible#"
         amMenuLang = mkInlineBtn "Arm" "menu-amlang#"
     in [ [bibles]
@@ -66,8 +69,8 @@ amSettingsKeyboard =
         -- ruBible = mkInlineBtn "Библия" "ruBible#"
         -- enBible = mkInlineBtn "Bible" "enBible#"
         narek = mkInlineBtn "Նարեկացի" "narek#"
-        parallelNarek = mkInlineBtn "Զուգահեռ Նարեկ" "parallel-narek#"
-        parallelBible = mkInlineBtn "Զւոգահեռ Աստուածաշունչ" "parallel-bible#"
+        parallelNarek = mkInlineBtn "Զուգահեռ Նարեկ" "parallelNarek#"
+        parallelBible = mkInlineBtn "Զւոգահեռ Աստուածաշունչ" "parallelBible#"
         subscribe = mkInlineBtn "Բաժանորդագրվել" "subscribe-bible#"
         enMenuLang = mkInlineBtn "English" "menu-enlang#"
     in [ [bibles]
@@ -88,12 +91,24 @@ subscriptionKeyboard =
     in [[subscribtionMode], [backToSetting]]
 
 -- | parallel sub menu
-parallelBiblesKeyboardMarkup = InlineKeyboardMarkup parallelBiblesKeyboard
-parallelBiblesKeyboard =
-    let armBible = mkInlineBtn "Աստուածաշունչ Մատեան" "parallel-armBible#"
-        ruBible = mkInlineBtn "Библия" "parallel-ruBible#"
-        enBible = mkInlineBtn "Bible" "parallel-enBible#"
-    in [[armBible, ruBible, enBible], [backToSetting]]
+-- parallelBiblesKeyboardMarkup = InlineKeyboardMarkup parallelBiblesKeyboard
+-- parallelBiblesKeyboard =
+--     let armBible = mkInlineBtn "Աստուածաշունչ Մատեան" "parallel-armBible#"
+--         ruBible = mkInlineBtn "Библия" "parallel-ruBible#"
+--         enBible = mkInlineBtn "Bible" "parallel-enBible#"
+--     in [[armBible, ruBible, enBible], [backToSetting]]
+parallelBiblesKeyboardMarkup :: Set Text -> InlineKeyboardMarkup
+parallelBiblesKeyboardMarkup ss = InlineKeyboardMarkup (parallelBiblesKeyboard "parallelBibleItem#" ss)
+
+parallelBiblesKeyboard :: Text -> Set Text -> [[InlineKeyboardButton]]
+parallelBiblesKeyboard cmdPrefix xs = map (map toKbd ) booksBible ++ [[backToSetting]]
+    where
+      toKbd :: (Text,Text) -> InlineKeyboardButton
+      toKbd (title, cb_data) =
+          let name = if Set.member cb_data xs
+                     then [qc|{title}++|]
+                     else title
+          in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
 
 
 parallelNareksKeyboardMarkup = InlineKeyboardMarkup parallelNareksKeyboard
@@ -112,13 +127,22 @@ nareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title d)
 -- Existing bible setting, version, translation and etc
 
 --  Armenian Bible's sub menu
-biblesKeyboardMarkup = InlineKeyboardMarkup biblesKeyboard
-biblesKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title [qc|bibleItem# {d}|])
-                 in map toKbd booksBible ++ [[backToSetting]]
+biblesKeyboardMarkup :: Text -> InlineKeyboardMarkup
+biblesKeyboardMarkup chName = InlineKeyboardMarkup (biblesKeyboard chName)
+
+biblesKeyboard :: Text -> [[InlineKeyboardButton]]
+biblesKeyboard chName = map (map (toKbd chName)) booksBible ++ [[backToSetting]]
+    where
+      toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
+      toKbd checkedName (title, cb_data) =
+          let name = if checkedName == cb_data
+                     then [qc|{title}++|]
+                     else title
+          in mkInlineBtn name [qc|bibleItem# {cb_data}|]
 
 
 
-armBiblesKeyboardMarkup = InlineKeyboardMarkup biblesKeyboard
+armBiblesKeyboardMarkup = InlineKeyboardMarkup armBiblesKeyboard
 armBiblesKeyboard =
     let grabar1895 = mkInlineBtn "Գրաբար 1895" "grabar1895#"
         grabar1905 = mkInlineBtn "Գրաբար 1905" "grabar1905#"
@@ -200,11 +224,16 @@ data Menu = Menu
 
 
 -- | Menu and sub menu titles and schema
-booksBible = [ [("Գրաբար 1895", "grabar1895#"), ("Գրաբար 1905", "grabar1905"), ("Էջմիածին 1994", "ejmiacin1994#")]
+-- http://www.biblesociety.am/main.php?testament_id=5&book_id=150&chapter_id=2621&submit=%3E%3E&lang=a&content=bible&page-id=8&subpage-id=3
+booksBible :: [ [(Text,Text)] ]
+booksBible = [ [("Գրաբար 1895", "grabar1895#"), ("Գրաբար 1905", "grabar1905#")]
+             , [("«Էջմիածին» թարգմանություն 1994", "ejmiacin1994#")]
+             , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "ejmiacin2004#")]
              , [("Sinodial", "ruSinodial#")]
              , [("KJV", "kjvBible#"), ("EVN", "envBible#")]
              ]
 
+booksNarek :: [ [(Text,Text)] ]
 booksNarek = [ [("Նարեկ Գրաբար", "grabarNarek#"), ("Նարեկ Խերանյան", "xerNarek#")]
              , [("Նարեկ Գևորգյան", "gevNarek#"), ("Նարեկ Գօչունեան", "gochNarek#")]
              , [("Книга скорбных песнопений", "ruNarek#")]

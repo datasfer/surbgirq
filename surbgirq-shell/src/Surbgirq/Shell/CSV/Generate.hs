@@ -141,7 +141,7 @@ generateScripturesCSV configFile path outPath = do
        arrayDel = "|"      
 
    corpora :: Corpora <- readYaml configFile
-
+ 
    TIO.putStrLn  $ T.pack $ show corpora
 
    TIO.putStrLn "reading list of Scriptures..."
@@ -374,7 +374,7 @@ dumpCSVHeaders del root = do
   let headerRoot = root </> "headers"
       hs = [ mkHeader "Scripture Header" "scripture_header.csv" [qc|scriptureID:ID{del}title|]
            , mkHeader "Scripture to Book relationship Header" "scripture_book_header.csv" [qc|:START_ID{del}:END_ID{del}:TYPE|]
-           , mkHeader "Translation Header" "translation_header.csv" [qc|translationID:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
+           , mkHeader "Translation Header" "translation_header.csv" [qc|id:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
            -- * Book
            , mkHeader "Book Header" "book_header.csv" [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
            , mkHeader "Book to Chapter return Header" "book_chapter_header.csv" [qc|:START_ID{del}chapter{del}:END_ID(CHAPTER-ID)|]
