@@ -20,6 +20,14 @@ module Surbgirq.Bot.Server.SettingsInline where
 
 import Web.Telegram.API.Bot
 
+import Data.Text                     (Text)
+import Text.InterpolatedString.Perl6 (qc)
+
+import Surbgirq.Types
+
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 -- go_seetings_menu = undefined
 
@@ -28,7 +36,12 @@ import Web.Telegram.API.Bot
 -- main menu
 settingsKeyboardReplyMarkup = ReplyInlineKeyboardMarkup settingsKeyboard
 
-settingsKeyboardMarkup = InlineKeyboardMarkup settingsKeyboard
+-- settingsKeyboardMarkup :: Language -> Int
+settingsKeyboardMarkup lang =
+    case lang of
+         AM -> InlineKeyboardMarkup amSettingsKeyboard
+         EN -> InlineKeyboardMarkup settingsKeyboard
+
 settingsKeyboard =
     let bibles = mkInlineBtn "Bibles" "bibles#"
         -- ruBible = mkInlineBtn "Библия" "ruBible#"
@@ -84,25 +97,14 @@ parallelBiblesKeyboard =
 
 
 parallelNareksKeyboardMarkup = InlineKeyboardMarkup parallelNareksKeyboard
-parallelNareksKeyboard =
-    let grabarNarek = mkInlineBtn "Նարեկ Գրաբար" "parallel-grabarNarek#"
-        xerNarek = mkInlineBtn "Նարեկ Խերանյան" "parallel-xerNarek#"
-        gevNarek = mkInlineBtn "Նարեկ Գևորգյան" "parallel-gevNarek#"
-        gochNarek = mkInlineBtn "Նարեկ Գօչունեան" "parallel-gochNarek#"
-        ruNarek = mkInlineBtn "Книга скорбных песнопений" "parallel-ruNarek#"
-        enNarek = mkInlineBtn "Book of Lamentations" "parallel-enNarek#"
-    in [[grabarNarek, gochNarek], [xerNarek, gevNarek], [ruNarek], [enNarek], [backToSetting]]
+parallelNareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title [qc|parallelNarek# {d}|])
+                         in map toKbd booksNarek ++ [[backToSetting]]
+
 
 
 nareksKeyboardMarkup = InlineKeyboardMarkup parallelNareksKeyboard
-nareksKeyboard =
-    let grabarNarek = mkInlineBtn "Նարեկ Գրաբար" "grabarNarek#"
-        xerNarek = mkInlineBtn "Նարեկ Խերանյան" "xerNarek#"
-        gevNarek = mkInlineBtn "Նարեկ Գևորգյան" "gevNarek#"
-        gochNarek = mkInlineBtn "Նարեկ Գօչունեան" "gochNarek#"
-        ruNarek = mkInlineBtn "Книга скорбных песнопений" "ruNarek#"
-        enNarek = mkInlineBtn "Book of Lamentations" "enNarek#"
-    in [[grabarNarek, gochNarek], [xerNarek, gevNarek], [ruNarek, enNarek], [backToSetting]]
+nareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title d)
+                 in map toKbd booksNarek ++ [[backToSetting]]
 
 
 
@@ -111,14 +113,9 @@ nareksKeyboard =
 
 --  Armenian Bible's sub menu
 biblesKeyboardMarkup = InlineKeyboardMarkup biblesKeyboard
-biblesKeyboard =
-    let grabar1895 = mkInlineBtn "Գրաբար 1895" "grabar1895#"
-        grabar1905 = mkInlineBtn "Գրաբար 1905" "grabar1905#"
-        ejmiacin1994 = mkInlineBtn "Էջմիածին 1994" "ejmiacin1994#"
-        sinodial = mkInlineBtn "Sinodial" "ruSinodial#"
-        kjv = mkInlineBtn "KJV" "kjvBible#"
-        evn = mkInlineBtn "EVN" "envBible#"
-    in [[grabar1895, grabar1905, ejmiacin1994], [sinodial], [kjv, evn], [backToSetting]]
+biblesKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title [qc|bibleItem# {d}|])
+                 in map toKbd booksBible ++ [[backToSetting]]
+
 
 
 armBiblesKeyboardMarkup = InlineKeyboardMarkup biblesKeyboard
@@ -183,9 +180,33 @@ backToSetting = mkInlineBtn "<< Back to Settings" "settings#"
 
 mkInlineBtn text callback_data = InlineKeyboardButton text Nothing (Just callback_data) Nothing Nothing Nothing Nothing
 
+checkBtn btn  = let txt = [qc|{ikb_text btn}++|]
+                in btn {ikb_text = txt}
+
 
 -- | A settings keyboard markup schema
 settingsKeyboardSchema =
      [ ("Dialect", ["Grabar", "Ashxarhabar" ])
      , ("Parallel Scriptures", [ "Grabar", "Russian" ])
      ]
+
+
+
+data Menu = Menu
+ { menu'title :: Text
+ , menu'data  :: Text
+
+ }
+
+
+-- | Menu and sub menu titles and schema
+booksBible = [ [("Գրաբար 1895", "grabar1895#"), ("Գրաբար 1905", "grabar1905"), ("Էջմիածին 1994", "ejmiacin1994#")]
+             , [("Sinodial", "ruSinodial#")]
+             , [("KJV", "kjvBible#"), ("EVN", "envBible#")]
+             ]
+
+booksNarek = [ [("Նարեկ Գրաբար", "grabarNarek#"), ("Նարեկ Խերանյան", "xerNarek#")]
+             , [("Նարեկ Գևորգյան", "gevNarek#"), ("Նարեկ Գօչունեան", "gochNarek#")]
+             , [("Книга скорбных песнопений", "ruNarek#")]
+             , [("Book of Lamentations", "enNarek#")]
+             ]

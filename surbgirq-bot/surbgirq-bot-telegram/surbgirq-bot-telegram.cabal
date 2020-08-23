@@ -29,7 +29,6 @@ library
 --  ghc-options:   -Wall -Werror
   exposed-modules: Surbgirq.Bot.Telegram
                    Surbgirq.Bot.Help
-                   Surbgirq.Bot.Types
                    Surbgirq.Bot.Server
                    Surbgirq.Bot.Server.Updates
                    Surbgirq.Bot.Server.Channels
@@ -48,10 +47,17 @@ library
   other-modules: Paths_surbgirq_bot_telegram
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
-               , aeson
+               , surbgirq-neo4j-client
+               , surbgirq-types
+               , surbgirq-bot-state
+               , surbgirq-utils
+               , surbgirq-bot-store
+               , surbgirq-bot-types
+                 -- 
                , telegram-api
                , fbmessenger-api
                , fb
+               , aeson
                , servant >= 0.16                                                                                                                                                                                                         
                , servant-server                                                                                                                                                                                                          
                , servant-client >= 0.16                                                                                                                                                                                                  
@@ -72,10 +78,6 @@ library
                , data-default
                , containers
                , regex-posix
-               , surbgirq-neo4j-client
-               , surbgirq-types
-               , surbgirq-bot-state
-               , surbgirq-utils
   default-language: Haskell2010
 
 -- executable surbgirq-telebot

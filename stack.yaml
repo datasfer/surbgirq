@@ -11,6 +11,8 @@ packages:
 - surbgirq-db
 - surbgirq-bot/surbgirq-bot-telegram
 - surbgirq-bot/surbgirq-bot-state
+- surbgirq-bot/surbgirq-bot-store
+- surbgirq-bot/surbgirq-bot-types
 - common
 - surbgirq
 

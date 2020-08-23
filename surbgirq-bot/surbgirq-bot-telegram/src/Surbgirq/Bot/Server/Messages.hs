@@ -8,7 +8,8 @@ module Surbgirq.Bot.Server.Messages where
 import Data.List (intercalate, intersperse)
 
 
-import qualified Data.Text as T
+import qualified Data.Map.Strict as M
+import qualified Data.Text       as T
 
 import Control.Monad.Reader
 import Web.Telegram.API.Bot
@@ -25,7 +26,9 @@ import Surbgirq.Utils
 
 handleMessage :: Message -> Bot ()
 handleMessage msg@Message{..} = do
-  BotConfig{..} <- ask
+--  BotConfig{..} <- ask
+--  tvar <- asks state
+
   -- liftIO $ putStrLn $ "Message id -> " ++ (show $ message_id msg)
   -- liftIO $ putStrLn $ "Message text -> " ++ (T.unpack messageText)
   -- liftIO $ putStrLn $ "Chat id -> " ++ (show $ chat_id $ chat msg)
@@ -34,6 +37,13 @@ handleMessage msg@Message{..} = do
     Nothing -> do
               liftIO $ putStrLn $ ">>>>>> Message text is null: \n" ++ (show msg)
     Just messageText -> onCommand messageText
+
+  -- liftIO $ atomically $ do
+  -- state@BotState{..} <- readTVar tvar
+  -- let ps = M.insert (UserId uId) smsCode state'confirmPhone
+  --     us =  ((UserId uId), signupUser) : state'users
+  --     state' = state {state'confirmPhone = ps, state'users = us}
+  -- writeTVar tvar state'
 
   where
     chatId = ChatId $ chat_id chat

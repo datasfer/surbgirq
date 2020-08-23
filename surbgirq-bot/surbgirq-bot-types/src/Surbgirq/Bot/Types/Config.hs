@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Surbgirq.Bot.Types where
+module Surbgirq.Bot.Types.Config where
 
 import Control.Concurrent.STM
 import Data.IORef
@@ -28,6 +28,7 @@ data BotConfig = BotConfig
   , ref                 :: IORef Int
   , state               :: State
   }
+
 
 data Version = Version
   { version :: Text

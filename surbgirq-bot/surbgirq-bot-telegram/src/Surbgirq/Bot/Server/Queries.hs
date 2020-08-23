@@ -41,6 +41,7 @@ import qualified Data.Text.Lazy as TL
 
 import Lucid
 
+import Control.Concurrent.STM
 import Control.Monad.Except
 import Control.Monad.Reader
 import Data.Aeson
@@ -62,25 +63,29 @@ import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
 import Surbgirq.Bot.Server.SettingsInline
+import Surbgirq.Bot.State
+import Surbgirq.Bot.Store
 import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
-
 
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
 
-
+-- InlineQuery {query_id = "1096629775692860954", query_from = User {user_id = 255329016, user_is_bot = False,
+-- user_first_name = "arthur", user_last_name = Nothing, user_username = Just "arthurvard",
+-- user_language_code = Just
+-- (LanguageCode "en")}, query_location = Nothing, query_query = "Mat", query_offset = ""}
 handleInlineQuery :: InlineQuery -> Bot ()
-handleInlineQuery iq = do
-  let iqId = query_id iq
+handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
 --   liftIO $ putStrLn $ "inline query args -> " ++ (show cmdArgs)
   liftIO $ putStrLn $ "Inline query -> " ++ (show iq)
-  onCommand $ query_query iq
-
+  onCommand query_query
+  cfg <- getUserConfig (UserId user_id)
+  liftIO $ putStrLn $  show cfg
   where
-    iqId = query_id iq
+    iqId = query_id
     onCommand (T.stripPrefix "/random" -> Just _)      = return ()
     onCommand (parseVerseRef  -> Right verseRef)        = inlineVerse' iqId verseRef
     onCommand (all isSpace . T.unpack   -> True)                       = inlineSettings iqId
@@ -103,40 +108,68 @@ handleInlineQuery iq = do
 
 
 handleCallbackQuery :: CallbackQuery -> Bot ()
-handleCallbackQuery cqy@CallbackQuery{..} = do
+handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
   BotConfig{..} <- ask
   liftIO $ putStrLn [qc|=========== callback Query {cqy}|]
-  case cq_data of
-    Just tc -> onCommand tc
-    Nothing -> return ()
+  cfg <- getUserConfig (UserId user_id)
+  let  lang = menuLanguage cfg
+  liftIO $ putStrLn [qc|=========== User settings {cfg}|]
+
+  maybe (return ()) (onCommand cfg) cq_data
 
   where
       cqId = cq_id
+      userId = UserId user_id
+      msg_id = maybe 0 message_id cq_message
+
       chatId = case cq_message of
         Just cqMessage -> ChatId $ chat_id $ chat cqMessage
-        Nothing        -> ChatId $ fromIntegral $ user_id cq_from
-      msg_id = case cq_message of
-        Just cqMessage -> message_id cqMessage
-        Nothing        -> 0
+        Nothing        -> ChatId $ fromIntegral $ user_id
 
-      onCommand (T.stripPrefix "settings#" -> Just _) = editRespuesta chatId msg_id "Settings for surbgirq bot" $ Just settingsKeyboardMarkup
+      onCommand cfg (T.stripPrefix "settings#" -> Just _) = editRespuesta chatId msg_id "Settings for surbgirq bot" $ Just (settingsKeyboardMarkup (menuLanguage cfg))
       -- onCommand (T.stripPrefix "subscribe-bible#" -> Just _) = editRespuesta chatId msg_id "Parallel bible reading setting" $ Just parallelsKeyboardMarkup
       -- onCommand (T.stripPrefix "languages#" -> Just _) = editRespuesta chatId msg_id "Set default Language" $ Just languagesKeyboardMarkup
       -- onCommand (T.stripPrefix "dialects#" -> Just _) = editRespuesta chatId msg_id "Choose Dialect" $ Just dialectsKeyboardMarkup
 
       -- sub menus
-      onCommand (T.stripPrefix "bibles#" -> Just _) = editRespuesta chatId msg_id "Bibles" $ Just biblesKeyboardMarkup
-      onCommand (T.stripPrefix "parallel-armBible#" -> Just _) = editRespuesta chatId msg_id "Parallel Armenian Bibles config" $ Just armBiblesKeyboardMarkup
-      onCommand (T.stripPrefix "ruBible#" -> Just _) = editRespuesta chatId msg_id "Russian Bibles" $ Just ruBiblesKeyboardMarkup
-      onCommand (T.stripPrefix "parallel-ruBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just ruBiblesKeyboardMarkup
-      onCommand (T.stripPrefix "enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just enBiblesKeyboardMarkup
-      onCommand (T.stripPrefix "parallel-enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just enBiblesKeyboardMarkup
-      onCommand (T.stripPrefix "narek#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just nareksKeyboardMarkup
-      onCommand (T.stripPrefix "parallel-narek#" -> Just _) = editRespuesta chatId msg_id "Parallel Narek config" $ Just parallelNareksKeyboardMarkup
-      onCommand (T.stripPrefix "parallel-bible#" -> Just _) = editRespuesta chatId msg_id "Parallel Bibles config" $ Just parallelBiblesKeyboardMarkup
-      onCommand (T.stripPrefix "menu-amlang#" -> Just _) = editRespuesta chatId msg_id "Arm Settings for surbgirq bot" $ Just amSettingsKeyboardMarkup
-      onCommand (T.stripPrefix "menu-enlang#" -> Just _) = editRespuesta chatId msg_id "Settings for surbgirq bot" $ Just settingsKeyboardMarkup
-      onCommand (T.stripPrefix "subscribe-bible#" -> Just _) = editRespuesta chatId msg_id "Daily bible subscribtion is currently <b>enabled</b>" $ Just subscriptionKeyboardMarkup
+      onCommand cfg (T.stripPrefix "bibles#" -> Just _) =
+          editRespuesta chatId msg_id "Bibles" $ Just biblesKeyboardMarkup
+
+      onCommand cfg (T.stripPrefix "bibleItem#" -> Just bibleName) = liftIO $ putStrLn [qc|=========== modifed settings user: {bibleName} |]
+
+
+      onCommand cfg (T.stripPrefix "parallel-armBible#" -> Just _) = editRespuesta chatId msg_id "Parallel Armenian Bibles config" $ Just armBiblesKeyboardMarkup
+      onCommand cfg (T.stripPrefix "ruBible#" -> Just _) = editRespuesta chatId msg_id "Russian Bibles" $ Just ruBiblesKeyboardMarkup
+      onCommand cfg (T.stripPrefix "parallel-ruBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just ruBiblesKeyboardMarkup
+      onCommand cfg (T.stripPrefix "enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just enBiblesKeyboardMarkup
+      onCommand cfg (T.stripPrefix "parallel-enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just enBiblesKeyboardMarkup
+      onCommand cfg (T.stripPrefix "narek#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just nareksKeyboardMarkup
+      onCommand cfg (T.stripPrefix "parallel-narek#" -> Just _) = editRespuesta chatId msg_id "Parallel Narek config" $ Just parallelNareksKeyboardMarkup
+      onCommand cfg (T.stripPrefix "parallel-bible#" -> Just _) = editRespuesta chatId msg_id "Parallel Bibles config" $ Just parallelBiblesKeyboardMarkup
+
+      -- Menu language
+      onCommand cfg (T.stripPrefix "menu-amlang#" -> Just _) = do
+        let cfg' = cfg {menuLanguage = AM}
+        modifyUserConfig userId cfg'
+        liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'}|]
+        tvar <- asks state
+        st <- liftIO $ readTVarIO tvar
+
+        liftIO $ putStrLn [qc|=========== Bot Config {st}|]
+
+        editRespuesta chatId msg_id "Arm Settings for surbgirq bot" $ Just amSettingsKeyboardMarkup
+      onCommand cfg (T.stripPrefix "menu-enlang#" -> Just _) = do
+        let cfg' = cfg {menuLanguage = EN}
+        modifyUserConfig userId cfg'
+        editRespuesta chatId msg_id "Settings for surbgirq bot" $ Just (settingsKeyboardMarkup EN)
+
+      --
+      onCommand cfg (T.stripPrefix "subscribe-bible#" -> Just _) = do
+        tvar <- asks state
+        st <- liftIO $ readTVarIO tvar
+
+        liftIO $ putStrLn [qc|=========== Bot Config {st}|]
+        editRespuesta chatId msg_id "Daily bible subscribtion is currently <b>enabled</b>" $ Just subscriptionKeyboardMarkup
 
       -- onCommand (T.stripPrefix "template#" -> Just tName) = do
       --   let insult = "<- liftIO $ insultTemplate (T.unpack tName) >>= evalInsult"
@@ -144,7 +177,7 @@ handleCallbackQuery cqy@CallbackQuery{..} = do
       -- onCommand (T.stripPrefix "wordgroup#" -> Just wgName) = do
       --   let ws = ["liftIO $ wordGroupWords", "(T.unpack wgName)"]
       --   respuesta chatId telegramToken manager $ concat $ intersperse ", " ws
-      onCommand _                                     = return ()
+      onCommand _ _                                    = return ()
 
 
 respuesta :: ChatId -> String -> Maybe ReplyKeyboard -> Bot ()
