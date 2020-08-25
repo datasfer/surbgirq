@@ -14,6 +14,7 @@ module Surbgirq.Bot.ClientRequests (
  , getBookSectionsHandler
  , getChapterSectionsHandler
  , getChapterOneSectionHandler
+ , getChapterVerseNumberHandler
 
  -- , bookChapterNums
  -- , bookChapterSectionNums
@@ -94,6 +95,17 @@ getChapterOneSectionHandler dialect girq ch sec = do
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a
+
+getChapterVerseNumberHandler :: Girq -> ChapterNum -> IO Int
+getChapterVerseNumberHandler girq ch = do
+  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
+  mgr <-  newManager tlsManagerSettings
+  mres <- flip runClientM env $ getChapterVerseNumber' girq ch
+  case mres of
+    Left e  -> error $ show e
+    Right a -> pure a
+
+
 
 
 

@@ -115,11 +115,13 @@ sendVerse sendAtOnce chatId verseRef =
 sendVerse' :: Bool -> ChatId -> VerseReference -> Bot ()
 sendVerse' sendAtOnce chatId vRef@VerseReference{..} = do
       vs <- liftIO $ getVerses Ashxarhabar vRef
+      maxVerseNum <- liftIO $ getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
+
       if sendAtOnce
       then do
         let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml vRef)
             currentPage = fromMaybe 1 verseRef'from
-            buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+            buttons = prevNextPageBtns currentPage maxVerseNum "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
             -- buttons = generatePageBtns 0 page 12 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
         sendTextReplyKb (ReplyInlineKeyboardMarkup buttons)  chatId verseHtml
       else do
@@ -127,7 +129,7 @@ sendVerse' sendAtOnce chatId vRef@VerseReference{..} = do
         let verseRefHtml = TL.toStrict . renderText $ toHtml vRef
             currentPage = fromMaybe 1 verseRef'from
             -- buttons = generatePageBtns 0 page 12 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
-            buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+            buttons = prevNextPageBtns currentPage maxVerseNum "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
 
 
         sendTextReplyKb (ReplyInlineKeyboardMarkup buttons)  chatId verseRefHtml
@@ -140,12 +142,12 @@ getVerse' chatId vRef@VerseReference{..} = getVerses Ashxarhabar vRef
 
 getVerses :: Dialect -> VerseReference -> IO [Verse]
 getVerses dialect vRef@VerseReference{..} = do
+  maxVerseNum <- liftIO $ getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
   case (verseRef'from, verseRef'to) of
-    (Nothing, Nothing)   -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just 200)
+    (Nothing, Nothing)   -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
     (Just from, Nothing) -> getOneVerseHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)
     (Just from, Just to) -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum from) (VerseNum <$> Just  to)
     (Nothing, Just to)   -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just to)
-
 
 
 

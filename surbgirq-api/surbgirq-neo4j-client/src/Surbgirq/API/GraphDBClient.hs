@@ -59,6 +59,11 @@ type GraphDBLocalAPI =
                  :> "books" :> Capture "girq" Girq
                  :> "sections"
                  :> Get '[JSON] [Section]
+       :<|> "scripture" :> "book" :> Summary "Get book's chapter's verse count"
+                 :> Capture "girq" Girq
+                 :> "chapter" :> Capture "ch" ChapterNum
+                 :> "verses" :> "count"
+                 :> Get '[JSON] Int
 
 
 --    :<|> "chapters" :> Get '[JSON] [Chapter]
@@ -79,9 +84,16 @@ getOneVerse' :: Dialect -> Girq -> ChapterNum -> VerseNum -> ClientM [Verse]
 getChapterSections' :: Dialect -> Girq -> ChapterNum -> ClientM [Section]
 getChapterOneSection' :: Dialect -> Girq -> ChapterNum -> SectionNum -> ClientM [Section]
 getBookSections' :: Dialect -> Girq ->  ClientM [Section]
+getChapterVerseNumber' :: Girq -> ChapterNum -> ClientM Int
 
-
-(getAllBooks' :<|> getVerseRange' :<|> getOneVerse' :<|> getChapterSections' :<|> getChapterOneSection' :<|> getBookSections') = client graphDBAPI
+( getAllBooks'
+ :<|> getVerseRange'
+ :<|> getOneVerse'
+ :<|> getChapterSections'
+ :<|> getChapterOneSection'
+ :<|> getBookSections'
+ :<|> getChapterVerseNumber'
+    ) = client graphDBAPI
 
 
 
@@ -130,4 +142,12 @@ getChapterOneSection
   -> Dialect -> Girq -> ChapterNum -> SectionNum
   -> IO (Either ClientError [Section])
 getChapterOneSection mgr dialect girq ch sec = runClientM (getChapterOneSection' dialect girq ch sec)
+                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+
+
+getChapterVerseNumber
+  :: Manager
+  -> Girq -> ChapterNum
+  -> IO (Either ClientError Int)
+getChapterVerseNumber mgr girq ch = runClientM (getChapterVerseNumber' girq ch)
                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)
