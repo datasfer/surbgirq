@@ -71,6 +71,8 @@ import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
 
+import Surbgirq.Bot.Server.Pagination
+import Surbgirq.Bot.ShopBotExample
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
@@ -88,10 +90,10 @@ handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
   liftIO $ putStrLn $  show cfg
   where
     iqId = query_id
-    onCommand (T.stripPrefix "/random" -> Just _)      = return ()
-    onCommand (parseVerseRef  -> Right verseRef)        = inlineVerse' iqId verseRef
-    onCommand (all isSpace . T.unpack   -> True)                       = inlineSettings iqId
-    onCommand str                                      = do
+    onCommand (T.stripPrefix "/random" -> Just _)   = return ()
+    onCommand (parseVerseRef  -> Right verseRef)    = inlineVerse' iqId verseRef
+    onCommand (all isSpace . T.unpack   -> True)    = inlineSettings iqId
+    onCommand str                                   = do
                                   liftIO $ print $ T.append "=================== Unknown Command"  str
                                   return ()
 
@@ -187,13 +189,47 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
         modifyUserConfig userId cfg'
         editRespuesta chatId msg_id "Settings for surbgirq bot" $ Just (settingsKeyboardMarkup EN)
 
-      --
+      -- Pagination btn callbacks
+
+      onCommand cfg (T.stripPrefix "go_to_verseRef#" -> Just args) = do
+        case parseVerseRef args of
+          Right verseRef@VerseReference{..} -> do
+            vs <- liftIO $ getVerse' chatId verseRef
+            let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml verseRef)
+
+            liftIO $ putStrLn $ show verseRef
+
+            let currentPage = fromMaybe 1 verseRef'from
+                buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+                -- buttons = generatePageBtns 0 page 12 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+
+            liftIO $ print buttons
+
+            editRespuesta chatId msg_id [qc|{verseHtml}|] $ Just $ InlineKeyboardMarkup buttons
+
+          Left e         -> error $ " failed parse verse in pagination " ++ show e
+
+
+      onCommand cfg (T.stripPrefix "go_to#" -> Just args) = do
+
+        let all@(x:y:_) = T.splitOn " " $ T.strip args
+        liftIO $ putStrLn [qc|=========== Args {all}|]
+
+        let page = read (T.unpack y) :: Int
+            buttons = generatePageBtns 0 page 12 "go_to#" "args"
+        liftIO $ putStrLn [qc|=========== Page {page}|]
+        liftIO $ putStrLn [qc|=========== Page {page}|]
+
+        editRespuesta chatId msg_id [qc|Pagination  {page} bible subscribtion is currently <b>enabled</b>|] $ Just $ InlineKeyboardMarkup buttons --  subscriptionKeyboardMarkup
+
       onCommand cfg (T.stripPrefix "subscribe-bible#" -> Just _) = do
         tvar <- asks state
         st <- liftIO $ readTVarIO tvar
 
         liftIO $ putStrLn [qc|=========== Bot Config {st}|]
-        editRespuesta chatId msg_id "Daily bible subscribtion is currently <b>enabled</b>" $ Just subscriptionKeyboardMarkup
+--        buttons <- liftIO $ inline_page_buttons "category" 0
+        let buttons = generatePageBtns 0 1 12 "go_to#" "args"
+        editRespuesta chatId msg_id "Daily bible subscribtion is currently <b>enabled</b>" $ Just $ InlineKeyboardMarkup buttons --  subscriptionKeyboardMarkup
 
       -- onCommand (T.stripPrefix "template#" -> Just tName) = do
       --   let insult = "<- liftIO $ insultTemplate (T.unpack tName) >>= evalInsult"

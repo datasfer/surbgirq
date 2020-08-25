@@ -8,6 +8,7 @@ module Surbgirq.Bot.Server.Responses where
 import Control.Monad                 (forM_)
 import Control.Monad.IO.Class        (liftIO)
 import Data.Char                     (isNumber)
+import Data.Maybe                    (fromMaybe)
 import Data.Text                     (Text)
 import Text.InterpolatedString.Perl6 (qc)
 import Text.Read                     (readMaybe)
@@ -29,6 +30,8 @@ import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
+
+import Surbgirq.Bot.Server.Pagination
 
 ------------------------------------------------------------
 --
@@ -111,14 +114,28 @@ sendVerse sendAtOnce chatId verseRef =
 
 sendVerse' :: Bool -> ChatId -> VerseReference -> Bot ()
 sendVerse' sendAtOnce chatId vRef@VerseReference{..} = do
-                  vs <- liftIO $ getVerses Ashxarhabar vRef
-                  if sendAtOnce
-                  then let verseHtml =  TL.toStrict . renderText $ (toHtml vs <> toHtml vRef)
-                       in sendHtml chatId  verseHtml
-                  else do
-                    sendAsParts chatId vs
-                    let verseRefHtml =  TL.toStrict . renderText $ toHtml vRef
-                    sendHtml chatId verseRefHtml
+      vs <- liftIO $ getVerses Ashxarhabar vRef
+      if sendAtOnce
+      then do
+        let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml vRef)
+            currentPage = fromMaybe 1 verseRef'from
+            buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+            -- buttons = generatePageBtns 0 page 12 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+        sendTextReplyKb (ReplyInlineKeyboardMarkup buttons)  chatId verseHtml
+      else do
+        sendAsParts chatId vs
+        let verseRefHtml = TL.toStrict . renderText $ toHtml vRef
+            currentPage = fromMaybe 1 verseRef'from
+            -- buttons = generatePageBtns 0 page 12 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+            buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+
+
+        sendTextReplyKb (ReplyInlineKeyboardMarkup buttons)  chatId verseRefHtml
+
+
+
+getVerse' :: ChatId -> VerseReference -> IO [Verse]
+getVerse' chatId vRef@VerseReference{..} = getVerses Ashxarhabar vRef
 
 
 getVerses :: Dialect -> VerseReference -> IO [Verse]
@@ -155,7 +172,7 @@ sendText chatId msg = do
 sendTextReplyKb :: ReplyKeyboard -> ChatId -> Text -> Bot ()
 sendTextReplyKb keyborad chatId msg = do
     BotConfig{..} <- ask
-    let request = SendMessageRequest chatId msg Nothing Nothing Nothing Nothing (Just keyborad)
+    let request = SendMessageRequest chatId msg (Just HTML) Nothing Nothing Nothing (Just keyborad)
     res <- ($) liftIO $ sendMessage telegramToken request manager
     liftIO $ putStrLn $ show res
     let id_ = case res of

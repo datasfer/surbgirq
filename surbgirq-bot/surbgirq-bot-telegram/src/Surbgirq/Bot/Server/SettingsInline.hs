@@ -106,7 +106,7 @@ parallelBiblesKeyboard cmdPrefix xs = map (map toKbd ) booksBible ++ [[backToSet
       toKbd :: (Text,Text) -> InlineKeyboardButton
       toKbd (title, cb_data) =
           let name = if Set.member cb_data xs
-                     then [qc|{title}++|]
+                     then [qc|{title} ✝|]
                      else title
           in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
 
@@ -136,7 +136,7 @@ biblesKeyboard chName = map (map (toKbd chName)) booksBible ++ [[backToSetting]]
       toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
       toKbd checkedName (title, cb_data) =
           let name = if checkedName == cb_data
-                     then [qc|{title}++|]
+                     then [qc|{title} ✝|]
                      else title
           in mkInlineBtn name [qc|bibleItem# {cb_data}|]
 
@@ -196,7 +196,7 @@ enLangBtn = mkInlineBtn "English" "enLang#"
 -- Settings menu
 dialectBtn = mkInlineBtn "Dialect" "dialects#"
 languageBtn = mkInlineBtn "Languages" "languages#"
-backToSetting = mkInlineBtn "<< Back to Settings" "settings#"
+backToSetting = mkInlineBtn "⮨ Back" "settings#"
 
 
 

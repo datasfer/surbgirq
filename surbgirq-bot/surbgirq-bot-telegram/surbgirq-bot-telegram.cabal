@@ -37,6 +37,7 @@ library
                    Surbgirq.Bot.Server.Messages
                    Surbgirq.Bot.Server.Webhook
                    Surbgirq.Bot.Server.SettingsInline
+                   Surbgirq.Bot.Server.Pagination
                    Surbgirq.Bot.Monad
                    Surbgirq.Bot.ClientRequests
                    Surbgirq.Bot.App
@@ -44,6 +45,7 @@ library
                    Surbgirq.Bot.Lucid.Instances
                    Surbgirq.Bot.FB.Facebook
                    Surbgirq.Bot.FB.Server.Webhook
+                   Surbgirq.Bot.ShopBotExample
   other-modules: Paths_surbgirq_bot_telegram
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
@@ -53,7 +55,10 @@ library
                , surbgirq-utils
                , surbgirq-bot-store
                , surbgirq-bot-types
-                 -- 
+                 --
+               , postgresql-libpq
+               , postgresql-simple
+                 --
                , telegram-api
                , fbmessenger-api
                , fb

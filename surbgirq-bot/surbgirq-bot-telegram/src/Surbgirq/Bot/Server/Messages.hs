@@ -50,7 +50,7 @@ handleMessage msg@Message{..} = do
     Just messageText = text
 
     onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
-    onCommand (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse False chatId verseRef
+    onCommand (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse True chatId verseRef
     onCommand (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse True chatId verseRef
     onCommand (T.stripPrefix "/chapter" -> Just args)    = sendChapterSections chatId args
     onCommand (T.stripPrefix "/books" -> Just book)      = sendBooks chatId book
@@ -62,7 +62,7 @@ handleMessage msg@Message{..} = do
     onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
     onCommand (T.stripPrefix "/start"  -> Just _)        = sendTextReplyKb settingsKeyboardReplyMarkup chatId "Settings for surbgirq bot"
     onCommand (T.stripPrefix "/settings"  -> Just _)     = sendTextReplyKb settingsKeyboardReplyMarkup chatId "Settings for surbgirq bot"
-    onCommand (parseVerseRef  -> Right verseRef)         = sendVerse' False chatId verseRef
+    onCommand (parseVerseRef  -> Right verseRef)         = sendVerse' True chatId verseRef
     onCommand _                                          = sendHelpMessage chatId
 
     -- onCommand str                                        = do

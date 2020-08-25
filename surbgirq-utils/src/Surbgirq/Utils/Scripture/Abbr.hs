@@ -29,7 +29,7 @@ findByAbbr str = listToMaybe $ snd <$> filter (\ (xs, girq) -> any (==str) xs) a
 
 -- (Մարկ. 1.1-8, Ղուկ. 3.1-18, Յովհ. 1.19-28, Մատթ. 1.1-3)
 
-abbr = [ (["Մատթ.", "Մատթ", "Մտ", "Mt", "Mat", "Matt","mat", "matt"], Matthew)
+abbr = [ (["Մատթ.", "Մատթ", "Մտ", "Mt", "Mat", "Matt","mat", "matt", "Matthew"], Matthew)
        , (["Մարկ", "Մր", "Mark", "Mk", "mark"], Mark)
        , (["Ղուկ.", "Ղուկ", "Ղկ", "Lk", "Luke", "Luk"], Luke)
        , ([ "Յովհ.", "Յովհ", "Յհ", "John", "john"], John)

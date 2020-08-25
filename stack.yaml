@@ -16,6 +16,9 @@ packages:
 - common
 - surbgirq
 
+# ghc-options:
+#   "$locals": -Wall -Werror
+
 allow-newer: true
 extra-deps:
   - wai-middleware-prometheus-1.0.0
