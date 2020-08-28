@@ -18,7 +18,7 @@ data/cypher/#*
 data/cypher/~*
 data/cypher/*~
 data/debug.log
-data/query.log
+data/query*
 data/security.log
 data/transactions/
 
