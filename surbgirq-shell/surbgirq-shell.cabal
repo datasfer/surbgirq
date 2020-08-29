@@ -53,6 +53,7 @@ library
                , raw-strings-qq
                , regex-pcre
                , pcre-heavy
+               , yaml
                
                
   default-language: Haskell2010

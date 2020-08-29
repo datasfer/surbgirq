@@ -3,6 +3,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE QuasiQuotes         #-}
+{-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE QuasiQuotes, FlexibleContexts #-}
 
 module Surbgirq.Shell.Scraper.Scalpel.BibleScraper where
@@ -23,10 +24,12 @@ import           System.IO
 import           Text.HTML.Scalpel
 import System.FilePath
 import           GHC.IO.Encoding
+import           GHC.Generics
 
 import Text.RawString.QQ    
 import Text.Regex.PCRE
 import qualified           Text.Regex.PCRE.Heavy as PCRE
+import Data.Yaml
     
 htmlData :: String
 htmlData = "<section id='examples'>\
@@ -112,24 +115,29 @@ allSections url = scrapeURL url (sections <|> sections1)
 data BookData = BookData
  { book'title :: Text
  , book'chapters :: [ChapterData]
- } deriving (Show)
+ } deriving (Show, Generic)
 data ChapterData = ChapterData
  { chapterNum :: Text
  , chapter'sections :: [SectionData]
- } deriving(Show)
+ } deriving(Show, Generic)
 
 data SectionData = SectionData
  { title :: Text
  , p_ref :: Text
  , verses :: [VerseData]
- } deriving(Show)
+ } deriving(Show, Generic)
 
 data VerseData = VerseData
  { verse'nums :: [Text]
  , verse'refs :: [Text]
  , verse :: Text
- } deriving(Show)
+ } deriving(Show, Generic)
 
+instance ToJSON VerseData 
+instance ToJSON SectionData
+instance ToJSON ChapterData
+instance ToJSON BookData
+    
 -- | parse html of from this link
 -- https://www.qahana.am/bible/NewTestament/Matthew.html
 -- parseBibleHtml :: Scraper String [BookData]
@@ -244,6 +252,7 @@ parseBibleTest = do
   let ts = scrapeStringLike exampleHtml parseBibleHtml_1
   case ts of
     Just xs -> do
+            encodeFile "parseHtml.yaml" xs
             hFile <- openFile "scalpel.out" WriteMode
             forM_ xs (printBook hFile)
     Nothing -> error $ "failed parse html file "
