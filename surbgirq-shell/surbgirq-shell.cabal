@@ -26,6 +26,7 @@ library
                    Surbgirq.Shell.Store.Neo4j
                    Surbgirq.Shell.Scraper.Scalpel
                    Surbgirq.Shell.Scraper.Hxt
+                   Surbgirq.Shell.Scraper.Scalpel.BibleScraper
                    Surbgirq.Shell.CSV.Generate
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Scripture
@@ -49,6 +50,11 @@ library
                , hxt
                , HandsomeSoup
                , split
+               , raw-strings-qq
+               , regex-pcre
+               , pcre-heavy
+               
+               
   default-language: Haskell2010
 
 executable surbgirq-shell

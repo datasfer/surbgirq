@@ -8,6 +8,8 @@ module Surbgirq.Shell.Scraper.Scalpel where
 import Data.Text(Text)
 
 import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.IO.Class
 import           Data.List
 import           Data.List.Split
 import qualified Data.Text           as T
@@ -15,6 +17,8 @@ import qualified Data.Text.Encoding  as TE
 import qualified Data.Text.IO        as TIO
 import           System.IO
 import           Text.HTML.Scalpel
+import System.FilePath
+import           GHC.IO.Encoding
 
 
 htmlData :: String
@@ -97,7 +101,7 @@ sections1 = do
 parseVerse :: Scraper String String
 parseVerse = do
   let del = "\160"
-  verse <- text "p"
+  verse <- text $ "p"  @: [hasClass "Body-Text"]
   return $ (++ "\n") <$> intercalate " " $ splitOn del verse
 
 -- allSections :: String -> IO (Maybe [(T.Text, [[T.Text]])])
@@ -105,19 +109,40 @@ allSections url = scrapeURL url (sections <|> sections1)
 
 
 
-test1 :: String -> IO (Maybe [[T.Text]])
-test1 url = scrapeURL url parse11
+-- test1 :: String -> IO (Maybe [[T.Text]])
+test1 url = do
+  setLocaleEncoding utf8
+  hSetEncoding stdout utf8
 
+  res <- scrapeURLWithConfig utf8Config (T.unpack url) parse11
+  case res of
+    Nothing -> error "Not output"
+    Just xss -> do
+              let (xs:_) = concat xss
+              TIO.writeFile "file.txt" xs
+              TIO.putStrLn  xs
+              TIO.putStrLn  "Գիրք ծննդեան"
+              h1 <- openFile ("scalpel_output.txt") WriteMode
+              forM_ xss $ \xs -> do
+                  forM_ xs $ \x -> TIO.hPutStrLn h1 $  x
+              hClose h1
+
+utf8Config :: Config String 
+utf8Config = Config utf8Decoder Nothing
+                   
 data Res = Res T.Text T.Text deriving Show
-            
+
+parse11 :: Scraper String [[Text]]
 parse11 = chroots ("section" @: ["id" @= "examples"]) $ do
-            a <- chroots ("div" // "p") $ do
+            a <- chroots ("div") $ do
               contents <- text ("p" @: [hasClass "Parallel-References"])
-              return $ T.pack contents
+              contents1 <- text ("h4" @: [hasClass "heading4"])
+
+              return $ T.pack (contents ++ contents1)
             b<- chroots ("div" // "h4") $ do
               contents <- text ("h4" @: [hasClass "heading4"])
               return $ T.pack contents
-            return (a++b)
+            return (a) -- ++ b)
 
 parseSerial :: Scraper String [(Text, [(Text, [Text])])]
 parseSerial = chroots ("section" @: ["id" @= "examples"]) $ inSerial $ do
@@ -131,8 +156,8 @@ parseSerial = chroots ("section" @: ["id" @= "examples"]) $ inSerial $ do
        return (T.pack (section ++ num), ps)
     return (T.pack (title ++ secNum), sections)
 
-parseSerial1 :: Scraper String [(Text, [(Text, [Text])])]
-parseSerial1 = chroots ("section" @: ["id" @= "examples"]) $ inSerial $ do
+-- parseSerial1 :: Scraper String [(Text, [(Text, [Text])])]
+parseSerial1 = chroots ("div" @: ["id" @= "mCSB_1_container"]) $ inSerial $ do
     title <- seekNext $ text "h2"
     sections <- many $ do
        section <- seekNext $ text "h4"
@@ -155,4 +180,32 @@ parseSerialHeadings = chroots ("section" @: ["id" @= "examples"]) $ inSerial $ d
 
 
 
+parseSerialBible :: Scraper String [String]
+parseSerialBible = chroots ("section" @: ["id" @= "examples"]) $ do
+    inSerial $ do seekNext (text $ "h4" @: [hasClass "heading4"])
+                  untilNext (text "h4") $
+                     liftM mconcat $ many $ stepNext $ text anySelector
 
+
+
+
+
+serialTest :: Scraper String [[(Text, [Text])]]
+serialTest = chroots ("div" @: ["id" @= "mCSB_1_container"]) $ do
+  inSerial $ do
+--    title <- seekNext (text $ "h4" @: [hasClass "heading4"])
+    verses <- many $ do
+       title <- T.pack <$>  seekNext (text $ "h4")
+       ps <- untilNext (matches "h4") (many $ seekNext $ T.pack <$> text "p")
+       return (title, ps)
+    return verses
+
+
+
+parseSerial11 = chroots ("section" @: ["id" @= "examples"]) $ inSerial $ do
+    title <- seekNext $ text "h2"
+    sections <- many $ do
+       section <- seekNext $ text "h4"
+       ps <- untilNext (matches "h4") (many $ seekNext $ T.pack <$> parseVerse)
+       return (T.pack (section), ps)
+    return (T.pack (title), sections)

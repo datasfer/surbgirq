@@ -72,7 +72,7 @@ import Surbgirq.Types
 import Surbgirq.Utils
 
 import Surbgirq.Bot.Server.Pagination
-import Surbgirq.Bot.ShopBotExample
+-- import Surbgirq.Bot.ShopBotExample
 ------------------------------------------------------------
 --
 ------------------------------------------------------------

@@ -51,7 +51,7 @@ extra-deps:
   
 
 nix:
-#  enable: true
+  enable: true
 #  shell-file: shell.nix
   pure: false
   packages:
@@ -61,3 +61,10 @@ nix:
     - lzma
     - haskellPackages.happy
     - curl
+    - pcre
+    
+
+# to find the path of package in nixos
+# nix-build --no-out-link "<nixpkgs>" -A postgresql
+extra-include-dirs: [/nix/store/9zmnw07ka6xkcdjc8ajg48vp4lgmajbd-postgresql-11.7/include/]
+extra-lib-dirs: [/nix/store/9zmnw07ka6xkcdjc8ajg48vp4lgmajbd-postgresql-11.7/lib/]
