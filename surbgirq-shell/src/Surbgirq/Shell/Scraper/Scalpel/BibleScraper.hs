@@ -126,6 +126,7 @@ data SectionData = SectionData
 
 data VerseData = VerseData
  { verse'nums :: [Text]
+ , verse'refs :: [Text]
  , verse :: Text
  } deriving(Show)
 
@@ -168,7 +169,7 @@ parseBibleHtml_1 = chroots ("div" @: ["id" @= "mCSB_1_container"]) $ inSerial in
                   (                
                    many $ seekNext $ parseVerse1
                   )
-            let vss = map (\(a,b) -> VerseData a $ T.pack b ) ps
+            let vss = map (\(nums, refs, verse) -> VerseData nums refs $ T.pack verse ) ps
             return $ SectionData sectionTitle p_ref vss )
          return $ ChapterData chapter  sections  
        return $ BookData title chapters
@@ -205,20 +206,27 @@ parseFootNoteTest = do
                       TIO.putStrLn (T.append "    " a)
                       TIO.putStrLn (T.append "    " b)
 
+
+-- <a id="footnote-265-903-backlink" class="footnote-link" href="#footnote-265-903">(903)</a>
 -- parseVerse1 :: Scraper String VerseData
 parseVerse1 = do
   let del = "\160"
   verse <- innerHTML $ "p"  @: [hasClass "Body-Text"]
   vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
+  versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
   
   -- verse <- text $ "p"  @: [hasClass "Body-Text"]
   -- return $ map (VerseData . T.pack ) $ splitOn del verse         
   -- return $ (++ "\n") <$> intercalate "{#}" $ splitOn del verse
-  return $  (vNums ,verse)
+  return $  (vNums, versRefs, verse)
   where
     parseVerseNum :: Scraper String Text
     parseVerseNum = do
            txt <- T.pack <$> (attr "id" $ "span")
+           return txt
+    parseVerseRef :: Scraper String Text
+    parseVerseRef = do
+           txt <- T.pack <$> text "a"
            return txt
 
          
@@ -269,7 +277,15 @@ printVerse' VerseData{..} = do
   let del = [qc|<\span>|]
 --  forM_ (T.splitOn del $  verse) $ \v -> TIO.putStrLn $ v
   TIO.putStrLn $T.pack . show $  verse'nums
+  TIO.putStrLn $T.pack . show $  verse'refs
   let vs = filter (not . T.null  ) $ PCRE.split rr_1  verse
+--      rs = filter (not . T.null  ) $ PCRE.scan refRegex  verse
+      rs = PCRE.scan refRegex  verse
+  mapM (\(link, [z]) -> do
+          TIO.putStrLn link
+          TIO.putStrLn z
+       )   rs
+
   forM_ (zip verse'nums vs) $ \(num, v) -> do
 --      TIO.putStrLn "-->"
       TIO.putStrLn $ [qc|{num}. {v}|]
@@ -306,3 +322,7 @@ delS = [qc|</span>|]
 -- tt2 = getAllTextMatches (txt1 =~ rg1) :: [String]
        
 rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
+
+
+-- ref link with the worde before that
+refRegex = [PCRE.re|(?:\S+\s)?\S*<\s*a[^>]*>(.*?)<\s*/\s*a>|]
