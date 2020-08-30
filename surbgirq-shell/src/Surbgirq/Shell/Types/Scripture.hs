@@ -100,7 +100,7 @@ data Verse = Verse
   , verse'seperatedBy :: Maybe Int
   -- ^ next part of this verse should go to next section or prgh
 --   , verse'grabar    :: Text
-  , verse'ref         :: Maybe VerseRef
+  , verse'ref         :: [VerseRef]
   } deriving (Show)
 
 
@@ -144,6 +144,7 @@ data RefType = RefBooks   [Text]
              | RefVerse   Text
              | RefWord    Text
              | RefText    Text
+             | RefFootnote Text Text
                deriving (Show, Read)
 
 

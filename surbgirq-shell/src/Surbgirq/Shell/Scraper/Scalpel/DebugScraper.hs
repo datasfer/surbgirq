@@ -84,33 +84,33 @@ verse1 = do
   title <- text $ "p"
   return $ VerseLine title
 
-sections :: Scraper String [(Text, [(Text, [Text])])]
-sections = do
-  chroots ("section" @: ["id" @= "examples"]) $ inSerial $ do
-    title <- seekNext $ text $ "h2" @: [hasClass "heading2"]
-    num <- seekNext $ text $ "h3" @: [hasClass "heading3"]
+-- sections :: Scraper String [(Text, [(Text, [Text])])]
+-- sections = do
+--   chroots ("section" @: ["id" @= "examples"]) $ inSerial $ do
+--     title <- seekNext $ text $ "h2" @: [hasClass "heading2"]
+--     num <- seekNext $ text $ "h3" @: [hasClass "heading3"]
 
-    ss <- many $ do
-         section <- seekNext $ text "h4"
+--     ss <- many $ do
+--          section <- seekNext $ text "h4"
 
-         ps <- untilNext (matches "h4") (many $ seekNext $ T.pack <$>  parseVerse)
-         return (T.pack (section ++ num), ps)
-    return (T.pack (title ++ num), ss)
+--          ps <- untilNext (matches "h4") (many $ seekNext $ T.pack <$>  parseVerse)
+--          return (T.pack (section ++ num), ps)
+--     return (T.pack (title ++ num), ss)
 
-sections1 :: Scraper String [(Text, [(Text, [Text])])]
-sections1 = do
-  chroots ("section" @: ["id" @= "examples"]) $ inSerial $ do
-    title <- seekNext $ text $ "h2" @: [hasClass "heading2"]
-    ss <- many $ do
-         section <- seekNext $ text "h4"
-         ps <- untilNext (matches "h4") (many $ seekNext $ T.pack <$>  parseVerse)
-         return (T.pack section, ps)
-    return (T.pack title, ss)
+-- sections1 :: Scraper String [(Text, [(Text, [Text])])]
+-- sections1 = do
+--   chroots ("section" @: ["id" @= "examples"]) $ inSerial $ do
+--     title <- seekNext $ text $ "h2" @: [hasClass "heading2"]
+--     ss <- many $ do
+--          section <- seekNext $ text "h4"
+--          ps <- untilNext (matches "h4") (many $ seekNext $ T.pack <$>  parseVerse)
+--          return (T.pack section, ps)
+--     return (T.pack title, ss)
 
 
 
 -- allSections :: String -> IO (Maybe [(T.Text, [[T.Text]])])
-allSections url = scrapeURL url (sections <|> sections1)
+-- allSections url = scrapeURL url (sections <|> sections1)
 
 data BookData = BookData
  { book'title :: Text
@@ -130,6 +130,7 @@ data SectionData = SectionData
 data VerseData = VerseData
  { verse'nums :: [Text]
  , verse'refs :: [Text]
+ , verse'ref_word :: [(String, [String])]
  , verse'num :: Text
  , verse'verse :: Text
  , verse :: Text
@@ -163,7 +164,7 @@ instance ToJSON BookData
 
 
 parseBibleHtml_1 :: Scraper String [BookData]
-parseBibleHtml_1 = chroots ("div" @: ["id" @= "mCSB_1_container"]) $ inSerial innerScraper
+parseBibleHtml_1 = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
   where
     innerScraper = do
        title <- seekNext $ T.pack <$> text "h2"
@@ -205,7 +206,7 @@ parseFootNoteTest :: IO ()
 parseFootNoteTest = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  exampleHtml <- readFile "./data/html/1994/matthew.html"
+  exampleHtml <- readFile "./data/html/1994/Mark.html"
   let ts = scrapeStringLike exampleHtml parseFootnotes
   case ts of
     Just xs -> do
@@ -227,13 +228,13 @@ parseVerse1 = do
   versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
 
   let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
-      rs = PCRE.scan refRegex  verse
+      rs = PCRE.scan refRegex verse
   -- mapM (\(link, [z]) -> do
   --         TIO.putStrLn link
   --         TIO.putStrLn z
   --      )   rs
 
-  let xs = map (\(num, v) -> VerseData vNums versRefs num v $ T.pack verse)  (zip vNums vs)
+  let xs = map (\(num, v) -> VerseData vNums (versRefs) rs num v $ T.pack verse)  (zip vNums vs)
   return xs
   -- verse <- text $ "p"  @: [hasClass "Body-Text"]
   -- return $ map (VerseData . T.pack ) $ splitOn del verse         
@@ -248,6 +249,26 @@ parseVerse1 = do
     parseVerseRef = do
            txt <- T.pack <$> text "a"
            return txt
+
+-- printVerse' VerseData{..} = do
+--   TIO.putStrLn " -- - dadatam"
+--   let del = [qc|<\span>|]
+--   TIO.putStrLn $T.pack . show $ verse'nums
+--   TIO.putStrLn $T.pack . show $ verse'refs
+--   let vs = filter (not . T.null ) $ PCRE.split rr_1  verse
+-- --      rs = filter (not . T.null  ) $ PCRE.scan refRegex  verse
+-- --      rs = PCRE.scan refRegex  verse
+--   mapM (\(link, [z]) -> do
+          
+--           let kv = [qc|{T.pack z} -> {T.pack link}|] :: Text
+--           TIO.putStrLn kv -- $ T.pack link
+-- --          TIO.putStrLn $ T.pack z
+--        ) verse'ref_word
+
+--   forM_ (zip verse'nums vs) $ \(num, v) -> do
+-- --      TIO.putStrLn "-->"
+--       TIO.putStrLn $ [qc|{num}. {v}|]
+
 
   -- let vs = filter (not . T.null) $ PCRE.split rr_1  verse
 --       rs = PCRE.scan refRegex  verse
@@ -274,7 +295,7 @@ parseVerse = do
   --         TIO.putStrLn z
   --      )   rs
 
-  let xs = map (\(num, v) -> VerseData vNums versRefs num v $ T.pack verse)  (zip vNums vs)
+  let xs = map (\(num, v) -> VerseData vNums versRefs [] num v $ T.pack verse)  (zip vNums vs)
   return xs
   -- verse <- text $ "p"  @: [hasClass "Body-Text"]
   -- return $ map (VerseData . T.pack ) $ splitOn del verse         
@@ -294,7 +315,7 @@ parseBibleTest :: IO ()
 parseBibleTest = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  exampleHtml <- readFile "./data/html/1994/matthew.html"
+  exampleHtml <- readFile "./data/html/1994/Mark.html"
   let ts = scrapeStringLike exampleHtml parseBibleHtml_1
   case ts of
     Just xs -> do
@@ -328,22 +349,24 @@ printVerse hFile VerseData{..} = do
 
 printVerse' VerseData{..} = do
   TIO.putStrLn " -- - dadatam"
---  let del = "\160"
   let del = [qc|<\span>|]
---  forM_ (T.splitOn del $  verse) $ \v -> TIO.putStrLn $ v
-  TIO.putStrLn $T.pack . show $  verse'nums
-  TIO.putStrLn $T.pack . show $  verse'refs
-  let vs = filter (not . T.null  ) $ PCRE.split rr_1  verse
+  TIO.putStrLn $T.pack . show $ verse'nums
+  TIO.putStrLn $T.pack . show $ verse'refs
+  let vs = filter (not . T.null ) $ PCRE.split rr_1  verse
 --      rs = filter (not . T.null  ) $ PCRE.scan refRegex  verse
-      rs = PCRE.scan refRegex  verse
+--      rs = PCRE.scan refRegex  verse
   mapM (\(link, [z]) -> do
-          TIO.putStrLn link
-          TIO.putStrLn z
-       )   rs
+          
+          let kv = [qc|{T.pack z} -> {T.pack link}|] :: Text
+          TIO.putStrLn kv -- $ T.pack link
+--          TIO.putStrLn $ T.pack z
+       ) verse'ref_word
+   
+  TIO.putStrLn $ [qc|{verse'num}. {verse'verse}|]
 
-  forM_ (zip verse'nums vs) $ \(num, v) -> do
---      TIO.putStrLn "-->"
-      TIO.putStrLn $ [qc|{num}. {v}|]
+--   forM_ (zip verse'nums vs) $ \(num, v) -> do
+-- --      TIO.putStrLn "-->"
+--       TIO.putStrLn $ [qc|{num}. {v}|]
 
 delS :: Text
 delS = [qc|</span>|]

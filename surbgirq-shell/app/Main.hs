@@ -301,8 +301,8 @@ generateInitCypher bookFile path outPath = do
 
                  -- verse ref processing
                  case verse'ref of
-                   Nothing -> return ()
-                   Just VerseRef{..} -> do
+                   [] -> return ()
+                   [VerseRef{..}] -> do
                      case verseRef'type of
                        RefText txt -> do
                          let wordN = concat [verseName, del, "word", show verseRef'index]

@@ -307,8 +307,8 @@ generateScripturesCSV configFile path outPath = do
 
                        -- verse ref processing
                        case verse'ref of
-                          Nothing -> return ()
-                          Just VerseRef{..} -> do
+                          [] -> return ()
+                          [VerseRef{..}] -> do -- TODO: implement cae when verse can have more than one ref
                             case verseRef'type of
                               RefText txt -> do
                                 let refWordID = concat [wordIDPrefix, "-", show verseRef'index]
@@ -330,6 +330,7 @@ generateScripturesCSV configFile path outPath = do
 --                                    footnoteRel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
 --                                TIO.hPutStrLn outRefsh footnoteLine
 --                                TIO.hPutStrLn outRefRelh footnoteRel
+                              RefFootnote key value -> error "not implemented"
                               _ -> return ()
 
 

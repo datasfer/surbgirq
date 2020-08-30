@@ -14,6 +14,13 @@ import Data.Maybe (fromMaybe)
 
 import Text.InterpolatedString.Perl6 (qc)
 
+
+import System.IO.Error hiding (catch)
+import Prelude hiding (catch)
+import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+
+import System.FilePath
+    
 import           Control.Applicative
 import System.Directory
 import           Control.Monad
@@ -77,161 +84,110 @@ parseBibleTest :: IO ()
 parseBibleTest = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  matthewText <- readFile "./data/html/1994/New/2.Mark.html"
-  let exportFolder = "./data/html/1994/export"
+  let datDir = "./data/html/1994/New"
+      outRootDir = "./data/html/1994/export"
 
-  createDirectoryIfMissing True exportFolder
+ 
 
-  let ts = scrapeStringLike matthewText parseBibleHtml_1
-      
-  case ts of
-    Just xs -> do
-            encodeFile "parseHtml.yaml" xs
-            A.encodeFile "parseHtml.json" xs
-            print $ length xs
-            forM_ xs $ \Book'{..} -> do
-              forM_ b'chapters $ \ ch@Chapeter{..} -> do
-                        let file = exportFolder </> [qc|{chapter'number}.yaml|]
-                        encodeFile file ch
-            return ()
---            hFile <- openFile "scalpel.out" WriteMode
---            forM_ xs (printBook hFile)
-    Nothing -> error $ "failed parse html file "
+  createDirectoryIfMissing True outRootDir
 
+  txtFiles <- listDirectory datDir `catchError` \_ -> do
+                                          liftIO $ putStrLn (concat [datDir, " does not exist."])
+                                          return []
 
-parseVerse_1 :: Scraper String [Verse]
-parseVerse_1 = do
-  verse <- innerHTML $ "p"  @: [hasClass "Body-Text"]
+  forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
+
+    let fullFilename = datDir </> file
+    htmlText <- readFile fullFilename
+    print fullFilename 
+    let ts = scrapeStringLike htmlText parseBibleHtml
+
+    case ts of
+      Just xs -> do
+              encodeFile "parseHtml.yaml" xs
+              A.encodeFile "parseHtml.json" xs
+              print $  length xs
+              when (length xs > 0) $ do
+                let outDir = outRootDir </> (takeBaseName file)
+                createDirectoryIfMissing True outDir
+
+                forM_ xs $ \Book'{..} -> do
+                  forM_ b'chapters $ \ ch@Chapeter{..} -> do
+                            let file = outDir </> [qc|{chapter'number}.yaml|]
+                            encodeFile file ch
+
+      Nothing -> error $ "failed parse html file "
+  where
+    doesFilenameMatch :: FilePath -> Bool
+    doesFilenameMatch path = takeExtension path `elem` [ ".html", ".HTML"]
+
+-- <a id="footnote-265-903-backlink" class="footnote-link" href="#footnote-265-903">(903)</a>
+parseVerse :: Scraper String [Verse]
+parseVerse = do
+  rawVerseHtml <- innerHTML $ "p"  @: [hasClass "Body-Text"]
   vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
   versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
 
-  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
-      rs = PCRE.scan refRegex  verse
-  let xs = map (\(n, v) ->
+  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack rawVerseHtml
+
+      rs :: [(String, [String])]     
+      rs = PCRE.scan refRegex rawVerseHtml
+      
+      verseRefs = map toVerseRef rs
+      xs = map (\(n, verse) ->
                     let num = fromMaybe 0 $ ((readMaybe  $ T.unpack n) :: Maybe Int)
-                    in Verse num v Nothing Nothing)  (zip vNums vs)
+                        vR = filter (prRefBelongs verse) verseRefs
+                        v = case vR of
+                              [] -> T.strip verse
+                              _  -> removeLinkTag verse
+                    in Verse num (T.strip v) Nothing vR)
+               (zip vNums vs)
   return xs
   where
+    removeLinkTag str =
+        T.intercalate "" $ PCRE.split linkRegex str
+    
+    toVerseRef :: (String,[String]) -> VerseRef
+    toVerseRef (footnote, [key]) = VerseRef 0 (RefFootnote (T.pack key) (removeLinkTag $ T.pack footnote) )
+
+    -- predicate reference belongs to verse
+    prRefBelongs :: Text -> VerseRef -> Bool
+    prRefBelongs verse VerseRef{..} =
+        case verseRef'type of
+          -- check if footnote belongs to the verse
+          RefFootnote key _ -> T.isInfixOf key verse
+          _ -> False
+               
     parseVerseNum :: Scraper String Text
     parseVerseNum = do
-           txt <- T.pack <$> text "span" --  (attr "id" $ "span")
+           txt <- T.strip . T.pack <$> text "span" --  (attr "id" $ "span")
            return txt
     parseVerseRef :: Scraper String Text
     parseVerseRef = do
-           txt <- T.pack <$> text "a"
+           txt <- T.strip . T.pack <$> text "a"
            return txt
 
-parseBibleHtml_1 :: Scraper String [Book']
-parseBibleHtml_1 = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
+parseBibleHtml :: Scraper String [Book']
+parseBibleHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
   where
     innerScraper = do
-       title <- seekNext $ T.pack <$> text "h2"
+       title <- seekNext $ T.strip . T.pack <$> text "h2"
        chapters <- many $ do
 
-                     -- TODO: parse to Int
-         chapter <- seekNext $ T.pack <$> text "h3" <|> return "999"
+         chapter <- seekNext $ T.strip . T.pack <$> text "h3" <|> return "999"
          let chNum = fromMaybe 0 $ ((readMaybe  $ T.unpack chapter) :: Maybe Int)
 
          sections <- untilNext (matches "h3") $
                      many $ do
-            sectionTitle <- (seekNext $ T.pack <$> text "h4")
-            p_ref <- (seekNext $ T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
-            ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse_1 
+            sectionTitle <- (seekNext $ T.strip . T.pack <$> text "h4")
+            p_ref <- (seekNext $ T.strip . T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
+            ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse
             return $ Section sectionTitle 111 p_ref $ [Paragraph 1 $ concat ps] 
          let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = n}) [1..] sections
          return $ Chapeter chNum "" "" secs  
        return $ Book' title   chapters
 
-parseBibleHtml :: Scraper String [BookData]
-parseBibleHtml = chroots ("div" @: ["id" @= "mCSB_1_container"]) $ inSerial innerScraper
-  where
-    innerScraper = do
-       title <- seekNext $ T.pack <$> text "h2"
-       chapters <- many $ do
 
-         chapter <- seekNext $ T.pack <$> text "h3" -- <|> return "****************"
-         sections <- untilNext (matches "h3")
-                     (many $ do
-            sectionTitle <- (seekNext $ T.pack <$> text "h4")
-            p_ref <- (seekNext $ T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return "ref empty"
---            ps <- untilNext (matches "h4") (many $ seekNext $ VerseData [] . T.pack <$> parseVerse1)
-
-            ps <- untilNext (matches "h4")
-                  (                
-                   many $ seekNext $ parseVerse
-                  )
---            let vss = map (\(nums, refs, verse) -> VerseData nums refs $ T.pack verse ) ps
-            return $ SectionData sectionTitle p_ref $ concat ps )
-         return $ ChapterData chapter  sections  
-       return $ BookData title chapters
-
-
-
-
-
-
-
--- <a id="footnote-265-903-backlink" class="footnote-link" href="#footnote-265-903">(903)</a>
-parseVerse :: Scraper String [VerseData]
-parseVerse = do
-  verse <- innerHTML $ "p"  @: [hasClass "Body-Text"]
-  vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
-  versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
-
-  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
-      rs = PCRE.scan refRegex  verse
-  let xs = map (\(num, v) -> VerseData num v)  (zip vNums vs)
-  return xs
-  where
-    parseVerseNum :: Scraper String Text
-    parseVerseNum = do
-           txt <- T.pack <$> (attr "id" $ "span")
-           return txt
-    parseVerseRef :: Scraper String Text
-    parseVerseRef = do
-           txt <- T.pack <$> text "a"
-           return txt
-
-  -- let vs = filter (not . T.null) $ PCRE.split rr_1  verse
---       rs = PCRE.scan refRegex  verse
---   mapM (\(link, [z]) -> do
---           TIO.putStrLn link
---           TIO.putStrLn z
---        )   rs
-
---   forM_ (zip verse'nums vs) $ \(num, v) -> do
--- --      TIO.putStrLn "-->"
---       TIO.putStrLn $ [qc|{num}. {v}|]
-         
--- parseVerse1 :: Scraper String [VerseData]
--- parseVerse1 = do
---   let del = "\160"
---   verse <- innerHTML $ "p"  @: [hasClass "Body-Text"]
---   vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
---   versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
-
---   let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
---       rs = PCRE.scan refRegex  verse
---   -- mapM (\(link, [z]) -> do
---   --         TIO.putStrLn link
---   --         TIO.putStrLn z
---   --      )   rs
-
---   let xs = map (\(num, v) -> VerseData vNums versRefs num v $ T.pack verse)  (zip vNums vs)
---   return xs
---   -- verse <- text $ "p"  @: [hasClass "Body-Text"]
---   -- return $ map (VerseData . T.pack ) $ splitOn del verse         
---   -- return $ (++ "\n") <$> intercalate "{#}" $ splitOn del verse
--- --  return $ VerseData vNums versRefs $ T.pack  verse --   (vNums, versRefs, verse)
---   where
---     parseVerseNum :: Scraper String Text
---     parseVerseNum = do
---            txt <- T.pack <$> (attr "id" $ "span")
---            return txt
---     parseVerseRef :: Scraper String Text
---     parseVerseRef = do
---            txt <- T.pack <$> text "a"
---            return txt
 
 
 printBook hFile BookData{..} = do
@@ -287,6 +243,7 @@ rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
 -- ref link with the worde before that
 refRegex = [PCRE.re|(?:\S+\s)?\S*<\s*a[^>]*>(.*?)<\s*/\s*a>|]
 
+linkRegex = [PCRE.re|<\s*a[^>]*>(.*?)<\s*/\s*a>|]
 
 
 -- | Footnotes
