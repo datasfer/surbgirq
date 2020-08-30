@@ -9,10 +9,13 @@
 module Surbgirq.Shell.Scraper.Scalpel.BibleScraper where
 
 import Data.Text(Text)
+import Text.Read (readMaybe)
+import Data.Maybe (fromMaybe)
 
 import Text.InterpolatedString.Perl6 (qc)
 
 import           Control.Applicative
+import System.Directory
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.List
@@ -31,6 +34,7 @@ import Text.Regex.PCRE
 import qualified           Text.Regex.PCRE.Heavy as PCRE
 import Data.Yaml
 import qualified Data.Aeson as A
+import Surbgirq.Shell.Types
     
 
 data BookData = BookData
@@ -54,6 +58,11 @@ data VerseData = VerseData
  } deriving(Show, Generic)
 
 
+data Book' = Book'
+ { b'title :: Text
+ , b'chapters :: [Chapter]
+ } deriving (Show, Generic)
+
 data FootnoteData = FootnoteData Text Text
                   deriving (Show, Generic)
 
@@ -61,23 +70,77 @@ instance ToJSON VerseData
 instance ToJSON SectionData
 instance ToJSON ChapterData
 instance ToJSON BookData
+instance ToJSON Book'
 instance ToJSON FootnoteData
     
 parseBibleTest :: IO ()
 parseBibleTest = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  exampleHtml <- readFile "./data/html/1994/matthew.html"
-  let ts = scrapeStringLike exampleHtml parseBibleHtml
+  matthewText <- readFile "./data/html/1994/New/2.Mark.html"
+  let exportFolder = "./data/html/1994/export"
+
+  createDirectoryIfMissing True exportFolder
+
+  let ts = scrapeStringLike matthewText parseBibleHtml_1
+      
   case ts of
     Just xs -> do
             encodeFile "parseHtml.yaml" xs
             A.encodeFile "parseHtml.json" xs
-            hFile <- openFile "scalpel.out" WriteMode
-            forM_ xs (printBook hFile)
+            print $ length xs
+            forM_ xs $ \Book'{..} -> do
+              forM_ b'chapters $ \ ch@Chapeter{..} -> do
+                        let file = exportFolder </> [qc|{chapter'number}.yaml|]
+                        encodeFile file ch
+            return ()
+--            hFile <- openFile "scalpel.out" WriteMode
+--            forM_ xs (printBook hFile)
     Nothing -> error $ "failed parse html file "
 
 
+parseVerse_1 :: Scraper String [Verse]
+parseVerse_1 = do
+  verse <- innerHTML $ "p"  @: [hasClass "Body-Text"]
+  vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
+  versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
+
+  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
+      rs = PCRE.scan refRegex  verse
+  let xs = map (\(n, v) ->
+                    let num = fromMaybe 0 $ ((readMaybe  $ T.unpack n) :: Maybe Int)
+                    in Verse num v Nothing Nothing)  (zip vNums vs)
+  return xs
+  where
+    parseVerseNum :: Scraper String Text
+    parseVerseNum = do
+           txt <- T.pack <$> text "span" --  (attr "id" $ "span")
+           return txt
+    parseVerseRef :: Scraper String Text
+    parseVerseRef = do
+           txt <- T.pack <$> text "a"
+           return txt
+
+parseBibleHtml_1 :: Scraper String [Book']
+parseBibleHtml_1 = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
+  where
+    innerScraper = do
+       title <- seekNext $ T.pack <$> text "h2"
+       chapters <- many $ do
+
+                     -- TODO: parse to Int
+         chapter <- seekNext $ T.pack <$> text "h3" <|> return "999"
+         let chNum = fromMaybe 0 $ ((readMaybe  $ T.unpack chapter) :: Maybe Int)
+
+         sections <- untilNext (matches "h3") $
+                     many $ do
+            sectionTitle <- (seekNext $ T.pack <$> text "h4")
+            p_ref <- (seekNext $ T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
+            ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse_1 
+            return $ Section sectionTitle 111 p_ref $ [Paragraph 1 $ concat ps] 
+         let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = n}) [1..] sections
+         return $ Chapeter chNum "" "" secs  
+       return $ Book' title   chapters
 
 parseBibleHtml :: Scraper String [BookData]
 parseBibleHtml = chroots ("div" @: ["id" @= "mCSB_1_container"]) $ inSerial innerScraper
