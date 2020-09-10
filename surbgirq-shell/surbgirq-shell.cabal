@@ -27,6 +27,7 @@ library
                    Surbgirq.Shell.Scraper.Scalpel
                    Surbgirq.Shell.Scraper.Hxt
                    Surbgirq.Shell.Scraper.Scalpel.BibleScraper
+                   Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
                    Surbgirq.Shell.CSV.Generate
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Scripture

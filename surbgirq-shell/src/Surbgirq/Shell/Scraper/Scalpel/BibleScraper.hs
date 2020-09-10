@@ -68,6 +68,7 @@ data VerseData = VerseData
 data Book' = Book'
  { b'title :: Text
  , b'chapters :: [Chapter]
+ , b'footnotes :: [FootnoteData]
  } deriving (Show, Generic)
 
 data FootnoteData = FootnoteData Text Text
@@ -101,12 +102,14 @@ parseBibleTest = do
     htmlText <- readFile fullFilename
     print fullFilename 
     let ts = scrapeStringLike htmlText parseBibleHtml
+        gs = scrapeStringLike htmlText parseFootnotes
 
-    case ts of
-      Just xs -> do
+    case (ts, gs) of 
+      (Just xs, Just fs )  -> do
               encodeFile "parseHtml.yaml" xs
               A.encodeFile "parseHtml.json" xs
               print $  length xs
+              print $  length fs
               when (length xs > 0) $ do
                 let outDir = outRootDir </> (takeBaseName file)
                 createDirectoryIfMissing True outDir
@@ -116,14 +119,14 @@ parseBibleTest = do
                             let file = outDir </> [qc|{chapter'number}.yaml|]
                             encodeFile file ch
 
-      Nothing -> error $ "failed parse html file "
+      (_, _) -> error $ "failed parse html file "
   where
     doesFilenameMatch :: FilePath -> Bool
     doesFilenameMatch path = takeExtension path `elem` [ ".html", ".HTML"]
 
 -- <a id="footnote-265-903-backlink" class="footnote-link" href="#footnote-265-903">(903)</a>
-parseVerse :: Scraper String [Verse]
-parseVerse = do
+parseVerse :: [FootnoteData] -> Scraper String [Verse]
+parseVerse fs = do
   rawVerseHtml <- innerHTML $ "p"  @: [hasClass "Body-Text"]
   vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
   versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
@@ -168,9 +171,22 @@ parseVerse = do
            return txt
 
 parseBibleHtml :: Scraper String [Book']
-parseBibleHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
+parseBibleHtml = do
+        footnotes <- chroots ("div" @:  [hasClass "footnote"]) $ parseFootnote
+
+        book <- chroots ("div" @: [hasClass "content"]) $ inSerial (innerScraper footnotes)
+        case book of
+          [b@(Book'{b'footnotes = a})] -> return [b{b'footnotes = footnotes}]
+          _ -> return []
   where
-    innerScraper = do
+    parseFootnote :: Scraper String FootnoteData
+    parseFootnote = do
+           txt <- T.pack <$> text "p"
+           num <- T.pack <$> text ("p" // "a"  )
+           return $ FootnoteData num txt
+
+    innerScraper :: [FootnoteData] -> SerialScraper String Book'
+    innerScraper fs = do
        title <- seekNext $ T.strip . T.pack <$> text "h2"
        chapters <- many $ do
 
@@ -181,11 +197,11 @@ parseBibleHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
                      many $ do
             sectionTitle <- (seekNext $ T.strip . T.pack <$> text "h4")
             p_ref <- (seekNext $ T.strip . T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
-            ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse
+            ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse fs
             return $ Section sectionTitle 111 p_ref $ [Paragraph 1 $ concat ps] 
          let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = n}) [1..] sections
          return $ Chapeter chNum "" "" secs  
-       return $ Book' title   chapters
+       return $ Book' title   chapters []
 
 
 
