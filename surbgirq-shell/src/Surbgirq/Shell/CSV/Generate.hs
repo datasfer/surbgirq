@@ -293,7 +293,7 @@ generateScripturesCSV configFile path outPath = do
                        TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
                        TIO.hPutStrLn outChVerseRelh  [qc|{prghID}{del}{verseID}|]
 
-                       let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", translationID,  "_", show  chapter'number, show section'number, show paragraph'number, show verse'verse]
+                       let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", translationID,  "_", show  chapter'number, ".", show section'number,".", show paragraph'number, ".", show verse'verse]
                        forM_ (zip [1..] verseWords) $ \(index,word) -> do
                          let wordID = concat [ wordIDPrefix, "-", show index]
                              wordNodeLabels = wordLabels word (show book'language) (show book'dialect) arrayDel
