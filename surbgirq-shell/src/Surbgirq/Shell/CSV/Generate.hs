@@ -330,11 +330,26 @@ generateScripturesCSV configFile path outPath = do
 --                                    footnoteRel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
 --                                TIO.hPutStrLn outRefsh footnoteLine
 --                                TIO.hPutStrLn outRefRelh footnoteRel
-                              RefFootnote key value -> error "not implemented"
+                              RefFootnote txt keyWord -> do
+                                let refWordID = concat [wordIDPrefix, "-", show verseRef'index]
+                                    footnoteID = concat ["ref_", wordIDPrefix, "-", show verseRef'index]
+                                    footnoteLine = [qc|{footnoteID}{del}{txt}{del}{verseRef'index}{del}Footnote|]
+                                    word_footnote_rel  = [qc|{refWordID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+                                    verse_footnote_rel  = [qc|{verseID}{del}{footnoteID}{del}REF_FOOTNOTE|]
+
+                                TIO.hPutStrLn outFootnotesh footnoteLine
+
+                                -- TODO: re-think this ref types
+                                when (verseRef'index > 0) $ TIO.hPutStrLn outWordFootnoteRelh word_footnote_rel
+                                TIO.hPutStrLn outVerseFootnoteRelh  verse_footnote_rel
+
                               _ -> return ()
 
 
   where
+
+
+    
     wordLabels :: Text -> String -> String -> String -> String
     wordLabels w lang dialect arrayDel =
         if isLower $ T.head w
