@@ -51,7 +51,7 @@ extra-deps:
   
 
 nix:
-  enable: true
+#  enable: true
 #  shell-file: shell.nix
   pure: false
   packages:
