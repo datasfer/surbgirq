@@ -178,7 +178,7 @@ parseBibleTest :: IO ()
 parseBibleTest = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  htmlText <- readFile "./data/html/v1805/New/01.Matthew.html"
+  htmlText <- readFile "./data/html/v1805/New/26.Philemon.html"
   let resM = scrapeStringLike htmlText parseFootnotesMap
       refMap = case resM of
                            Just m -> m
