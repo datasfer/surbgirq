@@ -178,7 +178,7 @@ parseBibleTest :: IO ()
 parseBibleTest = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  htmlText <- readFile "./data/html/v1805/New/26.Philemon.html"
+  htmlText <- readFile "./data/html/v1805/Old/03.Leviticus.html"
   let resM = scrapeStringLike htmlText parseFootnotesMap
       refMap = case resM of
                            Just m -> m
@@ -315,7 +315,7 @@ parseBibleHtml_2 refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
      vNums <- chroots ("p" // "span" @: [hasClass "Num"]) $ parseVerseNum
      subTitle <- (chroot ("p" // "span" @: [hasClass "Drop"]) $ parseSubTitle) <|> return T.empty
 
-     let from = trace (show vNums) $ head vNums
+     let from = trace ("vNums=" ++ show vNums) $ head vNums
          to = last vNums
 --         vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
          vs = filter ( (>1) . T.length . T.strip) $ PCRE.split rr_1 $ T.pack rawVerseHtml
@@ -364,7 +364,7 @@ parseBibleHtml_2 refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
            ns1 = filter (\(index, w) -> ( w == w1) || T.init w == w1) ws
            -- remove the last puncuation T.init w
            ns2 = filter (\(index, w) -> ( w == w2) || T.init w == w2) ws 
-           index = trace (show ns1) $  case (length ns1, length ns2) of
+           index = trace ("ns2=" ++ show ns1) $  case (length ns1, length ns2) of
              (_, 1) -> getIndex $ head ns2
              (1, _) -> getIndex $ head ns1
              (0, 0)  -> 0
@@ -399,7 +399,7 @@ parseBibleHtml_1 refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
      vv <- T.pack <$> innerHTML "p"
      rawVerseHtml <-  innerHTML $ "p" @: [hasClass "Body_Body-Text"]
      vNums <- chroots ("p" // "span" @: [hasClass "Num"]) $ parseVerseNum
-     let from = trace (show vNums) $ head vNums
+     let from = trace ("vNumS" ++ show vNums) $ head vNums
          to = last vNums
 --         vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
          vs = filter ( (>1) . T.length . T.strip) $ PCRE.split rr_1 $ T.pack rawVerseHtml
@@ -448,7 +448,7 @@ parseBibleHtml_1 refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
            ns1 = filter (\(index, w) -> ( w == w1) || T.init w == w1) ws
            -- remove the last puncuation T.init w
            ns2 = filter (\(index, w) -> ( w == w2) || T.init w == w2) ws 
-           index = trace (show ns1) $  case (length ns1, length ns2) of
+           index = trace ("ns1=" ++ show ns1) $  case (length ns1, length ns2) of
              (_, 1) -> getIndex $ head ns2
              (1, _) -> getIndex $ head ns1
              (0, 0)  -> 0
@@ -464,7 +464,7 @@ parseBibleHtml_1 refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
            zs = [ y  | x <- is1, y <- is2, x == y - 1] 
        in case zs of
             [] -> error $ T.unpack v -- T.unpack v
-            _ -> trace (show zs) $ head zs
+            _ -> trace ("zs = " ++ show zs) $ head zs
                  
        
 
@@ -515,7 +515,7 @@ parseVerse1 = do
 parseVerseNum :: Scraper String Int
 parseVerseNum = do
        txt <- text "span"
-       let num = fromMaybe 0 $ ((readMaybe txt) :: Maybe Int)
+       let num = trace ("vNum txt = " ++ show txt) $ fromMaybe 0 $ ((readMaybe txt) :: Maybe Int)
        return num
 parseVerseRef :: Scraper String Text
 parseVerseRef = do

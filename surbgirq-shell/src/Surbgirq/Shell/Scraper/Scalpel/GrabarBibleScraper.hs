@@ -89,17 +89,23 @@ parseBibleTest = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
   let datDir = "./data/html/v1805/New"
+      datDirOld = "./data/html/v1805/Old"
       outRootDir = "./data/yaml/bible/am/v1805"
 
   createDirectoryIfMissing True outRootDir
 
-  txtFiles <- listDirectory datDir `catchError` \_ -> do
+  txtFiles <- ((datDir </> ) <$>) <$> listDirectory datDir `catchError` \_ -> do
                                           liftIO $ putStrLn (concat [datDir, " does not exist."])
                                           return []
 
-  forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
+  txtFilesOld <- ((datDirOld </> ) <$>) <$> listDirectory datDirOld `catchError` \_ -> do
+                                            liftIO $ putStrLn (concat [datDirOld, " does not exist."])
+                                            return []
 
-    let fullFilename = datDir </> file
+  forM_  (sort (txtFiles ++ txtFilesOld) )
+          $ \file -> when (doesFilenameMatch file) $ do
+
+    let fullFilename = file
     htmlText <- readFile fullFilename
     print fullFilename 
 
