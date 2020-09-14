@@ -130,6 +130,30 @@ data Girq =
           -- ^ 4. Ավետարան ըստ Հովհաննեսի
           | Acts
           -- ^ 5. Գործք առաքելոց
+                      | James
+          | Peter1
+          | Peter2
+          | John1
+          | John2
+          | John3
+          | Jude
+          | Romans
+          | Corinthians1
+          | Corinthians2
+          | Galatians
+          | Ephesians
+          | Philippians
+          | Colossians
+          | Thessalonians1
+          | Thessalonians2
+          | Hebrews
+          | Timothy1
+          | Timothy2
+          | Titus
+          | Philemon
+          | Revelation
+
+
             deriving(Show, Eq, Generic, Enum, T.Read, Ord)
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին

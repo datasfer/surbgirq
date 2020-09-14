@@ -127,6 +127,15 @@ data Girq =
           -- ^ 4. Ավետարան ըստ Հովհաննեսի
           | Acts
           -- ^ 5. Գործք առաքելոց
+          | James
+          | Peter1
+          | Peter2
+          | John1
+          | John2
+          | John3
+          | Jude
+          | Revelation
+
             deriving(Show, Read)
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին
