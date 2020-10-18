@@ -19,8 +19,8 @@ source-repository head
   location: https://github.com/arthurvard/surbgirq-shell
 
 library
-  exposed-modules: Surbgirq.Shell.Commands
-                   Surbgirq.Shell.Types
+  exposed-modules: Surbgirq.Shell.Types
+                   Surbgirq.Shell.Scraper
                    Surbgirq.Shell.Store.SQLite.Selda
                    Surbgirq.Shell.Store.ParseFile
                    Surbgirq.Shell.Store.Neo4j
@@ -77,10 +77,10 @@ executable surbgirq-shell
                , mtl
   default-language: Haskell2010
 
-executable surbgirq-scraper
-  main-is: Scraper.hs
+executable grabar1805-scraper
+  main-is: Grabar1805.hs
   other-modules: Paths_surbgirq_shell
-  hs-source-dirs: app
+  hs-source-dirs: app/Scraper
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends: base >=4.7 && <5
                , surbgirq-shell
@@ -92,6 +92,7 @@ executable surbgirq-scraper
                , text
                , aeson
                , optparse-applicative
+               -- , optparse-generic
                , directory
                , interpolatedstring-perl6
                , filepath

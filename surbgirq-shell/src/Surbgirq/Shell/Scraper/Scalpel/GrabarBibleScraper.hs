@@ -6,7 +6,9 @@
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE QuasiQuotes, FlexibleContexts #-}
 
-module Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper where
+module Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
+    (parseGrabarBibleHtml)
+    where
 
 import Debug.Trace
 import Data.IORef
@@ -34,6 +36,7 @@ import qualified Data.Text.Encoding  as TE
 import qualified Data.Text.IO        as TIO
 import qualified Data.Map.Strict as Map
 import qualified Data.Aeson as A
+import qualified Text.Regex.PCRE.Heavy as PCRE
     
 import           System.IO
 import           Text.HTML.Scalpel
@@ -43,10 +46,13 @@ import           GHC.Generics
 
 import Text.RawString.QQ    
 import Text.Regex.PCRE
-import qualified           Text.Regex.PCRE.Heavy as PCRE
 import Data.Yaml
+
 import Surbgirq.Shell.Types
-    
+
+-------------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------------
 
 data BookData = BookData
  { book'title :: Text
@@ -83,14 +89,21 @@ instance ToJSON ChapterData
 instance ToJSON BookData
 instance ToJSON Book'
 instance ToJSON FootnoteData
-    
+
 parseBibleTest :: IO ()
-parseBibleTest = do
+parseBibleTest = parseGrabarBibleHtml "./data/html/v1805" "./data/yaml"
+
+data OutFormat =  YAML
+                | JSON
+
+parseGrabarBibleHtml :: FilePath -> FilePath -> IO ()
+parseGrabarBibleHtml dataRootPath  outPutPath = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  let datDir = "./data/html/v1805/New"
-      datDirOld = "./data/html/v1805/Old"
-      outRootDir = "./data/yaml/bible/am/v1805"
+  let datDir = dataRootPath </> "New"
+      datDirOld = dataRootPath </> "Old"
+      outRootDir = outPutPath </> "bible/am/v1805"
+      format = YAML
 
   createDirectoryIfMissing True outRootDir
 
@@ -113,7 +126,7 @@ parseBibleTest = do
         refMap = case resM of
                            Just m -> m
                            Nothing -> Map.empty
-        ts = scrapeStringLike htmlText (parseBibleHtml refMap)
+        ts = scrapeStringLike htmlText (parseBible refMap)
 
     case ts of 
       Just xs  -> do
@@ -130,8 +143,9 @@ parseBibleTest = do
                             let file = outDir </> if chapter'number < 10
                                                   then [qc|0{chapter'number}.yaml|]
                                                   else [qc|{chapter'number}.yaml|]
-                                                           
-                            encodeFile file ch
+                            case format of
+                              YAML -> encodeFile file ch
+                              JSON -> A.encodeFile file ch
 
       _ -> error $ "failed parse html file "
   where
@@ -139,8 +153,8 @@ parseBibleTest = do
     doesFilenameMatch path = takeExtension path `elem` [ ".html", ".HTML"]
 
 -- <a id="footnote-265-903-backlink" class="footnote-link" href="#footnote-265-903">(903)</a>
-parseBibleHtml :: Map Text Text -> Scraper String [Book']
-parseBibleHtml refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
+parseBible :: Map Text Text -> Scraper String [Book']
+parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
   where
    pp =  do
     bookTitle <- seekNext $ T.pack <$> text "h1"

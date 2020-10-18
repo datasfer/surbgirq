@@ -38,12 +38,15 @@ import Database.Selda
 import Database.Selda.SQLite
 
 import Common.Yaml
-import Surbgirq.Shell.Commands
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
 
 import Surbgirq.Shell.Store.ParseFile
 import Surbgirq.Shell.Store.SQLite.Selda
+
+-------------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------------
 
 main :: IO ()
 main = --  liftIO $ createDirectoryIfMissing True $ "db"
@@ -60,17 +63,3 @@ main = --  liftIO $ createDirectoryIfMissing True $ "db"
     return ()
 
 
-{-
-main1 :: IO ()
-main1 = do
- -- bs <- readBooks "./data/yaml/books.yaml"
---  ss1 <- readScriptures "./data/yaml/matthew/1.yaml"
---  ss <- readSections "./data/yaml/matthew/1.yaml"
-  ch <- readChapter "./data/yaml/matthew/1.yaml"
---  mapM_  (\Section{..} -> )chapter'sections
-  hSetEncoding stdout utf8
-  let res = (TL.toStrict . TLE.decodeUtf8 $ encode ch)
-  TIO.writeFile "file.txt" res
-  TIO.putStrLn res
-  TIO.putStrLn "Գիրք ծննդեան"
--}
