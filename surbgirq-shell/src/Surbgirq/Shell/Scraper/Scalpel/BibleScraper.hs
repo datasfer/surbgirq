@@ -86,6 +86,25 @@ instance ToJSON FootnoteData
 data OutFormat =  YAML
                 | JSON
 
+test :: IO ()
+test = do
+    setLocaleEncoding utf8
+    hSetEncoding stdout utf8
+    htmlText <- readFile "./data/html/e1994/New/01.Matthew.html"
+
+    let ts = scrapeStringLike htmlText parseBibleHtml
+        gs = scrapeStringLike htmlText parseFootnotes
+
+    case (ts, gs) of 
+      (Just xs, Just fs )  -> do
+              case xs of
+                [b] -> forM_ (b'chapters b) $ \ ch@Chapeter{..} -> do
+                                print chapter'number
+              encodeFile "matt-parseHtml.yaml" xs
+              A.encodeFile "matt-parseHtml.json" xs
+      (_, _) -> error $ "failed parse html file "
+
+                  
 parseBibleTest :: IO ()
 parseBibleTest = parseE1994BibleHtml "./data/html/e1994" "./data/yaml"
 
@@ -112,10 +131,9 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
   forM_  (sort (txtFiles ++ txtFilesOld) )
           $ \file -> when (doesFilenameMatch file) $ do
 
-    let fullFilename = datDir </> file
-        lastFolderName = (last . splitPath $ takeDirectory fullFilename)
-    htmlText <- readFile fullFilename
-    print fullFilename 
+    let lastFolderName = (last . splitPath $ takeDirectory file)
+    htmlText <- readFile file
+    print file 
     let ts = scrapeStringLike htmlText parseBibleHtml
         gs = scrapeStringLike htmlText parseFootnotes
 
@@ -129,8 +147,8 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
                 let outDir = outRootDir </> lastFolderName </> (takeBaseName file)
                 createDirectoryIfMissing True outDir
 
-                forM_ xs $ \Book'{..} -> do
-                  forM_ b'chapters $ \ ch@Chapeter{..} -> do
+                forM_ xs $ \book -> do
+                  forM_ (b'chapters book) $ \ ch@Chapeter{..} -> do
                             let file = outDir </> if chapter'number < 10
                                                   then [qc|0{chapter'number}.yaml|]
                                                   else [qc|{chapter'number}.yaml|]
@@ -210,7 +228,7 @@ parseBibleHtml = do
        title <- seekNext $ T.strip . T.pack <$> text "h2"
        chapters <- many $ do
 
-         chapter <- seekNext $ T.strip . T.pack <$> text "h3" <|> return "999"
+         chapter <- seekNext $ T.strip . T.pack <$> text "h3" --  <|> return "999"
          let chNum = fromMaybe 0 $ ((readMaybe  $ T.unpack chapter) :: Maybe Int)
 
          sections <- untilNext (matches "h3") $
