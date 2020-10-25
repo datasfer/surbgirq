@@ -174,7 +174,7 @@ parseVerse fs = do
       rs :: [(String, [String])]     
       rs = PCRE.scan refRegex rawVerseHtml
       
-      verseRefs = map toVerseRef rs
+      verseRefs = map (\(index, rData) -> toVerseRef index rData) (zip [1..] rs)
       xs = map (\(n, verse) ->
                     let num = fromMaybe 0 $ ((readMaybe  $ T.unpack n) :: Maybe Int)
                         vR = filter (prRefBelongs verse) verseRefs
@@ -188,8 +188,8 @@ parseVerse fs = do
     removeLinkTag str =
         T.intercalate "" $ PCRE.split linkRegex str
     
-    toVerseRef :: (String,[String]) -> VerseRef
-    toVerseRef (footnote, [key]) = VerseRef 0 (RefFootnote (T.pack key) (removeLinkTag $ T.pack footnote) )
+    toVerseRef :: Int -> (String,[String]) -> VerseRef
+    toVerseRef i (footnote, [key]) = VerseRef i (RefFootnote (T.pack key) (removeLinkTag $ T.pack footnote) )
 
     -- predicate reference belongs to verse
     prRefBelongs :: Text -> VerseRef -> Bool
