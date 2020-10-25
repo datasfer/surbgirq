@@ -130,7 +130,7 @@ data Girq =
           -- ^ 4. Ավետարան ըստ Հովհաննեսի
           | Acts
           -- ^ 5. Գործք առաքելոց
-                      | James
+          | James
           | Peter1
           | Peter2
           | John1

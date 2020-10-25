@@ -162,6 +162,19 @@ instance ToJSON BookData
 --          return $ ChapterData chapter  sections  
 --        return $ BookData title chapters
 
+parseBibleTest :: IO ()
+parseBibleTest = do
+  setLocaleEncoding utf8
+  hSetEncoding stdout utf8
+  exampleHtml <- readFile "./data/html/e1994/Old/01.Genesis.html"
+  let ts = scrapeStringLike exampleHtml parseBibleHtml_1
+  case ts of
+    Just xs -> do
+            encodeFile "gen-parseHtml.yaml" xs
+            hFile <- openFile "scalpel.out" WriteMode
+            forM_ xs (printBook hFile)
+    Nothing -> error $ "failed parse html file "
+
 
 parseBibleHtml_1 :: Scraper String [BookData]
 parseBibleHtml_1 = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
@@ -311,18 +324,6 @@ parseVerse = do
            txt <- T.pack <$> text "a"
            return txt
 
-parseBibleTest :: IO ()
-parseBibleTest = do
-  setLocaleEncoding utf8
-  hSetEncoding stdout utf8
-  exampleHtml <- readFile "./data/html/1994/Mark.html"
-  let ts = scrapeStringLike exampleHtml parseBibleHtml_1
-  case ts of
-    Just xs -> do
-            encodeFile "parseHtml.yaml" xs
-            hFile <- openFile "scalpel.out" WriteMode
-            forM_ xs (printBook hFile)
-    Nothing -> error $ "failed parse html file "
 
 printBook hFile BookData{..} = do
    TIO.putStrLn (T.append "    " book'title)
