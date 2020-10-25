@@ -308,7 +308,8 @@ generateScripturesCSV configFile path outPath = do
                        -- verse ref processing
                        case verse'ref of
                           [] -> return ()
-                          [VerseRef{..}] -> do -- TODO: implement cae when verse can have more than one ref
+                          xs -> forM_ xs $ \VerseRef{..} -> do
+
                             case verseRef'type of
                               RefText txt -> do
                                 let refWordID = concat [wordIDPrefix, "-", show verseRef'index]
@@ -345,11 +346,7 @@ generateScripturesCSV configFile path outPath = do
 
                               _ -> return ()
 
-
   where
-
-
-    
     wordLabels :: Text -> String -> String -> String -> String
     wordLabels w lang dialect arrayDel =
         if isLower $ T.head w
