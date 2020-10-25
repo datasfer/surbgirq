@@ -6,7 +6,9 @@
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE QuasiQuotes, FlexibleContexts #-}
 
-module Surbgirq.Shell.Scraper.Scalpel.BibleScraper where
+module Surbgirq.Shell.Scraper.Scalpel.BibleScraper
+    (parseE1994BibleHtml)
+    where
 
 import Data.Text(Text)
 import Text.Read (readMaybe)
@@ -80,15 +82,21 @@ instance ToJSON ChapterData
 instance ToJSON BookData
 instance ToJSON Book'
 instance ToJSON FootnoteData
-    
+
+data OutFormat =  YAML
+                | JSON
+
 parseBibleTest :: IO ()
-parseBibleTest = do
+parseBibleTest = parseE1994BibleHtml "./data/html/1994" "./data/yaml"
+
+parseE1994BibleHtml :: FilePath -> FilePath -> IO ()
+parseE1994BibleHtml dataRootPath  outPutPath = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  let datDir = "./data/html/1994/New"
-      outRootDir = "./data/html/1994/export"
-
- 
+  let datDir = dataRootPath </> "New"
+      datDirOld = dataRootPath </> "Old"
+      outRootDir = outPutPath </> "bible/am/e1994"
+      format = YAML
 
   createDirectoryIfMissing True outRootDir
 
@@ -117,7 +125,9 @@ parseBibleTest = do
                 forM_ xs $ \Book'{..} -> do
                   forM_ b'chapters $ \ ch@Chapeter{..} -> do
                             let file = outDir </> [qc|{chapter'number}.yaml|]
-                            encodeFile file ch
+                            case format of
+                              YAML -> encodeFile file ch
+                              JSON -> A.encodeFile file ch
 
       (_, _) -> error $ "failed parse html file "
   where

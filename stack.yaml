@@ -1,3 +1,4 @@
+#resolver: lts-16.18
 resolver: lts-14.23
 
 packages:
@@ -51,7 +52,7 @@ extra-deps:
   
 
 nix:
-#  enable: true
+  enable: true
 #  shell-file: shell.nix
   pure: false
   packages:

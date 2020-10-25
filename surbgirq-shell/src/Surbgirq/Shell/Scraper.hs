@@ -3,3 +3,4 @@ module Surbgirq.Shell.Scraper ( module X
 
 
 import Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper as X
+import Surbgirq.Shell.Scraper.Scalpel.BibleScraper as X

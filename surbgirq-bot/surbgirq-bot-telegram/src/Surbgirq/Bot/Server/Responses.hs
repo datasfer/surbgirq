@@ -114,6 +114,8 @@ sendVerse sendAtOnce chatId verseRef =
 
 sendVerse' :: Bool -> ChatId -> VerseReference -> Bot ()
 sendVerse' sendAtOnce chatId vRef@VerseReference{..} = do
+--      BotConfig{state=BotState{..}} <- ask
+
       vs <- liftIO $ getVerses Ashxarhabar vRef
       maxVerseNum <- liftIO $ getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
 

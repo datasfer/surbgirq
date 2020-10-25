@@ -48,7 +48,7 @@ import Surbgirq.Shell.Scraper
 --
 -------------------------------------------------------------------------------
 
--- |  stack exec -- grabar1805-scraper  --yaml  -i ./data/html/v1805 -o ./data/yaml
+-- | stack exec -- html-scraper --v1805  --yaml  -i ./data/html/v1805 -o ./data/yaml
 main :: IO ()
 main = do
   cmd <- customExecParser (prefs showHelpOnError) $
@@ -56,29 +56,51 @@ main = do
          fullDesc <> progDesc "Scrap html to yamlor json formats."
                   <> header   "Surbgirq text scraper from html."
                   <> footer   ("the generated yaml/json will then converted to csv to feed neo4j."
-                              <> "e.g. grabar1805-scraper  --yaml  -i ./data/html/v1805 -o ./data/yaml"
+                              <> "e.g. html-scraper  --yaml  -i ./data/html/v1805 -o ./data/yaml"
                               )
 
   case cmd of
     Command{..} -> 
+             case cmd'book of
+               V1805 -> 
                  case cmd'outFormat of
                    YAML -> do
-                          TIO.putStrLn "Start scrapping Bible scriptures from html to Yaml..."
+                          TIO.putStrLn "Start scrapping Grabar scriptures to Yaml..."
                           parseGrabarBibleHtml cmd'inPath cmd'outPath
                           TIO.putStrLn "Scrapping success!"
                    JSON -> do
-                          TIO.putStrLn "Start scrapping Bible scriptures from html to Json..."
+                          TIO.putStrLn "Start scrapping Grabar scriptures to Json..."
                           parseGrabarBibleHtml cmd'inPath cmd'outPath
                           TIO.putStrLn "Scrapping success!"
                    CSV -> do
-                          TIO.putStrLn "Start scrapping Bible scriptures from html to Csv..."
+                          TIO.putStrLn "Start scrapping Grabar scriptures to Csv..."
                           parseGrabarBibleHtml cmd'inPath cmd'outPath
+                          TIO.putStrLn "Scrapping success!"
+               E1994 -> 
+                 case cmd'outFormat of
+                   YAML -> do
+                          TIO.putStrLn "Start scrapping e 1994 scriptures to Yaml..."
+                          parseE1994BibleHtml cmd'inPath cmd'outPath
+                          TIO.putStrLn "Scrapping success!"
+                   JSON -> do
+                          TIO.putStrLn "Start scrapping e 1994 scriptures to Json..."
+                          parseE1994BibleHtml cmd'inPath cmd'outPath
+                          TIO.putStrLn "Scrapping success!"
+                   CSV -> do
+                          TIO.putStrLn "Start scrapping e 1994 scriptures to Csv..."
+                          parseE1994BibleHtml cmd'inPath cmd'outPath
                           TIO.putStrLn "Scrapping success!"
 
 
--- Cmd line commands parsing                                  
+
+
+-- Cmd line commands parsing
+data BookTranslation = V1805
+                     | E1994
+
 data Command = Command
-    { cmd'outFormat :: OutFormat
+    { cmd'book      :: BookTranslation
+    , cmd'outFormat :: OutFormat
     , cmd'inPath    :: FilePath
     , cmd'outPath   :: FilePath
     }
@@ -87,8 +109,20 @@ data OutFormat =  YAML
                 | JSON
                 | CSV
 
+-- | Parsing Book translations
+v1805Input :: Parser BookTranslation
+v1805Input = flag' V1805
+  (  long "v1805"
+  <> short 'v'
+  <> help "grabar 1805 translation" )
 
+e1994Input :: Parser BookTranslation
+e1994Input = flag' E1994
+  (  long "e1994"
+  <> short 'e'
+  <> help "ashxarhabar 1994 translation" )
 
+-- | Parsing formats
 yamlOut :: Parser OutFormat
 yamlOut = flag' YAML
   (  long "yaml"
@@ -104,14 +138,20 @@ jsonOut = flag' JSON
 csvOut :: Parser OutFormat
 csvOut = flag' CSV
   (  long "csv"
-  <> short 'v'
+  <> short 'c'
   <> help "CSV output" )
+
+
 
 outFormat :: Parser OutFormat
 outFormat = yamlOut <|> jsonOut <|> csvOut
 
+bookInput :: Parser BookTranslation
+bookInput = v1805Input <|> e1994Input
+
 parser :: Parser Command
 parser = do
+  cmd'book <- bookInput
   cmd'outFormat <- outFormat
   cmd'inPath <- strOption
     (  metavar "PATH"

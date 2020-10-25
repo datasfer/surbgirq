@@ -77,8 +77,8 @@ executable surbgirq-shell
                , mtl
   default-language: Haskell2010
 
-executable grabar1805-scraper
-  main-is: Grabar1805.hs
+executable html-scraper
+  main-is: Main.hs
   other-modules: Paths_surbgirq_shell
   hs-source-dirs: app/Scraper
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
