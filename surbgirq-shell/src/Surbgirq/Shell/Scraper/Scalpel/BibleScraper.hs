@@ -87,8 +87,9 @@ data OutFormat =  YAML
                 | JSON
 
 parseBibleTest :: IO ()
-parseBibleTest = parseE1994BibleHtml "./data/html/1994" "./data/yaml"
+parseBibleTest = parseE1994BibleHtml "./data/html/e1994" "./data/yaml"
 
+-- | stack exec -- html-scraper --e1994  --yaml  -i ./data/html/e1994 -o ./data/yaml
 parseE1994BibleHtml :: FilePath -> FilePath -> IO ()
 parseE1994BibleHtml dataRootPath  outPutPath = do
   setLocaleEncoding utf8
@@ -100,13 +101,19 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
 
   createDirectoryIfMissing True outRootDir
 
-  txtFiles <- listDirectory datDir `catchError` \_ -> do
+  txtFiles <- ((datDir </> ) <$>) <$> listDirectory datDir `catchError` \_ -> do
                                           liftIO $ putStrLn (concat [datDir, " does not exist."])
                                           return []
 
-  forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
+  txtFilesOld <- ((datDirOld </> ) <$>) <$> listDirectory datDirOld `catchError` \_ -> do
+                                            liftIO $ putStrLn (concat [datDirOld, " does not exist."])
+                                            return []
+
+  forM_  (sort (txtFiles ++ txtFilesOld) )
+          $ \file -> when (doesFilenameMatch file) $ do
 
     let fullFilename = datDir </> file
+        lastFolderName = (last . splitPath $ takeDirectory fullFilename)
     htmlText <- readFile fullFilename
     print fullFilename 
     let ts = scrapeStringLike htmlText parseBibleHtml
@@ -119,12 +126,15 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
               print $  length xs
               print $  length fs
               when (length xs > 0) $ do
-                let outDir = outRootDir </> (takeBaseName file)
+                let outDir = outRootDir </> lastFolderName </> (takeBaseName file)
                 createDirectoryIfMissing True outDir
 
                 forM_ xs $ \Book'{..} -> do
                   forM_ b'chapters $ \ ch@Chapeter{..} -> do
-                            let file = outDir </> [qc|{chapter'number}.yaml|]
+                            let file = outDir </> if chapter'number < 10
+                                                  then [qc|0{chapter'number}.yaml|]
+                                                  else [qc|{chapter'number}.yaml|]
+                            print file
                             case format of
                               YAML -> encodeFile file ch
                               JSON -> A.encodeFile file ch

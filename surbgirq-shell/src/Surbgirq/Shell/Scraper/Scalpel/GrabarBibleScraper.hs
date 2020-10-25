@@ -96,6 +96,7 @@ parseBibleTest = parseGrabarBibleHtml "./data/html/v1805" "./data/yaml"
 data OutFormat =  YAML
                 | JSON
 
+-- | stack exec -- html-scraper --v1805  --yaml  -i ./data/html/v1805 -o ./data/yaml
 parseGrabarBibleHtml :: FilePath -> FilePath -> IO ()
 parseGrabarBibleHtml dataRootPath  outPutPath = do
   setLocaleEncoding utf8
@@ -118,7 +119,8 @@ parseGrabarBibleHtml dataRootPath  outPutPath = do
   forM_  (sort (txtFiles ++ txtFilesOld) )
           $ \file -> when (doesFilenameMatch file) $ do
 
-    let fullFilename = file
+    let fullFilename =file
+        lastFolderName = (last . splitPath $ takeDirectory fullFilename)
     htmlText <- readFile fullFilename
     print fullFilename 
 
@@ -135,7 +137,7 @@ parseGrabarBibleHtml dataRootPath  outPutPath = do
               print $  length xs
       
               when (length xs > 0) $ do
-                let outDir = outRootDir </> (takeBaseName file)
+                let outDir = outRootDir </> lastFolderName </> (takeBaseName file)
                 createDirectoryIfMissing True outDir
 
                 forM_ xs $ \Book'{..} -> do
@@ -143,6 +145,7 @@ parseGrabarBibleHtml dataRootPath  outPutPath = do
                             let file = outDir </> if chapter'number < 10
                                                   then [qc|0{chapter'number}.yaml|]
                                                   else [qc|{chapter'number}.yaml|]
+                            print file
                             case format of
                               YAML -> encodeFile file ch
                               JSON -> A.encodeFile file ch
