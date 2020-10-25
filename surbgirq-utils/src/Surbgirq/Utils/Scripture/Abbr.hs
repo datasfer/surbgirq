@@ -35,7 +35,7 @@ abbr = [ (Matthew, ["Մատթ.", "Մատթ", "Մտ", "Mt", "Mat", "Matt","mat", 
        , (John,    [ "Յովհ.", "Յովհ", "Յհ", "John", "john"])
        , (Acts, ["Գրծ", "Acts"])
        , (James, ["Յկ", "Jas", "James" ])
-       , (Peter1, ["Ա Պտ", "1Pet"])
+       , (Peter1, ["Ա Պտ", "1Pet", "Pet1"])
        , (Peter2, ["Բ Պտ", "2Pet"])
        , (John1, ["Ա Յհ", "1John"])
        , (John2, ["Բ Յհ", "2John"])

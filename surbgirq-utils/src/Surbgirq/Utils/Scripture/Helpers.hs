@@ -37,11 +37,13 @@ parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text
 
 
 readNums :: Text -> [Int]
-readNums  = catMaybes . map (readMaybe . T.unpack) . T.groupBy (\x y -> isDigit x && isDigit y)
+readNums  = catMaybes . map (readMaybe . T.unpack) . T.groupBy (\x y -> isDigit x && isDigit y) . T.unwords . drop 1 . T.words 
 
 
 readGirqs :: Text -> [Girq]
-readGirqs  = catMaybes . map findByAbbr . T.groupBy (\x y -> isAlpha x && isAlpha y)
+readGirqs txt = case T.words txt of
+                  (x:xs) -> catMaybes $ [findByAbbr x] -- . T.groupBy (\x y -> isAlpha x && isAlpha y)
+                  _   -> [] 
 
 
 verseRefRange :: VerseReference -> [VerseReference]
