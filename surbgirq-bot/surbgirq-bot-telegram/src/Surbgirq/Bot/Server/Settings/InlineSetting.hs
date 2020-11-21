@@ -16,7 +16,7 @@ Description : Implement Settings inline keyboards and callback query handlers
 Implement Settings inline keyboards and callback query handlers
 -}
 
-module Surbgirq.Bot.Server.SettingsInline where
+module Surbgirq.Bot.Server.Settings.InlineSetting where
 
 import Web.Telegram.API.Bot
 

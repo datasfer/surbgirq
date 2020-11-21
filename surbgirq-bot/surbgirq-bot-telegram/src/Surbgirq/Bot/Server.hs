@@ -25,7 +25,7 @@ import Surbgirq.Bot.Server.Webhook
 import Surbgirq.Types
 
 import Surbgirq.Bot.Monad
-import Surbgirq.Bot.Server.Updates
+import Surbgirq.Bot.Server.Handlers
 import Surbgirq.Bot.WebhookAPI
 
 

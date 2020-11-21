@@ -15,7 +15,7 @@ import qualified Data.ByteString.Lazy.Char8 as C
 import qualified Data.Text                  as T
 
 import Surbgirq.Bot.Monad
-import Surbgirq.Bot.Server.Updates
+import Surbgirq.Bot.Server.Handlers
 import Surbgirq.Bot.Types
 ------------------------------------------------------------
 --

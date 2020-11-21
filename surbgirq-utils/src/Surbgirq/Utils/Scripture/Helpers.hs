@@ -28,22 +28,20 @@ parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text
      in case gs of
            [] -> Left [qc|Unknown book name: {verseRange}|]
            (girq:_) -> case ns of
-                         []        -> Left "Failed parse verse numbers"
                          (a:b:c:_) -> Right $ VerseReference girq a (Just b) (Just c)
                          (a:b:_)   -> Right $ VerseReference girq a (Just b) Nothing
                          (a:_)     -> Right $ VerseReference girq a Nothing Nothing
-                         _         -> Left "Failed parse verse numbers"
-
+                         []        -> Left "Failed parse verse numbers"
 
 
 readNums :: Text -> [Int]
-readNums  = catMaybes . map (readMaybe . T.unpack) . T.groupBy (\x y -> isDigit x && isDigit y) . T.unwords . drop 1 . T.words 
+readNums  = catMaybes . map (readMaybe . T.unpack) . T.groupBy (\x y -> isDigit x && isDigit y) . T.unwords . drop 1 . T.words
 
 
 readGirqs :: Text -> [Girq]
 readGirqs txt = case T.words txt of
                   (x:xs) -> catMaybes $ [findByAbbr x] -- . T.groupBy (\x y -> isAlpha x && isAlpha y)
-                  _   -> [] 
+                  _      -> []
 
 
 verseRefRange :: VerseReference -> [VerseReference]

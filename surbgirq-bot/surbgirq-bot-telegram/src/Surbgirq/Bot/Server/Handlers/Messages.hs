@@ -3,7 +3,7 @@
 {-# LANGUAGE ViewPatterns      #-}
 
 
-module Surbgirq.Bot.Server.Messages where
+module Surbgirq.Bot.Server.Handlers.Messages where
 
 import Data.List (intercalate, intersperse)
 
@@ -16,7 +16,7 @@ import Web.Telegram.API.Bot
 
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
-import Surbgirq.Bot.Server.SettingsInline
+import Surbgirq.Bot.Server.Settings.InlineSetting
 import Surbgirq.Bot.Types
 import Surbgirq.Utils
 

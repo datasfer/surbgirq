@@ -16,7 +16,7 @@ Description : Handlers for inline and callback  queries
 Implement Handlers for telegram queries
 -}
 
-module Surbgirq.Bot.Server.Queries where
+module Surbgirq.Bot.Server.Handlers.Queries where
 
 
 import Control.Monad                 (replicateM)
@@ -64,14 +64,14 @@ import Surbgirq.Bot.Help
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
-import Surbgirq.Bot.Server.SettingsInline
+import Surbgirq.Bot.Server.Settings.InlineSetting
 import Surbgirq.Bot.State
 import Surbgirq.Bot.Store
 import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
 
-import Surbgirq.Bot.Server.Pagination
+import Surbgirq.Bot.Server.Helpers.Pagination
 -- import Surbgirq.Bot.ShopBotExample
 ------------------------------------------------------------
 --

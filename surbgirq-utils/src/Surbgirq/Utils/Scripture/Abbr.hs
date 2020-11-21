@@ -3,7 +3,11 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 
-module Surbgirq.Utils.Scripture.Abbr where
+module Surbgirq.Utils.Scripture.Abbr
+    ( findByAbbr
+    , abbr
+    )
+    where
 
 import Common.Aeson
 import Data.Aeson   (Value)
@@ -29,10 +33,10 @@ findByAbbr name = listToMaybe $ fst <$> filter (\ (girq, xs) ->  any (==name) xs
 
 -- (Մարկ. 1.1-8, Ղուկ. 3.1-18, Յովհ. 1.19-28, Մատթ. 1.1-3)
 abbr :: [(Girq, [Text])]
-abbr = [ (Matthew, ["Մատթ.", "Մատթ", "Մտ", "Mt", "Mat", "Matt","mat", "matt", "Matthew"])
-       , (Mark,    ["Մարկ", "Մր", "Mark", "Mk", "mark"])
-       , (Luke,    ["Ղուկ.", "Ղուկ", "Ղկ", "Lk", "Luke", "Luk"])
-       , (John,    [ "Յովհ.", "Յովհ", "Յհ", "John", "john"])
+abbr = [ (Matthew, mat)
+       , (Mark, mark)
+       , (Luke, luke)
+       , (John,    ["Յովհաննէս", "Հովհաննես", "Հովհ", "Հովհ.",   "Յովհ.", "Յովհ", "Յհ", "John", "john"])
        , (Acts, ["Գրծ", "Acts"])
        , (James, ["Յկ", "Jas", "James" ])
        , (Peter1, ["Ա Պտ", "1Pet", "Pet1"])
@@ -59,3 +63,30 @@ abbr = [ (Matthew, ["Մատթ.", "Մատթ", "Մտ", "Mt", "Mat", "Matt","mat", 
        ]
 
 
+mat :: [Text]
+mat = matAm ++ matRu ++ matEn
+  where
+    matAm = ["Մատթէոս", "Մատթ.", "Մատթ", "Մտ"]
+    matEn = ["Matthew", "Mt", "Mat", "Matt","mat", "matt"]
+    matRu = []
+
+mark :: [Text]
+mark = markAm ++ markRu ++ markEn
+  where
+    markAm = ["Մարկոս", "Մարկ.", "Մարկ", "Մր"]
+    markEn = ["Mark", "Mk"]
+    markRu = []
+
+luke :: [Text]
+luke = lukeAm ++ lukeRu ++ lukeEn
+  where
+    lukeAm = ["Ղուկաս", "Ղուկ.", "Ղուկ", "Ղկ"]
+    lukeEn = ["Lk", "Luke", "Luk"]
+    lukeRu = []
+
+john :: [Text]
+john = johnAm ++ johnRu ++ johnEn
+  where
+    johnAm = ["Յովհաննէս", "Հովհաննես", "Հովհ", "Հովհ.",   "Յովհ.", "Յովհ", "Յհ"]
+    johnEn = ["John"]
+    johnRu = []

@@ -4,7 +4,7 @@
 
 
 
-module Surbgirq.Bot.Server.Channels where
+module Surbgirq.Bot.Server.Handlers.Channels where
 
 import qualified Data.Text as T
 

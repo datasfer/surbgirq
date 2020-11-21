@@ -31,7 +31,7 @@ import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
 
-import Surbgirq.Bot.Server.Pagination
+import Surbgirq.Bot.Server.Helpers.Pagination
 
 ------------------------------------------------------------
 --

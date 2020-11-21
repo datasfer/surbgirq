@@ -1,82 +1,82 @@
 {-# LANGUAGE ApplicativeDo     #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE QuasiQuotes         #-}
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE QuasiQuotes, FlexibleContexts #-}
 
 module Surbgirq.Shell.Scraper.Scalpel.BibleScraper
     (parseE1994BibleHtml)
     where
 
-import Data.Text(Text)
-import Text.Read (readMaybe)
 import Data.Maybe (fromMaybe)
+import Data.Text  (Text)
+import Text.Read  (readMaybe)
 
 import Text.InterpolatedString.Perl6 (qc)
 
 
-import System.IO.Error hiding (catch)
-import Prelude hiding (catch)
 import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+import Prelude              hiding (catch)
+import System.IO.Error      hiding (catch)
 
 import System.FilePath
-    
+
 import           Control.Applicative
-import System.Directory
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.List
 import           Data.List.Split
-import qualified Data.Text           as T
-import qualified Data.Text.Encoding  as TE
-import qualified Data.Text.IO        as TIO
+import qualified Data.Text              as T
+import qualified Data.Text.Encoding     as TE
+import qualified Data.Text.IO           as TIO
+import           GHC.Generics
+import           GHC.IO.Encoding
+import           System.Directory
+import           System.FilePath
 import           System.IO
 import           Text.HTML.Scalpel
-import System.FilePath
-import           GHC.IO.Encoding
-import           GHC.Generics
 
-import Text.RawString.QQ    
-import Text.Regex.PCRE
-import qualified           Text.Regex.PCRE.Heavy as PCRE
-import Data.Yaml
-import qualified Data.Aeson as A
-import Surbgirq.Shell.Types
-    
+import qualified Data.Aeson            as A
+import           Data.Yaml
+import           Surbgirq.Shell.Types
+import           Text.RawString.QQ
+import           Text.Regex.PCRE
+import qualified Text.Regex.PCRE.Heavy as PCRE
+
 
 data BookData = BookData
- { book'title :: Text
+ { book'title    :: Text
  , book'chapters :: [ChapterData]
  } deriving (Show, Generic)
 data ChapterData = ChapterData
- { chapterNum :: Text
+ { chapterNum       :: Text
  , chapter'sections :: [SectionData]
  } deriving(Show, Generic)
 
 data SectionData = SectionData
- { title :: Text
- , p_ref :: Text
+ { title  :: Text
+ , p_ref  :: Text
  , verses :: [VerseData]
  } deriving(Show, Generic)
 
 data VerseData = VerseData
- { verse'num :: Text
+ { verse'num   :: Text
  , verse'verse :: Text
  } deriving(Show, Generic)
 
 
 data Book' = Book'
- { b'title :: Text
- , b'chapters :: [Chapter]
+ { b'title     :: Text
+ , b'chapters  :: [Chapter]
  , b'footnotes :: [FootnoteData]
  } deriving (Show, Generic)
 
 data FootnoteData = FootnoteData Text Text
                   deriving (Show, Generic)
 
-instance ToJSON VerseData 
+instance ToJSON VerseData
 instance ToJSON SectionData
 instance ToJSON ChapterData
 instance ToJSON BookData
@@ -95,7 +95,7 @@ test = do
     let ts = scrapeStringLike htmlText parseBibleHtml
         gs = scrapeStringLike htmlText parseFootnotes
 
-    case (ts, gs) of 
+    case (ts, gs) of
       (Just xs, Just fs )  -> do
               case xs of
                 [b] -> forM_ (b'chapters b) $ \ ch@Chapeter{..} -> do
@@ -104,7 +104,7 @@ test = do
               A.encodeFile "matt-parseHtml.json" xs
       (_, _) -> error $ "failed parse html file "
 
-                  
+
 parseBibleTest :: IO ()
 parseBibleTest = parseE1994BibleHtml "./data/html/e1994" "./data/yaml"
 
@@ -133,11 +133,11 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
 
     let lastFolderName = (last . splitPath $ takeDirectory file)
     htmlText <- readFile file
-    print file 
+    print file
     let ts = scrapeStringLike htmlText parseBibleHtml
         gs = scrapeStringLike htmlText parseFootnotes
 
-    case (ts, gs) of 
+    case (ts, gs) of
       (Just xs, Just fs )  -> do
               encodeFile "parseHtml.yaml" xs
               A.encodeFile "parseHtml.json" xs
@@ -171,9 +171,9 @@ parseVerse fs = do
 
   let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack rawVerseHtml
 
-      rs :: [(String, [String])]     
+      rs :: [(String, [String])]
       rs = PCRE.scan refRegex rawVerseHtml
-      
+
       verseRefs = map (\(index, rData) -> toVerseRef index rData) (zip [1..] rs)
       xs = map (\(n, verse) ->
                     let num = fromMaybe 0 $ ((readMaybe  $ T.unpack n) :: Maybe Int)
@@ -187,7 +187,7 @@ parseVerse fs = do
   where
     removeLinkTag str =
         T.intercalate "" $ PCRE.split linkRegex str
-    
+
     toVerseRef :: Int -> (String,[String]) -> VerseRef
     toVerseRef i (footnote, [key]) = VerseRef i (RefFootnote (T.pack key) (removeLinkTag $ T.pack footnote) )
 
@@ -197,8 +197,8 @@ parseVerse fs = do
         case verseRef'type of
           -- check if footnote belongs to the verse
           RefFootnote key _ -> T.isInfixOf key verse
-          _ -> False
-               
+          _                 -> False
+
     parseVerseNum :: Scraper String Text
     parseVerseNum = do
            txt <- T.strip . T.pack <$> text "span" --  (attr "id" $ "span")
@@ -215,7 +215,7 @@ parseBibleHtml = do
         book <- chroots ("div" @: [hasClass "content"]) $ inSerial (innerScraper footnotes)
         case book of
           [b@(Book'{b'footnotes = a})] -> return [b{b'footnotes = footnotes}]
-          _ -> return []
+          _                            -> return []
   where
     parseFootnote :: Scraper String FootnoteData
     parseFootnote = do
@@ -236,9 +236,9 @@ parseBibleHtml = do
             sectionTitle <- (seekNext $ T.strip . T.pack <$> text "h4")
             p_ref <- (seekNext $ T.strip . T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
             ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse fs
-            return $ Section sectionTitle 111 p_ref $ [Paragraph 1 $ concat ps] 
+            return $ Section sectionTitle 111 p_ref $ [Paragraph 1 $ concat ps]
          let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = n}) [1..] sections
-         return $ Chapeter chNum "" "" secs  
+         return $ Chapeter chNum "" "" secs
        return $ Book' title   chapters []
 
 
@@ -263,7 +263,7 @@ printSection hFile SectionData{..} = do
 
 printVerse hFile VerseData{..} = do
   TIO.putStrLn "{#}"
-  TIO.hPutStrLn hFile verse'verse    
+  TIO.hPutStrLn hFile verse'verse
   TIO.putStrLn verse'verse
 
 
@@ -289,8 +289,8 @@ printVerse hFile VerseData{..} = do
 delS :: Text
 delS = [qc|</span>|]
 
-  
-       
+
+
 rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
 
 

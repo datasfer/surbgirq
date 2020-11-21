@@ -3,7 +3,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 
 
-module Surbgirq.Bot.Server.Pagination where
+module Surbgirq.Bot.Server.Helpers.Pagination where
 
 import Data.Text                     (Text)
 import Text.InterpolatedString.Perl6 (qc)
