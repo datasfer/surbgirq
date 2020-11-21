@@ -55,7 +55,10 @@ import Servant
 import Servant.Server
 import System.Environment
 import Text.Regex.Posix
-import Web.Telegram.API.Bot
+
+import Surbgirq.Bot.Server.TelegramAPI
+import Web.Telegram.API.Bot            hiding (sendMessage)
+
 import Web.Telegram.API.Bot.API.Edit
 
 
@@ -244,7 +247,7 @@ respuesta :: ChatId -> String -> Maybe ReplyKeyboard -> Bot ()
 respuesta chatId  msg keyborad = do
   BotConfig{..} <- ask
   let request = SendMessageRequest chatId (T.pack msg) Nothing Nothing Nothing Nothing keyborad
-  res <- ($) liftIO $ sendMessage telegramToken request manager
+  res <- ($) sendMessage telegramToken request manager
   liftIO $ putStrLn "response: --------------------"
   liftIO $ putStrLn $ show res
 

@@ -54,8 +54,13 @@ import Surbgirq.Bot.Types
 ------------------------------------------------------------
 
 
-startApp :: String -> IO ()
-startApp dbName = do
+-- if Settings.telegram_base_url != "https://api.telegram.org/bot":
+--         r = requests.get(f"https://api.telegram.org/bot{Settings.telegram_token}/logOut")
+--         logger.info("Using local bot API, logout result: %s", r.text)
+-- print "API endpoint: %s", bot.base_url
+
+startApp :: String -> String -> Int -> IO ()
+startApp dbName botApiUrl port = do
   putStrLn "Surbgirq bot started..."
   manager' <- newManager tlsManagerSettings
   fbManager <- newManager tlsManagerSettings
@@ -68,6 +73,8 @@ startApp dbName = do
 
       config = BotConfig
         { telegramToken = Token $ T.pack $ "bot" <> telegramToken'
+        , botApiHost = T.pack botApiUrl
+        , botApiPort = port
         , facebookVerifyToken = fbVerifyToken
         , facebookPageToken = fbPageToken
         , manager = manager'
@@ -75,4 +82,6 @@ startApp dbName = do
         , ref = ref
         , state = state
         }
+  putStrLn $ concat ["BOT API endpoint: ", botApiUrl, ":", show port]
+
   run 5000 $ app config

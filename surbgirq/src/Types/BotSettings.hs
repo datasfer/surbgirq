@@ -34,8 +34,10 @@ data BotSpec = BotSpec
   -- ^ telegram bot settings
   } deriving(Show)
 
-newtype TelegramBotConfig = TelegramBotConfig
-    { telegramBotConfig'dbName :: String
+data TelegramBotConfig = TelegramBotConfig
+    { telegramBotConfig'dbName     :: String
+    , telegramBotConfig'botApiHost :: String
+    , telegramBotConfig'botApiPort :: Int
     } deriving (Show)
 
 

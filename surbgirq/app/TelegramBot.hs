@@ -26,13 +26,15 @@ main = do
   installSigtermHandler
   bot@BotSettings{..} <- getBotSettings "Bots Config"
   let dbName = telegramBotConfig'dbName $ bot'telegram surbgirq'bots
+      botApiHost = telegramBotConfig'botApiHost $ bot'telegram surbgirq'bots
+      botApiPort = telegramBotConfig'botApiPort $ bot'telegram surbgirq'bots
 
   putStrLn "Please, enter Telegram bot's API token:"
   putStrLn $ mconcat [" with db: ", dbName]
   putStrLn $ show bot
 --  getEnvToken "TELEGRAM_BOT_TOKEN" >>= run
 --  token <- T.pack <$> getLine
-  startApp dbName -- run $ token
+  startApp dbName botApiHost botApiPort  -- run $ token
 
 
 data CmdOptions = CmdOptions

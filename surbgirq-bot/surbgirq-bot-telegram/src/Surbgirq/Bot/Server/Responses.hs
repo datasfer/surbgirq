@@ -21,7 +21,9 @@ import Data.IORef
 
 import Control.Monad.Reader
 import Lucid
-import Web.Telegram.API.Bot
+
+import Surbgirq.Bot.Server.TelegramAPI
+import Web.Telegram.API.Bot            hiding (sendMessage)
 
 import Surbgirq.Bot.ClientRequests
 import Surbgirq.Bot.Help
@@ -40,7 +42,7 @@ import Surbgirq.Bot.Server.Helpers.Pagination
 sendHelpMessage :: ChatId -> Bot ()
 sendHelpMessage chatId = do
   BotConfig{..} <- ask
-  liftIO $ sendMessage telegramToken (helpMessage chatId) manager >> return ()
+  sendMessage telegramToken (helpMessage chatId) manager >> return ()
   return ()
 
 
@@ -162,14 +164,14 @@ sendHtml :: ChatId -> Text -> Bot ()
 sendHtml chatId msg = do
     BotConfig{..} <- ask
     let request = SendMessageRequest chatId msg (Just HTML) Nothing Nothing Nothing Nothing
-    _ <- ($) liftIO $ sendMessage telegramToken request manager
+    _ <- ($) sendMessage telegramToken request manager
     return ()
 
 sendText :: ChatId -> Text -> Bot ()
 sendText chatId msg = do
     BotConfig{..} <- ask
     let request = SendMessageRequest chatId msg Nothing Nothing Nothing Nothing Nothing
-    _ <- ($) liftIO $ sendMessage telegramToken request manager
+    _ <- ($) sendMessage telegramToken request manager
     return ()
 
 -- | send text with reply keybords
@@ -177,7 +179,7 @@ sendTextReplyKb :: ReplyKeyboard -> ChatId -> Text -> Bot ()
 sendTextReplyKb keyborad chatId msg = do
     BotConfig{..} <- ask
     let request = SendMessageRequest chatId msg (Just HTML) Nothing Nothing Nothing (Just keyborad)
-    res <- ($) liftIO $ sendMessage telegramToken request manager
+    res <- ($) sendMessage telegramToken request manager
     liftIO $ putStrLn $ show res
     let id_ = case res of
                 Right rm -> message_id $ result rm
@@ -236,7 +238,7 @@ sendAphorism chatId args = do
         Nothing -> 1
   let sentences = ["liftIO $ replicateM cantidad eligeSentenceFromBlog"]
   let requests = map (\s -> sendMessageRequest chatId (T.pack s)) sentences
-  _ <- ($) liftIO $ forM_ requests $ (\r -> sendMessage telegramToken r manager)
+  _ <- ($) forM_ requests $ (\r -> sendMessage telegramToken r manager)
   return ()
 
 

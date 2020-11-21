@@ -21,6 +21,9 @@ type State = TVar BotState
 
 data BotConfig = BotConfig
   { telegramToken       :: Token
+  , botApiHost          :: Text -- custon telegram bot api
+  , botApiPort          :: Int
+
   , facebookVerifyToken :: Text
   , facebookPageToken   :: Text
   , manager             :: Manager

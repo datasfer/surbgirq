@@ -1,3 +1,6 @@
 bots:
   telegram:
     dbName: "db/telebot"
+    #  api.telegram.org
+    botApiHost: "_env:BOT_API_URL:api.telegram.org"
+    botApiPort: _env:BOT_API_PORT:443

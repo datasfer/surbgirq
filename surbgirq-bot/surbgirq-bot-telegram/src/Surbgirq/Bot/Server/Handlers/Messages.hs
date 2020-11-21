@@ -12,14 +12,15 @@ import qualified Data.Map.Strict as M
 import qualified Data.Text       as T
 
 import Control.Monad.Reader
-import Web.Telegram.API.Bot
+
+import Surbgirq.Bot.Server.TelegramAPI
+import Web.Telegram.API.Bot            hiding (sendMessage)
 
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
 import Surbgirq.Bot.Server.Settings.InlineSetting
 import Surbgirq.Bot.Types
 import Surbgirq.Utils
-
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
@@ -77,7 +78,7 @@ testMd :: ChatId -> Bot ()
 testMd chatId = do
     BotConfig{..} <- ask
     let request = SendMessageRequest chatId (T.pack formatText) (Just Markdown) Nothing Nothing Nothing Nothing
-    _ <- ($) liftIO $ sendMessage telegramToken request manager
+    _ <- ($) sendMessage telegramToken request manager
     return ()
   where
     formatText = "*boldtext* _italictext_ `fixed width font` [link]   (http://google.com)."
@@ -87,7 +88,7 @@ testHtml :: ChatId -> Bot ()
 testHtml chatId = do
     BotConfig{..} <- ask
     let request = SendMessageRequest chatId (T.pack htmlText) (Just HTML) Nothing Nothing Nothing Nothing
-    _ <- ($) liftIO $ sendMessage telegramToken request manager
+    _ <- ($) sendMessage telegramToken request manager
     return ()
   where
     htmlText = intercalate "\n"
