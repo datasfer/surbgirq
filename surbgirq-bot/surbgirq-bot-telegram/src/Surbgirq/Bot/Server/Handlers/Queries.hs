@@ -72,18 +72,13 @@ import Surbgirq.Types
 import Surbgirq.Utils
 
 import Surbgirq.Bot.Server.Helpers.Pagination
--- import Surbgirq.Bot.ShopBotExample
+
 ------------------------------------------------------------
 --
 ------------------------------------------------------------
 
--- InlineQuery {query_id = "1096629775692860954", query_from = User {user_id = 255329016, user_is_bot = False,
--- user_first_name = "arthur", user_last_name = Nothing, user_username = Just "arthurvard",
--- user_language_code = Just
--- (LanguageCode "en")}, query_location = Nothing, query_query = "Mat", query_offset = ""}
 handleInlineQuery :: InlineQuery -> Bot ()
 handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
---   liftIO $ putStrLn $ "inline query args -> " ++ (show cmdArgs)
   liftIO $ putStrLn $ "Inline query -> " ++ (show iq)
   onCommand query_query
   cfg <- getUserConfig (UserId user_id)
@@ -331,8 +326,6 @@ inlineQuote qFn iqId args = do
 
 
 -- | Surbgirq inline queries
-
-
 inlineVerse :: Text -> [String] -> Bot ()
 inlineVerse iqId args = do
   let arg = intercalate " " args

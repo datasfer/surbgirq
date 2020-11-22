@@ -169,7 +169,7 @@ parseVerse fs = do
   vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
   versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
 
-  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack rawVerseHtml
+  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.strip $  T.pack rawVerseHtml
 
       rs :: [(String, [String])]
       rs = PCRE.scan refRegex rawVerseHtml
@@ -189,7 +189,7 @@ parseVerse fs = do
         T.intercalate "" $ PCRE.split linkRegex str
 
     toVerseRef :: Int -> (String,[String]) -> VerseRef
-    toVerseRef i (footnote, [key]) = VerseRef i (RefFootnote (T.pack key) (removeLinkTag $ T.pack footnote) )
+    toVerseRef i (footnote, [key]) = VerseRef i (RefFootnote (T.strip $ T.pack key) (removeLinkTag $ T.strip $ T.pack footnote) )
 
     -- predicate reference belongs to verse
     prRefBelongs :: Text -> VerseRef -> Bool
@@ -219,8 +219,8 @@ parseBibleHtml = do
   where
     parseFootnote :: Scraper String FootnoteData
     parseFootnote = do
-           txt <- T.pack <$> text "p"
-           num <- T.pack <$> text ("p" // "a"  )
+           txt <- T.strip . T.pack <$> text "p"
+           num <- T.strip . T.pack <$> text ("p" // "a"  )
            return $ FootnoteData num txt
 
     innerScraper :: [FootnoteData] -> SerialScraper String Book'
@@ -307,8 +307,8 @@ parseFootnotes = do
   where
     parseFootnote :: Scraper String FootnoteData
     parseFootnote = do
-           txt <- T.pack <$> text "p"
-           num <- T.pack <$> text ("p" // "a"  )
+           txt <- T.strip . T.pack <$> text "p"
+           num <- T.strip . T.pack <$> text ("p" // "a"  )
            return $ FootnoteData num txt
 
 parseFootNoteTest :: IO ()
