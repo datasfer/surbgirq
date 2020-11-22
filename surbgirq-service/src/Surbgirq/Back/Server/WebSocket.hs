@@ -12,7 +12,7 @@ import Control.Concurrent     (threadDelay)
 import Control.Monad          (forever)
 import Control.Monad.IO.Class (liftIO)
 import Data.Text              (pack)
-import Network.WebSockets     (forkPingThread)
+import Network.WebSockets     (withPingThread)
 
 import qualified Network.WebSockets as WS
 
@@ -26,6 +26,6 @@ import Surbgirq.Back.App.Env
 -- | web socket handler sample
 notifyNewX :: WS.Connection -> AppM ()
 notifyNewX c = do
-  liftIO $ forkPingThread c 10
-  _ <- forever $ liftIO $ WS.sendTextData c (pack $ show 1000) >> threadDelay 1000000
-  return ()
+  liftIO . withPingThread c 10 (pure ()) . forever $ do
+    _ <- forever $ liftIO $ WS.sendTextData c (pack $ show 1000) >> threadDelay 1000000
+    return ()
