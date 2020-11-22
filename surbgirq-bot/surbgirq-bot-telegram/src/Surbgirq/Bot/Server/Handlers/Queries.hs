@@ -57,9 +57,6 @@ import System.Environment
 import Text.Regex.Posix
 
 import Surbgirq.Bot.Server.TelegramAPI
-import Web.Telegram.API.Bot            hiding (sendMessage)
-
-import Web.Telegram.API.Bot.API.Edit
 
 
 import Surbgirq.Bot.ClientRequests
@@ -266,7 +263,7 @@ editRespuesta chatId  msgId msg keyborad = do
   let request = EditMessageTextRequest (Just chatId) (Just msgId) Nothing (T.pack msg)
                 (Just HTML)
                 Nothing keyborad
-  res <- ($) liftIO $ editMessageText telegramToken request manager
+  res <- ($) editMessageText telegramToken request manager
   liftIO $ putStrLn $ show res
   let id_ = case res of
               Right rm -> message_id $ result rm
@@ -299,7 +296,7 @@ inlineAphorisms iqId args askToClassify = do
       keyboard = InlineKeyboardMarkup [ [classifyButton] ]
       inlineQueryResults = map (\(a,idx) -> InlineQueryResultArticle (T.pack $ "aphorism" ++ show idx) (Just $ T.pack $ "aphorism #" ++ show idx) (Just $ InputTextMessageContent (T.pack a) Nothing Nothing) (if askToClassify then (Just keyboard) else Nothing) Nothing Nothing (Just $ T.pack a) Nothing Nothing Nothing) (zip sentences [1..n])
       request = AnswerInlineQueryRequest iqId inlineQueryResults (Just 1) Nothing Nothing Nothing Nothing
-  res <- ($) liftIO $ answerInlineQuery telegramToken request manager
+  res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
       _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
@@ -321,7 +318,7 @@ inlineQuote qFn iqId args = do
                                                              (Just $ T.pack $ "quote #" ++ show idx)
                                                              (Just $ InputTextMessageContent (T.pack a) Nothing Nothing) Nothing Nothing Nothing (Just $ T.pack a) Nothing Nothing Nothing) (zip quotes [1..n])
       request = AnswerInlineQueryRequest iqId inlineQueryResults (Just 1) Nothing Nothing Nothing Nothing
-  res <- ($) liftIO $ answerInlineQuery telegramToken request manager
+  res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
       _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
@@ -377,7 +374,7 @@ inlineSettings iqId = do
 
       request = AnswerInlineQueryRequest iqId [] -- [inlineSettingResult]
                                               (Just 1) Nothing Nothing  (Just "Settings") ( Just "settings")
-  res <- ($) liftIO $ answerInlineQuery telegramToken request manager
+  res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
       _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
@@ -419,7 +416,7 @@ inlineVerse' iqId verseRef@VerseReference{..} = do
                                                              -- ^ Thumbnail height
                                                               ) (zip vs (verseRefRange verseRef))
       request = AnswerInlineQueryRequest iqId inlineQueryResults (Just 1) Nothing Nothing Nothing Nothing
-  res <- ($) liftIO $ answerInlineQuery telegramToken request manager
+  res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
       _ <- liftIO $ putStrLn $ "Error: " ++ (show e)

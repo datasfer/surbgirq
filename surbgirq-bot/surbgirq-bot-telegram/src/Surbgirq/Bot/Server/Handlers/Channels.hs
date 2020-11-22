@@ -9,7 +9,8 @@ module Surbgirq.Bot.Server.Handlers.Channels where
 import qualified Data.Text as T
 
 import Control.Monad.Reader
-import Web.Telegram.API.Bot
+
+import Surbgirq.Bot.Server.TelegramAPI
 
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses

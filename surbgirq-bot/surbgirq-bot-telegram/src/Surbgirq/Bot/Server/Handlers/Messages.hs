@@ -14,7 +14,6 @@ import qualified Data.Text       as T
 import Control.Monad.Reader
 
 import Surbgirq.Bot.Server.TelegramAPI
-import Web.Telegram.API.Bot            hiding (sendMessage)
 
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses

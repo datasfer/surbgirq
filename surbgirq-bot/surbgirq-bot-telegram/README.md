@@ -15,6 +15,9 @@ https://api.telegram.org/bot<token>/setWebhook?url=https://bot.datasfer.com/tg-w
 request:
 https://api.telegram.org/bot<token>/getWebHookInfo
 
+https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/getWebHookInfo
+https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/setWebhook?url=https://bot.datasfer.com/tg-webhook
+
 response:
 {
     "ok": true,
@@ -40,3 +43,9 @@ response:
 
 ## bot info
 https://api.telegram.org/bot<token>/getMe
+
+
+## local BOT API server
+
+- logout cloud Bot API server
+https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/logOut

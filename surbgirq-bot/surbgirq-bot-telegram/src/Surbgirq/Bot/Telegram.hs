@@ -44,9 +44,9 @@ import Servant
 import Servant.Server
 import System.Environment
 import Text.Regex.Posix
-import Web.Telegram.API.Bot
 
 import Surbgirq.Bot.App
+import Surbgirq.Bot.Server.TelegramAPI
 import Surbgirq.Bot.Types
 
 ------------------------------------------------------------
@@ -59,6 +59,8 @@ import Surbgirq.Bot.Types
 --         logger.info("Using local bot API, logout result: %s", r.text)
 -- print "API endpoint: %s", bot.base_url
 
+--
+-- https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/logOut
 startApp :: String -> String -> Int -> IO ()
 startApp dbName botApiUrl port = do
   putStrLn "Surbgirq bot started..."

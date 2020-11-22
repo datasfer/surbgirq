@@ -29,6 +29,7 @@ library
 --  ghc-options:   -Wall -Werror
   exposed-modules: Surbgirq.Bot.Telegram
   
+                   Surbgirq.Bot.Server.Imports.TelegramAPI
                    Surbgirq.Bot.Server.TelegramAPI
                    Surbgirq.Bot.Help
                    Surbgirq.Bot.Server

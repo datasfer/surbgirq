@@ -39,7 +39,6 @@ import Servant
 import Servant.Server
 import System.Environment
 import Text.Regex.Posix
-import Web.Telegram.API.Bot
 
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Server

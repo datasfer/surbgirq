@@ -8,7 +8,8 @@ module Surbgirq.Bot.Server.Helpers.Pagination where
 import Data.Text                     (Text)
 import Text.InterpolatedString.Perl6 (qc)
 
-import Web.Telegram.API.Bot
+import Surbgirq.Bot.Server.TelegramAPI
+
 
 import qualified Data.Text as T (pack, unpack)
 

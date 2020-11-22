@@ -23,7 +23,6 @@ import Control.Monad.Reader
 import Lucid
 
 import Surbgirq.Bot.Server.TelegramAPI
-import Web.Telegram.API.Bot            hiding (sendMessage)
 
 import Surbgirq.Bot.ClientRequests
 import Surbgirq.Bot.Help
@@ -216,7 +215,7 @@ sendTextInlineReplyKb keyboard chatId msg = do
 
             -- SendMessageRequest chatId msg Nothing Nothing Nothing Nothing (Just keyborad)
         request = AnswerInlineQueryRequest msg [inlineQuery] (Just 1) Nothing Nothing Nothing Nothing
-    res <- ($) liftIO $ answerInlineQuery telegramToken request manager
+    res <- ($) answerInlineQuery telegramToken request manager
     liftIO $ putStrLn $ show res
     return ()
 

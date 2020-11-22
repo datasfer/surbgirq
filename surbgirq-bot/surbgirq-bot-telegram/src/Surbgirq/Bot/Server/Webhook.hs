@@ -1,8 +1,8 @@
 
 module Surbgirq.Bot.Server.Webhook where
 
-import Data.Version         (makeVersion, showVersion)
-import Web.Telegram.API.Bot (Token(..), Update)
+import Data.Version                    (makeVersion, showVersion)
+import Surbgirq.Bot.Server.TelegramAPI (Token(..), Update)
 
 
 import Control.Monad.Except

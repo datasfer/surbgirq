@@ -18,7 +18,8 @@ Implement Settings inline keyboards and callback query handlers
 
 module Surbgirq.Bot.Server.Settings.InlineSetting where
 
-import Web.Telegram.API.Bot
+
+import Surbgirq.Bot.Server.TelegramAPI
 
 import Data.Set                      (Set)
 import Data.Text                     (Text)

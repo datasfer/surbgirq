@@ -5,8 +5,7 @@ module Surbgirq.Bot.Help where
 import           Data.Text (Text)
 import qualified Data.Text as T
 
-import Web.Telegram.API.Bot
-
+import Surbgirq.Bot.Server.TelegramAPI
 
 
 
