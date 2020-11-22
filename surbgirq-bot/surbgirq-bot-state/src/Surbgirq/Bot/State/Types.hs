@@ -25,12 +25,12 @@ import Surbgirq.Types
 type UserConfigMap = Map UserId UserSettings
 
 data BotState = BotState
- { state'users   :: [BotUser]
+ { state'users   :: [BotAppUser]
  , state'configs :: UserConfigMap
 
  } deriving (Show, Generic)
 
-data BotUser = BotUser
+data BotAppUser = BotAppUser
  { userId    :: UserId
  , firstName :: String
  , lastName  :: String
@@ -54,12 +54,12 @@ instance Default BotState where
     def = BotState mempty mempty
 
 instance Default UserSettings where
-    def = UserSettings "ejmiacin1994#" mempty "gevNarek#" mempty False EN
+    def = UserSettings "e1994#" mempty "gevNarek#" mempty False EN
 
 $(deriveJSON dropPrefixOptions ''BotState)
 
-instance FromJSON BotUser
-instance ToJSON BotUser
+instance FromJSON BotAppUser
+instance ToJSON BotAppUser
 instance ToJSONKey UserId
 instance FromJSONKey UserId
 instance ToJSON UserId

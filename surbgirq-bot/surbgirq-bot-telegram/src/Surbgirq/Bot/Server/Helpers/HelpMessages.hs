@@ -1,13 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Surbgirq.Bot.Help where
+module Surbgirq.Bot.Server.Helpers.HelpMessages where
 
 import           Data.Text (Text)
 import qualified Data.Text as T
 
 import Surbgirq.Bot.Server.TelegramAPI
-
-
 
 
 -- | A help message to show on conversation start with bot.

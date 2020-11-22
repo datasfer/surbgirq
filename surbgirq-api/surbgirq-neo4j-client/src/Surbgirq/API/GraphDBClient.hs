@@ -3,7 +3,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 -- | Client for the Surbgirq neo4j graph db web API
-module Surbgirq.API.GraphDBClient where
+module Surbgirq.API.GraphDBClient
+    ( getAllBooks'
+    , getVerseRange'
+    , getOneVerse'
+    , getChapterSections'
+    , getChapterOneSection'
+    , getBookSections'
+    , getChapterVerseNumber'
+
+    , getAllBooks
+    )where
 
 import Control.Applicative
 import Control.Monad
@@ -29,7 +39,9 @@ import Surbgirq.Types
 --
 -------------------------------------------------------------------------------
 
-
+-- | Api schema of .net core web api, that expose neo4j data
+-- haskell neo4j driver doesnot support neo4j 4.* this is the reason
+-- we develope net core web api to get neo4j data
 type GraphDBLocalAPI =
          "scripture" :> "books" :> Get '[JSON] [Book]
 --    :<|> GetVerseRange -- /chapter/verse/matthew/1/1/10"
@@ -106,48 +118,48 @@ getAllBooks mgr = runClientM getAllBooks'
 
 
 
-getVerseRange
-  :: Manager
-  -> Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum
-  -> IO (Either ClientError [Verse])
-getVerseRange mgr dialect girq ch from to = runClientM (getVerseRange' dialect girq ch from to)
-                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+-- getVerseRange
+--   :: Manager
+--   -> Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum
+--   -> IO (Either ClientError [Verse])
+-- getVerseRange mgr dialect girq ch from to = runClientM (getVerseRange' dialect girq ch from to)
+--                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)
 
 
-getOneVerse
-  :: Manager
-  -> Dialect -> Girq -> ChapterNum -> VerseNum
-  -> IO (Either ClientError [Verse])
-getOneVerse mgr dialect girq ch from = runClientM (getOneVerse' dialect girq ch from)
-                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+-- getOneVerse
+--   :: Manager
+--   -> Dialect -> Girq -> ChapterNum -> VerseNum
+--   -> IO (Either ClientError [Verse])
+-- getOneVerse mgr dialect girq ch from = runClientM (getOneVerse' dialect girq ch from)
+--                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)
 
 
 
-getBookSections
-  :: Manager
-  -> Dialect -> Girq
-  -> IO (Either ClientError [Section])
-getBookSections mgr dialect girq = runClientM (getBookSections' dialect girq)
-                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+-- getBookSections
+--   :: Manager
+--   -> Dialect -> Girq
+--   -> IO (Either ClientError [Section])
+-- getBookSections mgr dialect girq = runClientM (getBookSections' dialect girq)
+--                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)
 
-getChapterSections
-  :: Manager
-  -> Dialect -> Girq -> ChapterNum
-  -> IO (Either ClientError [Section])
-getChapterSections mgr dialect girq ch = runClientM (getChapterSections' dialect girq ch)
-                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+-- getChapterSections
+--   :: Manager
+--   -> Dialect -> Girq -> ChapterNum
+--   -> IO (Either ClientError [Section])
+-- getChapterSections mgr dialect girq ch = runClientM (getChapterSections' dialect girq ch)
+--                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)
 
-getChapterOneSection
-  :: Manager
-  -> Dialect -> Girq -> ChapterNum -> SectionNum
-  -> IO (Either ClientError [Section])
-getChapterOneSection mgr dialect girq ch sec = runClientM (getChapterOneSection' dialect girq ch sec)
-                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+-- getChapterOneSection
+--   :: Manager
+--   -> Dialect -> Girq -> ChapterNum -> SectionNum
+--   -> IO (Either ClientError [Section])
+-- getChapterOneSection mgr dialect girq ch sec = runClientM (getChapterOneSection' dialect girq ch sec)
+--                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)
 
 
-getChapterVerseNumber
-  :: Manager
-  -> Girq -> ChapterNum
-  -> IO (Either ClientError Int)
-getChapterVerseNumber mgr girq ch = runClientM (getChapterVerseNumber' girq ch)
-                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+-- getChapterVerseNumber
+--   :: Manager
+--   -> Girq -> ChapterNum
+--   -> IO (Either ClientError Int)
+-- getChapterVerseNumber mgr girq ch = runClientM (getChapterVerseNumber' girq ch)
+--                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)

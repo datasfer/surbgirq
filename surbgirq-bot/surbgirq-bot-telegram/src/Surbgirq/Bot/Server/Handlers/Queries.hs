@@ -60,7 +60,6 @@ import Surbgirq.Bot.Server.TelegramAPI
 
 
 import Surbgirq.Bot.ClientRequests
-import Surbgirq.Bot.Help
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
@@ -83,10 +82,11 @@ handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
   onCommand query_query
   cfg <- getUserConfig (UserId user_id)
   liftIO $ putStrLn $  show cfg
+
   where
     iqId = query_id
     onCommand (T.stripPrefix "/random" -> Just _)   = return ()
-    onCommand (parseVerseRef  -> Right verseRef)    = inlineVerse' iqId verseRef
+    onCommand (parseVerseRef  -> Right verseRef)    = inlineVerse' (UserId user_id) iqId verseRef
     onCommand (all isSpace . T.unpack   -> True)    = inlineSettings iqId
     onCommand str                                   = do
                                   liftIO $ print $ T.append "=================== Unknown Command"  str
@@ -145,7 +145,7 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
           editRespuesta chatId msg_id [qc|Bibles - choosed {bibleName}|] $ Just (biblesKeyboardMarkup bibleName)
 
 
-      onCommand cfg (T.stripPrefix "parallel-armBible#" -> Just _) = editRespuesta chatId msg_id "Parallel Armenian Bibles config" $ Just armBiblesKeyboardMarkup
+      --onCommand cfg (T.stripPrefix "parallel-armBible#" -> Just _) = editRespuesta chatId msg_id "Parallel Armenian Bibles config" $ Just armBiblesKeyboardMarkup
       onCommand cfg (T.stripPrefix "ruBible#" -> Just _) = editRespuesta chatId msg_id "Russian Bibles" $ Just ruBiblesKeyboardMarkup
       onCommand cfg (T.stripPrefix "parallel-ruBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just ruBiblesKeyboardMarkup
       onCommand cfg (T.stripPrefix "enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just enBiblesKeyboardMarkup
@@ -186,10 +186,14 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
 
       -- Pagination btn callbacks
 
-      onCommand cfg (T.stripPrefix "go_to_verseRef#" -> Just args) = do
+      onCommand UserSettings{..} (T.stripPrefix "go_to_verseRef#" -> Just args) = do
         case parseVerseRef args of
           Right verseRef@VerseReference{..} -> do
-            vs <- liftIO $ getVerse' chatId verseRef
+            let dialect = case config'bible of
+                            "e1994-T" -> Ashxarhabar
+                            "v1805-T" -> Grabar
+                            _         -> Ashxarhabar
+            vs <- liftIO $ getVerse' dialect chatId verseRef
             let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml verseRef)
 
             liftIO $ putStrLn $ show verseRef
@@ -326,15 +330,15 @@ inlineQuote qFn iqId args = do
 
 
 -- | Surbgirq inline queries
-inlineVerse :: Text -> [String] -> Bot ()
-inlineVerse iqId args = do
+inlineVerse :: UserId -> Text -> [String] -> Bot ()
+inlineVerse userId iqId args = do
   let arg = intercalate " " args
       vRef = parseVerseRef $ T.pack arg
   case vRef of
     Left e ->  do
               _ <- liftIO $ putStrLn $ "Verse Reference parse error: " ++ (show e)
               return ()
-    Right vRef -> inlineVerse' iqId vRef
+    Right vRef -> inlineVerse' userId iqId vRef
 
 
 inlineSettings :: Text -> Bot ()
@@ -378,10 +382,16 @@ inlineSettings iqId = do
 
 
 
-inlineVerse' :: Text -> VerseReference -> Bot ()
-inlineVerse' iqId verseRef@VerseReference{..} = do
+inlineVerse' :: UserId -> Text -> VerseReference -> Bot ()
+inlineVerse' userId iqId verseRef@VerseReference{..} = do
   BotConfig{..} <- ask
-  vs <- liftIO $ getVerses Ashxarhabar verseRef
+  cfg <- getUserConfig  userId
+  let dialect = case config'bible cfg of
+                  "v1994-T" -> Ashxarhabar
+                  "v1805-T" -> Grabar
+                  _         -> Ashxarhabar
+
+  vs <- liftIO $ getVerses dialect verseRef
          -- liftIO $ case verseRef'to of
          --     Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum <$> verseRef'from)
          --     Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)

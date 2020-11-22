@@ -25,9 +25,9 @@ import Lucid
 import Surbgirq.Bot.Server.TelegramAPI
 
 import Surbgirq.Bot.ClientRequests
-import Surbgirq.Bot.Help
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Monad
+import Surbgirq.Bot.Server.Helpers.HelpMessages
 import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
@@ -139,13 +139,13 @@ sendVerse' sendAtOnce chatId vRef@VerseReference{..} = do
 
 
 
-getVerse' :: ChatId -> VerseReference -> IO [Verse]
-getVerse' chatId vRef@VerseReference{..} = getVerses Ashxarhabar vRef
+getVerse' :: Dialect -> ChatId -> VerseReference -> IO [Verse]
+getVerse' dialect chatId vRef@VerseReference{..} = getVerses dialect vRef
 
 
 getVerses :: Dialect -> VerseReference -> IO [Verse]
 getVerses dialect vRef@VerseReference{..} = do
-  maxVerseNum <- liftIO $ getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
+  maxVerseNum <- getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
   case (verseRef'from, verseRef'to) of
     (Nothing, Nothing)   -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
     (Just from, Nothing) -> getOneVerseHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)

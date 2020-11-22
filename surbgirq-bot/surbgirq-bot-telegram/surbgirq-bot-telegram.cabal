@@ -31,7 +31,9 @@ library
   
                    Surbgirq.Bot.Server.Imports.TelegramAPI
                    Surbgirq.Bot.Server.TelegramAPI
-                   Surbgirq.Bot.Help
+
+                   Surbgirq.Bot.Server.Helpers.HelpMessages
+
                    Surbgirq.Bot.Server
                    Surbgirq.Bot.Server.Handlers
                    Surbgirq.Bot.Server.Handlers.Channels

@@ -143,12 +143,12 @@ biblesKeyboard chName = map (map (toKbd chName)) booksBible ++ [[backToSetting]]
 
 
 
-armBiblesKeyboardMarkup = InlineKeyboardMarkup armBiblesKeyboard
-armBiblesKeyboard =
-    let grabar1895 = mkInlineBtn "Գրաբար 1895" "grabar1895#"
-        grabar1905 = mkInlineBtn "Գրաբար 1905" "grabar1905#"
-        ejmiacin1994 = mkInlineBtn "Էջմիածին 1994" "ejmiacin1994#"
-    in [[grabar1895, grabar1905, ejmiacin1994], [backToSetting]]
+-- armBiblesKeyboardMarkup = InlineKeyboardMarkup armBiblesKeyboard
+-- armBiblesKeyboard =
+--     let v1805 = mkInlineBtn "Գրաբար 1805" "v1895#"
+--         -- grabar1905 = mkInlineBtn "Գրաբար 1905" "grabar1905#"
+--         e1994 = mkInlineBtn "Էջմիածին 1994" "e1994#"
+--     in [[e1994, v1805], [backToSetting]]
 
 -- Russian Bible's sub menu
 ruBiblesKeyboardMarkup = InlineKeyboardMarkup ruBiblesKeyboard
@@ -227,7 +227,7 @@ data Menu = Menu
 -- | Menu and sub menu titles and schema
 -- http://www.biblesociety.am/main.php?testament_id=5&book_id=150&chapter_id=2621&submit=%3E%3E&lang=a&content=bible&page-id=8&subpage-id=3
 booksBible :: [ [(Text,Text)] ]
-booksBible = [ [("Գրաբար 1805", "v1805-T"), ("Գրաբար 1905", "grabar1905#")]
+booksBible = [ [("Գրաբար 1805", "v1805-T")]
              , [("«Էջմիածին» թարգմանություն 1994", "e1994-T")]
              , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "e2004-T")]
              , [("Sinodial", "ruSinodial#")]
@@ -235,8 +235,8 @@ booksBible = [ [("Գրաբար 1805", "v1805-T"), ("Գրաբար 1905", "grabar1
              ]
 
 booksNarek :: [ [(Text,Text)] ]
-booksNarek = [ [("Նարեկ Գրաբար", "grabarNarek#"), ("Նարեկ Խերանյան", "xerNarek#")]
-             , [("Նարեկ Գևորգյան", "gevNarek#"), ("Նարեկ Գօչունեան", "gochNarek#")]
+booksNarek = [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խերանյան)", "xerNarek#")]
+             , [("Նարեկ(Գևորգյան)", "gevNarek#"), ("Նարեկ(Գօչունեան)", "gochNarek#")]
              , [("Книга скорбных песнопений", "ruNarek#")]
              , [("Book of Lamentations", "enNarek#")]
              ]
