@@ -19,6 +19,7 @@ import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
 import Surbgirq.Bot.Server.Settings.KeyboardMarkups
 import Surbgirq.Bot.Types
+import Surbgirq.Types
 import Surbgirq.Utils
 ------------------------------------------------------------
 --
@@ -73,7 +74,9 @@ handleMessage msg@Message{..} = do
 
 
 showSettings :: ChatId -> Bot ()
-showSettings chatId = sendTextReplyKb enSettingsKeyboardReplyMarkup chatId "Settings"
+showSettings chatId = do
+    -- lang <- getLanguage
+    sendTextReplyKb (settingsKeyboardReplyMarkup EN) chatId "Settings"
 
 testMd :: ChatId -> Bot ()
 testMd chatId = do

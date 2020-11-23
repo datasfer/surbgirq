@@ -14,13 +14,20 @@ module Surbgirq.Bot.Server.Settings.KeyboardMarkups where
 
 import Surbgirq.Bot.Server.TelegramAPI
 
+import Control.Monad.Reader          (ask)
 import Data.Set                      (Set)
 import Data.Text                     (Text)
 import Text.InterpolatedString.Perl6 (qc)
 
 import qualified Data.Set as Set
 
+import Surbgirq.Bot.Monad
+import Surbgirq.Bot.Server.Helpers.HelpMessages
+import Surbgirq.Bot.State
+import Surbgirq.Bot.Store
+import Surbgirq.Bot.Types
 import Surbgirq.Types
+
 
 ------------------------------------------------------------
 --
@@ -30,69 +37,60 @@ import Surbgirq.Types
 --
 
 -- | seems this is for first time show the keyboard
-settingsKeyboardMarkup lang =
-    case lang of
-         AM -> InlineKeyboardMarkup amSettingsKeyboard
-         EN -> InlineKeyboardMarkup enSettingsKeyboard
-         RU -> InlineKeyboardMarkup ruSettingsKeyboard
+settingsKeyboardMarkup lang = InlineKeyboardMarkup (settingsKeyboard lang)
 
 -- | English Menu
-enSettingsKeyboardReplyMarkup = ReplyInlineKeyboardMarkup enSettingsKeyboard
-enSettingsKeyboard =
-    let bibles = mkInlineBtn "Bibles" "bibles#"
-        -- ruBible = mkInlineBtn "Библия" "ruBible#"
-        -- enBible = mkInlineBtn "Bible" "enBible#"
-        narek = mkInlineBtn "Narek" "narek#"
-        parallelNarek = mkInlineBtn "Narek Parallel Translations" "parallelNarek#"
-        parallelBible = mkInlineBtn "Bible Parallel Translations" "parallelBible#"
-        subscribe = mkInlineBtn "Subscribe" "subscribe-bible#"
-        amMenuLang = mkInlineBtn "Armenian" "menu-amlang#"
-        ruMenuLang = mkInlineBtn "Russian" "menu-rulang#"
+settingsKeyboardReplyMarkup lang = ReplyInlineKeyboardMarkup (settingsKeyboard lang)
+
+settingsKeyboard lang  =
+    let
+        toMsg = i18n lang
+        bibles = mkInlineBtn (toMsg Bibles) "bibles#"
+        narek  = mkInlineBtn (toMsg Narek) "narek#"
+        parallelNarek = mkInlineBtn (toMsg NarekParallel) "parallelNarek#"
+        parallelBible = mkInlineBtn (toMsg BiblesParallel) "parallelBible#"
+        subscribe = mkInlineBtn (toMsg Subscription) "subscribe-bible#"
+        amMenuLang = mkInlineBtn (toMsg Armenian) "menu-amlang#"
+        ruMenuLang = mkInlineBtn (toMsg Russian) "menu-rulang#"
+        enMenuLang = mkInlineBtn (toMsg English) "menu-enlang#"
+        ls = case lang of
+          EN -> [amMenuLang, ruMenuLang]
+          RU -> [amMenuLang, enMenuLang]
+          AM -> [enMenuLang, ruMenuLang]
     in [ [bibles, parallelBible]
 --       , [ruBible, enBible]
        , [narek, parallelNarek]
        , [subscribe]
-       , [amMenuLang, ruMenuLang]
+       , ls
        ]
 
--- | Armenian Menu
-amSettingsKeyboardMarkup = InlineKeyboardMarkup amSettingsKeyboard
-amSettingsKeyboard =
-    let bibles = mkInlineBtn "Աստուածաշունչ Մատեան" "bibles#"
-        -- ruBible = mkInlineBtn "Библия" "ruBible#"
-        -- enBible = mkInlineBtn "Bible" "enBible#"
-        narek = mkInlineBtn "Նարեկացի" "narek#"
-        parallelNarek = mkInlineBtn "Նարեկ Զւոգահեռ Թարգմանություններ" "parallelNarek#"
-        parallelBible = mkInlineBtn "Աստուածաշունչ Զւոգահեռ Թարգմանություններ" "parallelBible#"
-        subscribe = mkInlineBtn "Բաժանորդագրվել" "subscribe-bible#"
-        enMenuLang = mkInlineBtn "Անգլրերն" "menu-enlang#"
-        ruMenuLang = mkInlineBtn "Ռուսերեն" "menu-rulang#"
-    in [ [bibles, parallelBible]
---       , [ruBible, enBible]
-       , [narek, parallelNarek]
-       , [subscribe]
-       , [enMenuLang, ruMenuLang]
+
+
+booksBible :: Language -> [ [(Text,Text)] ]
+booksBible lang =
+    let toMsg = i18n lang
+        grabar = toMsg  Grabar1805
+    in [ [(grabar, "v1805-T")]
+       , [("«Էջմիածին» թարգմանություն 1994", "e1994-T")]
+       , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "e2004-T")]
+       , [("Sinodial", "ruSinodial#")]
+       , [("KJV", "kjv-T"), ("EVN", "envBible#")]
        ]
 
--- | Russian Menu
-ruSettingsKeyboardMarkup = InlineKeyboardMarkup ruSettingsKeyboard
-ruSettingsKeyboard =
-    let bibles = mkInlineBtn "Библия" "bibles#"
-        -- ruBible = mkInlineBtn "Библия" "ruBible#"
-        -- enBible = mkInlineBtn "Bible" "enBible#"
-        narek = mkInlineBtn "Григор Нарекаци" "narek#"
-        parallelNarek = mkInlineBtn "Нарекаци параллельные переводы" "parallelNarek#"
-        parallelBible = mkInlineBtn "Библия параллельные переводы" "parallelBible#"
-        subscribe = mkInlineBtn "Подписаться" "subscribe-bible#"
-        enMenuLang = mkInlineBtn "Английский" "menu-enlang#"
-        amMenuLang = mkInlineBtn "Армянский" "menu-amlang#"
-    in [ [bibles]
-       , [parallelBible]
---       , [ruBible, enBible]
-       , [narek, parallelNarek]
-       , [subscribe]
-       , [enMenuLang, amMenuLang]
-       ]
+booksNarek :: [ [(Text,Text)] ]
+booksNarek = [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խերանյան)", "xerNarek#")]
+             , [("Նարեկ(Գևորգյան)", "gevNarek#"), ("Նարեկ(Գօչունեան)", "gochNarek#")]
+             , [("Книга скорбных песнопений", "ruNarek#")]
+             , [("Book of Lamentations", "enNarek#")]
+             ]
+
+getLanguage :: Int -> Bot Language
+getLanguage userId = do
+  BotConfig{..} <- ask
+  cfg <- getUserConfig (UserId userId)
+  let  lang = config'menuLanguage cfg
+
+  return lang
 
 
 
@@ -107,20 +105,6 @@ subscriptionKeyboard =
 -- | Menu and sub menu titles and schema
 -- http://www.biblesociety.am/main.php?testament_id=5&book_id=150&chapter_id=2621
 -- &submit=%3E%3E&lang=a&content=bible&page-id=8&subpage-id=3
-booksBible :: [ [(Text,Text)] ]
-booksBible = [ [("Գրաբար 1805", "v1805-T")]
-             , [("«Էջմիածին» թարգմանություն 1994", "e1994-T")]
-             , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "e2004-T")]
-             , [("Sinodial", "ruSinodial#")]
-             , [("KJV", "kjv-T"), ("EVN", "envBible#")]
-             ]
-
-booksNarek :: [ [(Text,Text)] ]
-booksNarek = [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խերանյան)", "xerNarek#")]
-             , [("Նարեկ(Գևորգյան)", "gevNarek#"), ("Նարեկ(Գօչունեան)", "gochNarek#")]
-             , [("Книга скорбных песнопений", "ruNarek#")]
-             , [("Book of Lamentations", "enNarek#")]
-             ]
 
 -- | parallel sub menu
 -- parallelBiblesKeyboardMarkup = InlineKeyboardMarkup parallelBiblesKeyboard
@@ -129,11 +113,11 @@ booksNarek = [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խե�
 --         ruBible = mkInlineBtn "Библия" "parallel-ruBible#"
 --         enBible = mkInlineBtn "Bible" "parallel-enBible#"
 --     in [[armBible, ruBible, enBible], [backToSetting]]
-parallelBiblesKeyboardMarkup :: Set Text -> InlineKeyboardMarkup
-parallelBiblesKeyboardMarkup ss = InlineKeyboardMarkup (parallelBiblesKeyboard "parallelBibleItem#" ss)
+parallelBiblesKeyboardMarkup :: Language -> Set Text -> InlineKeyboardMarkup
+parallelBiblesKeyboardMarkup lang ss = InlineKeyboardMarkup (parallelBiblesKeyboard lang "parallelBibleItem#" ss)
 
-parallelBiblesKeyboard :: Text -> Set Text -> [[InlineKeyboardButton]]
-parallelBiblesKeyboard cmdPrefix xs = map (map toKbd ) booksBible ++ [[backToSetting]]
+parallelBiblesKeyboard :: Language -> Text -> Set Text -> [[InlineKeyboardButton]]
+parallelBiblesKeyboard lang cmdPrefix xs = map (map toKbd ) (booksBible lang) ++ [[backToSetting]]
     where
       toKbd :: (Text,Text) -> InlineKeyboardButton
       toKbd (title, cb_data) =
@@ -159,11 +143,11 @@ nareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title d)
 -- Existing bible setting, version, translation and etc
 
 --  Armenian Bible's sub menu
-biblesKeyboardMarkup :: Text -> InlineKeyboardMarkup
-biblesKeyboardMarkup chName = InlineKeyboardMarkup (biblesKeyboard chName)
+biblesKeyboardMarkup :: Language -> Text -> InlineKeyboardMarkup
+biblesKeyboardMarkup lang chName = InlineKeyboardMarkup (biblesKeyboard lang chName)
 
-biblesKeyboard :: Text -> [[InlineKeyboardButton]]
-biblesKeyboard chName = map (map (toKbd chName)) booksBible ++ [[backToSetting]]
+biblesKeyboard :: Language -> Text -> [[InlineKeyboardButton]]
+biblesKeyboard lang chName = map (map (toKbd chName)) (booksBible lang) ++ [[backToSetting]]
     where
       toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
       toKbd checkedName (title, cb_data) =
@@ -254,4 +238,45 @@ data Menu = Menu
 
  }
 
+
+
+
+-- -- | Armenian Menu
+-- amSettingsKeyboardMarkup = InlineKeyboardMarkup amSettingsKeyboard
+-- amSettingsKeyboard =
+--     let bibles = mkInlineBtn "Աստուածաշունչ Մատեան" "bibles#"
+--         -- ruBible = mkInlineBtn "Библия" "ruBible#"
+--         -- enBible = mkInlineBtn "Bible" "enBible#"
+--         narek = mkInlineBtn "Նարեկացի" "narek#"
+--         parallelNarek = mkInlineBtn "Նարեկ Զւոգահեռ Թարգմանություններ" "parallelNarek#"
+--         parallelBible = mkInlineBtn "Աստուածաշունչ Զւոգահեռ Թարգմանություններ" "parallelBible#"
+--         subscribe = mkInlineBtn "Բաժանորդագրվել" "subscribe-bible#"
+--         enMenuLang = mkInlineBtn "Անգլրերն" "menu-enlang#"
+--         ruMenuLang = mkInlineBtn "Ռուսերեն" "menu-rulang#"
+--     in [ [bibles, parallelBible]
+-- --       , [ruBible, enBible]
+--        , [narek, parallelNarek]
+--        , [subscribe]
+--        , [enMenuLang, ruMenuLang]
+--        ]
+
+-- -- | Russian Menu
+-- ruSettingsKeyboardMarkup = InlineKeyboardMarkup ruSettingsKeyboard
+-- ruSettingsKeyboard =
+--     let bibles = mkInlineBtn "Библия" "bibles#"
+--         -- ruBible = mkInlineBtn "Библия" "ruBible#"
+--         -- enBible = mkInlineBtn "Bible" "enBible#"
+--         narek = mkInlineBtn "Григор Нарекаци" "narek#"
+--         parallelNarek = mkInlineBtn "Нарекаци параллельные переводы" "parallelNarek#"
+--         parallelBible = mkInlineBtn "Библия параллельные переводы" "parallelBible#"
+--         subscribe = mkInlineBtn "Подписаться" "subscribe-bible#"
+--         enMenuLang = mkInlineBtn "Английский" "menu-enlang#"
+--         amMenuLang = mkInlineBtn "Армянский" "menu-amlang#"
+--     in [ [bibles]
+--        , [parallelBible]
+-- --       , [ruBible, enBible]
+--        , [narek, parallelNarek]
+--        , [subscribe]
+--        , [enMenuLang, amMenuLang]
+--        ]
 
