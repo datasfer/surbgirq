@@ -17,7 +17,7 @@ import Surbgirq.Bot.Server.TelegramAPI
 
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
-import Surbgirq.Bot.Server.Settings.InlineSetting
+import Surbgirq.Bot.Server.Settings.KeyboardMarkups
 import Surbgirq.Bot.Types
 import Surbgirq.Utils
 ------------------------------------------------------------
@@ -60,8 +60,9 @@ handleMessage msg@Message{..} = do
     onCommand (T.stripPrefix "/random" -> Just _)        = sendBooks_ chatId
     onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
     onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
-    onCommand (T.stripPrefix "/start"  -> Just _)        = sendTextReplyKb settingsKeyboardReplyMarkup chatId "Settings for surbgirq bot"
-    onCommand (T.stripPrefix "/settings"  -> Just _)     = sendTextReplyKb settingsKeyboardReplyMarkup chatId "Settings for surbgirq bot"
+
+    onCommand (T.stripPrefix "/start"  -> Just _)        = showSettings chatId
+    onCommand (T.stripPrefix "/settings"  -> Just _)     = showSettings chatId
     onCommand (parseVerseRef  -> Right verseRef)         = sendVerse' True chatId verseRef
     onCommand _                                          = sendHelpMessage chatId
 
@@ -71,7 +72,8 @@ handleMessage msg@Message{..} = do
     --                                 -- sendHelpMessage chatId
 
 
-
+showSettings :: ChatId -> Bot ()
+showSettings chatId = sendTextReplyKb enSettingsKeyboardReplyMarkup chatId "Settings"
 
 testMd :: ChatId -> Bot ()
 testMd chatId = do

@@ -10,9 +10,10 @@ import qualified Data.Text as T
 import Control.Monad.Reader
 
 import Surbgirq.Bot.Monad
+import Surbgirq.Bot.Server.Handlers.CallbackQueries
 import Surbgirq.Bot.Server.Handlers.Channels
+import Surbgirq.Bot.Server.Handlers.InlineQueries
 import Surbgirq.Bot.Server.Handlers.Messages
-import Surbgirq.Bot.Server.Handlers.Queries
 
 import Web.Telegram.API.Bot (Update(..))
 

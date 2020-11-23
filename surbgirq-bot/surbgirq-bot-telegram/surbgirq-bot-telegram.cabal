@@ -37,12 +37,13 @@ library
                    Surbgirq.Bot.Server
                    Surbgirq.Bot.Server.Handlers
                    Surbgirq.Bot.Server.Handlers.Channels
-                   Surbgirq.Bot.Server.Handlers.Queries
+                   Surbgirq.Bot.Server.Handlers.CallbackQueries
+                   Surbgirq.Bot.Server.Handlers.InlineQueries
                    Surbgirq.Bot.Server.Handlers.Messages
 
                    Surbgirq.Bot.Server.Responses
                    Surbgirq.Bot.Server.Webhook
-                   Surbgirq.Bot.Server.Settings.InlineSetting
+                   Surbgirq.Bot.Server.Settings.KeyboardMarkups
                    Surbgirq.Bot.Server.Helpers.Pagination
                    Surbgirq.Bot.Monad
                    Surbgirq.Bot.ClientRequests
