@@ -1,23 +1,28 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE ViewPatterns      #-}
 
 
 module Surbgirq.Bot.Server.Handlers.Messages where
 
-import Data.List (intercalate, intersperse)
+import Data.Default
 
+import Data.List                     (intercalate, intersperse)
+import Data.Maybe                    (maybe)
+import Text.InterpolatedString.Perl6 (qc)
 
 import qualified Data.Map.Strict as M
 import qualified Data.Text       as T
 
 import Control.Monad.Reader
 
-import Surbgirq.Bot.Server.TelegramAPI
-
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Responses
 import Surbgirq.Bot.Server.Settings.KeyboardMarkups
+import Surbgirq.Bot.Server.TelegramAPI
+import Surbgirq.Bot.State
+import Surbgirq.Bot.Store
 import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
@@ -33,11 +38,22 @@ handleMessage msg@Message{..} = do
   -- liftIO $ putStrLn $ "Message id -> " ++ (show $ message_id msg)
   -- liftIO $ putStrLn $ "Message text -> " ++ (T.unpack messageText)
   -- liftIO $ putStrLn $ "Chat id -> " ++ (show $ chat_id $ chat msg)
-  liftIO $ putStrLn $ "Message: " ++ (show msg)
+  let userId = UserId $ maybe 0 user_id  from
+  -- case u_id of
+  --   Just uId -> initUserSettings uId def
+  --   Nothing   -> do
+  --               liftIO $ putStrLn $ "Erro: message has not from: to get user_id " ++ (show msg)
+  --               return ()
+  liftIO $ putStrLn [qc|=========== Message Handler {msg} Message =================|]
+  liftIO $ putStrLn [qc|=========== u_id {userId}|]
+
+  BotConfig{..} <- ask
+  cfg <- getUserConfig userId
+
   case text of
     Nothing -> do
               liftIO $ putStrLn $ ">>>>>> Message text is null: \n" ++ (show msg)
-    Just messageText -> onCommand messageText
+    Just messageText -> onCommand userId messageText
 
   -- liftIO $ atomically $ do
   -- state@BotState{..} <- readTVar tvar
@@ -50,22 +66,22 @@ handleMessage msg@Message{..} = do
     chatId = ChatId $ chat_id chat
     Just messageText = text
 
-    onCommand (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
-    onCommand (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse True chatId verseRef
-    onCommand (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse True chatId verseRef
-    onCommand (T.stripPrefix "/chapter" -> Just args)    = sendChapterSections chatId args
-    onCommand (T.stripPrefix "/books" -> Just book)      = sendBooks chatId book
-    onCommand (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
-    onCommand (T.stripPrefix "/mihatov" -> Just _)       = sendBooks_ chatId
-    onCommand (T.stripPrefix "/today" -> Just _)         = sendBooks_ chatId
-    onCommand (T.stripPrefix "/random" -> Just _)        = sendBooks_ chatId
-    onCommand (T.stripPrefix "/md" -> Just _)            = testMd chatId
-    onCommand (T.stripPrefix "/html" -> Just _)          = testHtml chatId
+    onCommand userId (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
+    onCommand userId (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse True chatId verseRef
+    onCommand userId (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse True chatId verseRef
+    onCommand userId (T.stripPrefix "/chapter" -> Just args)    = sendChapterSections chatId args
+    onCommand userId (T.stripPrefix "/books" -> Just book)      = sendBooks chatId book
+    onCommand userId (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
+    onCommand userId (T.stripPrefix "/mihatov" -> Just _)       = sendBooks_ chatId
+    onCommand userId (T.stripPrefix "/today" -> Just _)         = sendBooks_ chatId
+    onCommand userId (T.stripPrefix "/random" -> Just _)        = sendBooks_ chatId
+    onCommand userId (T.stripPrefix "/md" -> Just _)            = testMd chatId
+    onCommand userId (T.stripPrefix "/html" -> Just _)          = testHtml chatId
 
-    onCommand (T.stripPrefix "/start"  -> Just _)        = showSettings chatId
-    onCommand (T.stripPrefix "/settings"  -> Just _)     = showSettings chatId
-    onCommand (parseVerseRef  -> Right verseRef)         = sendVerse' True chatId verseRef
-    onCommand _                                          = sendHelpMessage chatId
+    onCommand userId (T.stripPrefix "/start" -> Just _)         = showSettings chatId userId
+    onCommand userId (T.stripPrefix "/settings" -> Just _)      = showSettings chatId userId
+    onCommand userId (parseVerseRef  -> Right verseRef)         = sendVerse' True chatId verseRef
+    onCommand _ _                                               = sendHelpMessage chatId
 
     -- onCommand str                                        = do
     --                               liftIO $ print $ T.append "=================== Unknown Command"  str
@@ -73,10 +89,11 @@ handleMessage msg@Message{..} = do
     --                                 -- sendHelpMessage chatId
 
 
-showSettings :: ChatId -> Bot ()
-showSettings chatId = do
-    -- lang <- getLanguage
-    sendTextReplyKb (settingsKeyboardReplyMarkup EN) chatId "Settings"
+showSettings :: ChatId -> UserId -> Bot ()
+showSettings chatId userId = do
+    lang <- getLanguage ( unUserId userId)
+    liftIO $ putStrLn [qc|=========== UserId {userId} | lang: {lang}|]
+    sendTextReplyKb (settingsKeyboardReplyMarkup lang) chatId "Settings"
 
 testMd :: ChatId -> Bot ()
 testMd chatId = do

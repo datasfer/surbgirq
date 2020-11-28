@@ -25,6 +25,25 @@ import Surbgirq.Types.Girq
 class HasId a where
     toId :: a -> Text
 
+
+data BibleTranslation = E1994T
+                      | E2004T
+                      | V1805T
+                      | SinodalT
+                      | KJVT
+                 deriving (Eq, Generic)
+
+instance ToJSON BibleTranslation
+instance FromJSON BibleTranslation
+
+instance Show BibleTranslation where
+    show t = case t of
+               E1994T   -> "e1994#"
+               E2004T   -> "e2004#"
+               V1805T   -> "v1805#"
+               SinodalT -> "sinodal#"
+               KJVT     -> "kjv#"
+
 data Testament = Old
                | New
                  deriving (Show, Eq,  Read, Generic)

@@ -31,9 +31,9 @@ data BotState = BotState
  } deriving (Show, Generic)
 
 data BotAppUser = BotAppUser
- { userId    :: UserId
- , firstName :: String
- , lastName  :: String
+ { botAppUser'userId    :: UserId
+ , botAppUser'firstName :: String
+ , botAppUser'lastName  :: String
  } deriving (Show, Generic)
 
 

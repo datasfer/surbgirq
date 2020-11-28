@@ -63,15 +63,64 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
         Nothing        -> ChatId $ fromIntegral $ user_id
 
       -- | Show settings Menu
-      onCommand cfg (T.stripPrefix "settings#" -> Just _) = editRespuesta chatId msg_id "Settings for surbgirq bot" $ Just (settingsKeyboardMarkup (config'menuLanguage cfg))
+      onCommand cfg (T.stripPrefix "settings#" -> Just _) =
+          editRespuesta chatId msg_id "Settings for surbgirq bot" $
+                        Just (settingsKeyboardMarkup (config'menuLanguage cfg))
 
-      --  sub menu items of bile menu -  handler
+      -- | Top Menu Item Handlers
+      onCommand cfg (T.stripPrefix "bibles#" -> Just _) = do
+          cfg <- getUserConfig (UserId user_id)
+          let  lang = config'menuLanguage cfg
+          editRespuesta chatId msg_id "Bibles- " $ Just (biblesKeyboardMarkup lang $ config'bible cfg)
+
+      onCommand cfg (T.stripPrefix "narek#" -> Just _) =
+          editRespuesta chatId msg_id "Arm Narek- translations" $ Just nareksKeyboardMarkup
+
+      onCommand cfg (T.stripPrefix "parallelNarek#" -> Just _) = editRespuesta chatId msg_id "Parallel Narek- config" $ Just parallelNareksKeyboardMarkup
+      onCommand cfg (T.stripPrefix "parallelBible#" -> Just _) = do
+        cfg <- getUserConfig (UserId user_id)
+        let  lang = config'menuLanguage cfg
+        editRespuesta chatId msg_id "Parallel Bible- config" $ Just (parallelBiblesKeyboardMarkup lang $ config'parallelBibles cfg)
+
+      onCommand cfg (T.stripPrefix "subscribe-dailybible#" -> Just _) = do
+        tvar <- asks state
+        st <- liftIO $ readTVarIO tvar
+
+        liftIO $ putStrLn [qc|=========== Bot Config {st}|]
+--        buttons <- liftIO $ inline_page_buttons "category" 0
+        let buttons = generatePageBtns 0 1 12 "go_to#" "args"
+        editRespuesta chatId msg_id "Daily bible subscribtion is currently <b>enabled</b>" $
+                       -- Just $ InlineKeyboardMarkup buttons
+                      Just subscriptionKeyboardMarkup
+
+
+      onCommand cfg (T.stripPrefix "menu-amlang#" -> Just _) = do
+        let cfg' = cfg {config'menuLanguage = AM}
+        modifyUserConfig userId cfg'
+        liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'}|]
+        tvar <- asks state
+        st <- liftIO $ readTVarIO tvar
+
+        liftIO $ putStrLn [qc|=========== Bot Config {st}|]
+        setLang cfg userId AM
+        editRespuesta chatId msg_id "Կարգավորումներ" $ Just (settingsKeyboardMarkup AM)
+
+      onCommand cfg (T.stripPrefix "menu-enlang#" -> Just _) = do
+        setLang cfg userId EN
+        editRespuesta chatId msg_id "Settings" $ Just (settingsKeyboardMarkup EN)
+
+      onCommand cfg (T.stripPrefix "menu-rulang#" -> Just _) = do
+        setLang cfg userId RU
+        editRespuesta chatId msg_id "Настройки" $ Just (settingsKeyboardMarkup RU)
+
+      -- end Top menu items
+
+      -- | sub menu items of bile menu -  handler
       onCommand cfg (T.stripPrefix "bibleItem#" -> Just arg) = do
 
           let bibleName = T.strip arg
               cfg' = cfg { config'bible = bibleName }
           us <- modifyUserConfig userId cfg'
-          cfg <- getUserConfig (UserId user_id)
           let  lang = config'menuLanguage cfg
 
           liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'} - returned {us}|]
@@ -86,18 +135,6 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
       onCommand cfg (T.stripPrefix "enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible- translations" $ Just enBiblesKeyboardMarkup
 
 
-      onCommand cfg (T.stripPrefix "narek#" -> Just _) = editRespuesta chatId msg_id "Arm Narek- translations" $ Just nareksKeyboardMarkup
-      onCommand cfg (T.stripPrefix "bibles#" -> Just _) = do
-          cfg <- getUserConfig (UserId user_id)
-          let  lang = config'menuLanguage cfg
-          editRespuesta chatId msg_id "Bibles- " $ Just (biblesKeyboardMarkup lang $ config'bible cfg)
-
-      onCommand cfg (T.stripPrefix "parallelNarek#" -> Just _) = editRespuesta chatId msg_id "Parallel Narek- config" $ Just parallelNareksKeyboardMarkup
-      onCommand cfg (T.stripPrefix "parallelBible#" -> Just _) = do
-        cfg <- getUserConfig (UserId user_id)
-        let  lang = config'menuLanguage cfg
-        editRespuesta chatId msg_id "Parallel Bible- config" $ Just (parallelBiblesKeyboardMarkup lang $ config'parallelBibles cfg)
-
       onCommand cfg (T.stripPrefix "parallelBibleItem#" -> Just arg) = do
           let bibleName = T.strip arg
               biblesSet = config'parallelBibles cfg
@@ -107,33 +144,14 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
                      else Set.insert bibleName biblesSet
               cfg' = cfg { config'parallelBibles = pSet }
           us <- modifyUserConfig userId cfg'
-          cfg <- getUserConfig (UserId user_id)
           let  lang = config'menuLanguage cfg
 
           liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'} - returned {us}|]
           liftIO $ putStrLn [qc|=========== modifed settings user: {bibleName} |]
-          editRespuesta chatId msg_id [qc|Parallel Bibles - choosed {pSet}|] $ Just (parallelBiblesKeyboardMarkup lang pSet)
+          editRespuesta chatId msg_id [qc|Parallel Bibles - choosed {pSet}|] $
+                        Just (parallelBiblesKeyboardMarkup lang pSet)
 
       -- Menu language
-      onCommand cfg (T.stripPrefix "menu-amlang#" -> Just _) = do
-        let cfg' = cfg {config'menuLanguage = AM}
-        modifyUserConfig userId cfg'
-        liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'}|]
-        tvar <- asks state
-        st <- liftIO $ readTVarIO tvar
-
-        liftIO $ putStrLn [qc|=========== Bot Config {st}|]
-        editRespuesta chatId msg_id "Կարգավորումներ" $ Just (settingsKeyboardMarkup AM)
-
-      onCommand cfg (T.stripPrefix "menu-enlang#" -> Just _) = do
-        let cfg' = cfg { config'menuLanguage = EN }
-        modifyUserConfig userId cfg'
-        editRespuesta chatId msg_id "Settings" $ Just (settingsKeyboardMarkup EN)
-
-      onCommand cfg (T.stripPrefix "menu-rulang#" -> Just _) = do
-        let cfg' = cfg { config'menuLanguage = RU }
-        modifyUserConfig userId cfg'
-        editRespuesta chatId msg_id "Настройки" $ Just (settingsKeyboardMarkup RU)
 
       -- Pagination btn callbacks
 
@@ -172,14 +190,6 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
 
         editRespuesta chatId msg_id [qc|Pagination  {page} bible subscribtion is currently <b>enabled</b>|] $ Just $ InlineKeyboardMarkup buttons --  subscriptionKeyboardMarkup
 
-      onCommand cfg (T.stripPrefix "subscribe-bible#" -> Just _) = do
-        tvar <- asks state
-        st <- liftIO $ readTVarIO tvar
-
-        liftIO $ putStrLn [qc|=========== Bot Config {st}|]
---        buttons <- liftIO $ inline_page_buttons "category" 0
-        let buttons = generatePageBtns 0 1 12 "go_to#" "args"
-        editRespuesta chatId msg_id "Daily bible subscribtion is currently <b>enabled</b>" $ Just $ InlineKeyboardMarkup buttons --  subscriptionKeyboardMarkup
 
       -- onCommand (T.stripPrefix "template#" -> Just tName) = do
       --   let insult = "<- liftIO $ insultTemplate (T.unpack tName) >>= evalInsult"
@@ -224,6 +234,10 @@ editRespuesta chatId  msgId msg keyborad = do
 
 
 
+setLang :: UserSettings -> UserId -> Language -> Bot UserSettings
+setLang cfg userId  lang = do
+    let cfg' = cfg { config'menuLanguage = lang }
+    modifyUserConfig userId cfg'
 
 
 

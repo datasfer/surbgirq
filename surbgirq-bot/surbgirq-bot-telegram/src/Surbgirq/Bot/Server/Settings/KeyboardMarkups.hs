@@ -42,6 +42,7 @@ settingsKeyboardMarkup lang = InlineKeyboardMarkup (settingsKeyboard lang)
 -- | English Menu
 settingsKeyboardReplyMarkup lang = ReplyInlineKeyboardMarkup (settingsKeyboard lang)
 
+-- | Top Menu
 settingsKeyboard lang  =
     let
         toMsg = i18n lang
@@ -49,23 +50,24 @@ settingsKeyboard lang  =
         narek  = mkInlineBtn (toMsg Narek) "narek#"
         parallelNarek = mkInlineBtn (toMsg NarekParallel) "parallelNarek#"
         parallelBible = mkInlineBtn (toMsg BiblesParallel) "parallelBible#"
-        subscribe = mkInlineBtn (toMsg Subscription) "subscribe-bible#"
+        subscribe = mkInlineBtn (toMsg Subscription) "subscribe-dailybible#"
         amMenuLang = mkInlineBtn (toMsg Armenian) "menu-amlang#"
         ruMenuLang = mkInlineBtn (toMsg Russian) "menu-rulang#"
         enMenuLang = mkInlineBtn (toMsg English) "menu-enlang#"
         ls = case lang of
           EN -> [amMenuLang, ruMenuLang]
-          RU -> [amMenuLang, enMenuLang]
+          RU -> [enMenuLang, amMenuLang]
           AM -> [enMenuLang, ruMenuLang]
     in [ [bibles, parallelBible]
---       , [ruBible, enBible]
        , [narek, parallelNarek]
        , [subscribe]
        , ls
        ]
 
+-- | Sub menus
 
 
+-- bibles#
 booksBible :: Language -> [ [(Text,Text)] ]
 booksBible lang =
     let toMsg = i18n lang
@@ -77,6 +79,7 @@ booksBible lang =
        , [("KJV", "kjv-T"), ("EVN", "envBible#")]
        ]
 
+-- narek#
 booksNarek :: [ [(Text,Text)] ]
 booksNarek = [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խերանյան)", "xerNarek#")]
              , [("Նարեկ(Գևորգյան)", "gevNarek#"), ("Նարեկ(Գօչունեան)", "gochNarek#")]
@@ -84,35 +87,16 @@ booksNarek = [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խե�
              , [("Book of Lamentations", "enNarek#")]
              ]
 
-getLanguage :: Int -> Bot Language
-getLanguage userId = do
-  BotConfig{..} <- ask
-  cfg <- getUserConfig (UserId userId)
-  let  lang = config'menuLanguage cfg
-
-  return lang
-
-
-
--- | Sub menus
-
+-- subscribe-dailybible#
 subscriptionKeyboardMarkup = InlineKeyboardMarkup subscriptionKeyboard
 subscriptionKeyboard =
     let subscribtionMode = mkInlineBtn "Turn Subscription mode on" "subscribtion-on#"
     in [[subscribtionMode], [backToSetting]]
 
 
--- | Menu and sub menu titles and schema
--- http://www.biblesociety.am/main.php?testament_id=5&book_id=150&chapter_id=2621
--- &submit=%3E%3E&lang=a&content=bible&page-id=8&subpage-id=3
 
--- | parallel sub menu
--- parallelBiblesKeyboardMarkup = InlineKeyboardMarkup parallelBiblesKeyboard
--- parallelBiblesKeyboard =
---     let armBible = mkInlineBtn "Աստուածաշունչ Մատեան" "parallel-armBible#"
---         ruBible = mkInlineBtn "Библия" "parallel-ruBible#"
---         enBible = mkInlineBtn "Bible" "parallel-enBible#"
---     in [[armBible, ruBible, enBible], [backToSetting]]
+
+
 parallelBiblesKeyboardMarkup :: Language -> Set Text -> InlineKeyboardMarkup
 parallelBiblesKeyboardMarkup lang ss = InlineKeyboardMarkup (parallelBiblesKeyboard lang "parallelBibleItem#" ss)
 
@@ -136,6 +120,25 @@ parallelNareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title [qc|p
 nareksKeyboardMarkup = InlineKeyboardMarkup parallelNareksKeyboard
 nareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title d)
                  in map toKbd booksNarek ++ [[backToSetting]]
+
+
+
+
+
+-- | Menu and sub menu titles and schema
+-- http://www.biblesociety.am/main.php?testament_id=5&book_id=150&chapter_id=2621
+-- &submit=%3E%3E&lang=a&content=bible&page-id=8&subpage-id=3
+
+-- | parallel sub menu
+-- parallelBiblesKeyboardMarkup = InlineKeyboardMarkup parallelBiblesKeyboard
+-- parallelBiblesKeyboard =
+--     let armBible = mkInlineBtn "Աստուածաշունչ Մատեան" "parallel-armBible#"
+--         ruBible = mkInlineBtn "Библия" "parallel-ruBible#"
+--         enBible = mkInlineBtn "Bible" "parallel-enBible#"
+--     in [[armBible, ruBible, enBible], [backToSetting]]
+
+
+
 
 
 
@@ -238,6 +241,13 @@ data Menu = Menu
 
  }
 
+getLanguage :: Int -> Bot Language
+getLanguage userId = do
+  BotConfig{..} <- ask
+  cfg <- getUserConfig (UserId userId)
+  let  lang = config'menuLanguage cfg
+
+  return lang
 
 
 

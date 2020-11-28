@@ -34,12 +34,12 @@ getUserConfig uId = do
   tvar <- asks state
   st@BotState{..} <- liftIO $ readTVarIO tvar
   let userCfg = Map.lookup uId state'configs
-  return $ case userCfg of
-      Nothing  -> def
-      Just cfg -> cfg
+  case userCfg of
+      Nothing  -> modifyUserConfig uId def
+      Just cfg -> return cfg
 
 
-
+-- modify or set user settings
 modifyUserConfig :: (MonadReader BotConfig m, MonadIO m) => UserId -> UserSettings ->  m UserSettings
 modifyUserConfig uId cfg = do
   tvar <- asks state
@@ -50,5 +50,21 @@ modifyUserConfig uId cfg = do
 
     writeTVar tvar state'
     return cfg
+
+-- modify or set user settings
+initUserSettings :: (MonadReader BotConfig m, MonadIO m) => UserId -> UserSettings ->  m ()
+initUserSettings uId cfg = do
+  tvar <- asks state
+  liftIO $ atomically $ do
+    state@BotState{..} <- readTVar tvar
+    case Map.lookup uId state'configs of
+      Nothing -> do
+        let xs = Map.insert uId cfg state'configs
+            state' = state {state'configs = xs}
+        writeTVar tvar state'
+        return ()
+      Just c  -> return ()
+
+
 
 
