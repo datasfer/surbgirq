@@ -33,7 +33,20 @@ import Surbgirq.Types
 --
 ------------------------------------------------------------
 
--- | Inline Keyboard Markups
+-- | Inline Keyboard Markups Helpers
+mkInlineBtn text callback_data =
+    InlineKeyboardButton text Nothing (Just callback_data) Nothing Nothing Nothing Nothing
+
+backToSetting = mkInlineBtn "⮨ Back" "settings#"
+
+getLanguage :: Int -> Bot Language
+getLanguage userId = do
+  BotConfig{..} <- ask
+  cfg <- getUserConfig (UserId userId)
+  let  lang = config'menuLanguage cfg
+  return lang
+
+
 --
 
 -- | seems this is for first time show the keyboard
@@ -94,57 +107,15 @@ subscriptionKeyboard caption =
     in [[subscribtionMode], [backToSetting]]
 
 
---  Armenian Bible's sub menu
+-- | Books sub menu
 biblesKeyboardMarkup :: Language -> Text -> InlineKeyboardMarkup
-biblesKeyboardMarkup lang chName = InlineKeyboardMarkup (biblesKeyboard lang chName)
-
-biblesKeyboard :: Language -> Text -> [[InlineKeyboardButton]]
-biblesKeyboard lang chName = map (map (toKbd chName)) (booksBible lang) ++ [[backToSetting]]
-    where
-      toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
-      toKbd checkedName (title, cb_data) =
-          let name = if checkedName == cb_data
-                     then [qc|{title} ✝|]
-                     else title
-          in mkInlineBtn name [qc|bibleItem# {cb_data}|]
-
-
-parallelBiblesKeyboardMarkup :: Language -> Set Text -> InlineKeyboardMarkup
-parallelBiblesKeyboardMarkup lang ss = InlineKeyboardMarkup (parallelBiblesKeyboard lang "parallelBibleItem#" ss)
-
-parallelBiblesKeyboard :: Language -> Text -> Set Text -> [[InlineKeyboardButton]]
-parallelBiblesKeyboard lang cmdPrefix xs = map (map toKbd ) (booksBible lang) ++ [[backToSetting]]
-    where
-      toKbd :: (Text,Text) -> InlineKeyboardButton
-      toKbd (title, cb_data) =
-          let name = if Set.member cb_data xs
-                     then [qc|{title} ✝|]
-                     else title
-          in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
-
-
-parallelNareksKeyboardMarkup lang ss = InlineKeyboardMarkup (parallelNareksKeyboard lang "parallelNarekItem#" ss)
-parallelNareksKeyboard :: Language -> Text -> Set Text -> [[InlineKeyboardButton]]
-parallelNareksKeyboard lang cmdPrefix xs = map (map toKbd ) (booksNarek lang) ++ [[backToSetting]]
-    where
-      toKbd :: (Text,Text) -> InlineKeyboardButton
-      toKbd (title, cb_data) =
-          let name = if Set.member cb_data xs
-                     then [qc|{title} ✝|]
-                     else title
-          in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
-
-
--- parallelNareksKeyboard' = let toKbd = map (\(title, d) -> mkInlineBtn title [qc|parallelNarek# {d}|])
---                          in map toKbd booksNarek ++ [[backToSetting]]
-
-
+biblesKeyboardMarkup lang chName = InlineKeyboardMarkup (booksKeyboard (booksBible lang) "bibleItem#" chName)
 
 nareksKeyboardMarkup :: Language -> Text -> InlineKeyboardMarkup
-nareksKeyboardMarkup lang chName = InlineKeyboardMarkup (nareksKeyboard lang "narekItem#" chName)
+nareksKeyboardMarkup lang chName = InlineKeyboardMarkup (booksKeyboard (booksNarek lang) "narekItem#" chName)
 
-nareksKeyboard :: Language -> Text -> Text -> [[InlineKeyboardButton]]
-nareksKeyboard lang cmdPrefix chName = map (map (toKbd chName)) (booksNarek lang) ++ [[backToSetting]]
+booksKeyboard :: [[(Text, Text)]] -> Text -> Text -> [[InlineKeyboardButton]]
+booksKeyboard books cmdPrefix chName = map (map (toKbd chName)) books ++ [[backToSetting]]
     where
       toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
       toKbd checkedName (title, cb_data) =
@@ -153,9 +124,47 @@ nareksKeyboard lang cmdPrefix chName = map (map (toKbd chName)) (booksNarek lang
                      else title
           in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
 
+-- | Parallel Books sub menu
+parallelBiblesKeyboardMarkup :: Language -> Set Text -> InlineKeyboardMarkup
+parallelBiblesKeyboardMarkup lang ss = InlineKeyboardMarkup (parallelItemsKeyboard (booksBible lang) "parallelBibleItem#" ss)
+
+parallelNareksKeyboardMarkup :: Language -> Set Text -> InlineKeyboardMarkup
+parallelNareksKeyboardMarkup lang ss = InlineKeyboardMarkup (parallelItemsKeyboard (booksNarek lang) "parallelNarekItem#" ss)
+
+parallelItemsKeyboard :: [[(Text, Text)]] -> Text -> Set Text -> [[InlineKeyboardButton]]
+parallelItemsKeyboard books cmdPrefix xs = map (map toKbd ) books ++ [[backToSetting]]
+    where
+      toKbd :: (Text,Text) -> InlineKeyboardButton
+      toKbd (title, cb_data) =
+          let name = if Set.member cb_data xs
+                     then [qc|{title} ✝|]
+                     else title
+          in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+-- parallelNareksKeyboardMarkup lang ss = InlineKeyboardMarkup (parallelNareksKeyboard lang "parallelNarekItem#" ss)
+-- parallelNareksKeyboard :: Language -> Text -> Set Text -> [[InlineKeyboardButton]]
+-- parallelNareksKeyboard lang cmdPrefix xs = map (map toKbd ) (booksNarek lang) ++ [[backToSetting]]
+--     where
+--       toKbd :: (Text,Text) -> InlineKeyboardButton
+--       toKbd (title, cb_data) =
+--           let name = if Set.member cb_data xs
+--                      then [qc|{title} ✝|]
+--                      else title
+--           in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
 
 
 -- | Menu and sub menu titles and schema
@@ -171,10 +180,6 @@ nareksKeyboard lang cmdPrefix chName = map (map (toKbd chName)) (booksNarek lang
 --     in [[armBible, ruBible, enBible], [backToSetting]]
 
 
-
-
-
-
 -- |
 -- Existing bible setting, version, translation and etc
 
@@ -187,17 +192,17 @@ nareksKeyboard lang cmdPrefix chName = map (map (toKbd chName)) (booksNarek lang
 --     in [[e1994, v1805], [backToSetting]]
 
 -- Russian Bible's sub menu
-ruBiblesKeyboardMarkup = InlineKeyboardMarkup ruBiblesKeyboard
-ruBiblesKeyboard =
-    let sinodial = mkInlineBtn "Sinodial" "ruSinodial#"
-    in [[sinodial], [backToSetting]]
+-- ruBiblesKeyboardMarkup = InlineKeyboardMarkup ruBiblesKeyboard
+-- ruBiblesKeyboard =
+--     let sinodial = mkInlineBtn "Sinodial" "ruSinodial#"
+--     in [[sinodial], [backToSetting]]
 
 -- English Bible's versions  sub menu
-enBiblesKeyboardMarkup = InlineKeyboardMarkup enBiblesKeyboard
-enBiblesKeyboard =
-    let kjv = mkInlineBtn "KJV" "kjvBible#"
-        evn = mkInlineBtn "EVN" "envBible#"
-    in [ [kjv, evn], [backToSetting] ]
+-- enBiblesKeyboardMarkup = InlineKeyboardMarkup enBiblesKeyboard
+-- enBiblesKeyboard =
+--     let kjv = mkInlineBtn "KJV" "kjvBible#"
+--         evn = mkInlineBtn "EVN" "envBible#"
+--     in [ [kjv, evn], [backToSetting] ]
 
 
 
@@ -210,8 +215,6 @@ enBiblesKeyboard =
 
 -- armDialectsKeyboardMarkup  =  InlineKeyboardMarkup armDialectsKeyboard
 -- armDialectsKeyboard = [[grabarBtn, ashxarhabarBtn], [backToSetting]]
-
-
 
 
 -- -- Dialect's submenu
@@ -231,42 +234,24 @@ enBiblesKeyboard =
 -- enLangBtn = mkInlineBtn "English" "enLang#"
 
 -- Settings menu
-dialectBtn = mkInlineBtn "Dialect" "dialects#"
-languageBtn = mkInlineBtn "Languages" "languages#"
-backToSetting = mkInlineBtn "⮨ Back" "settings#"
+-- dialectBtn = mkInlineBtn "Dialect" "dialects#"
+-- languageBtn = mkInlineBtn "Languages" "languages#"
+
+-- -- checkBtn btn  = let txt = [qc|{ikb_text btn}++|]
+-- --                 in btn {ikb_text = txt}
 
 
+-- -- | A settings keyboard markup schema
+-- settingsKeyboardSchema =
+--      [ ("Dialect", ["Grabar", "Ashxarhabar" ])
+--      , ("Parallel Scriptures", [ "Grabar", "Russian" ])
+--      ]
 
+-- data Menu = Menu
+--  { menu'title :: Text
+--  , menu'data  :: Text
 
-
-mkInlineBtn text callback_data = InlineKeyboardButton text Nothing (Just callback_data) Nothing Nothing Nothing Nothing
-
-checkBtn btn  = let txt = [qc|{ikb_text btn}++|]
-                in btn {ikb_text = txt}
-
-
--- | A settings keyboard markup schema
-settingsKeyboardSchema =
-     [ ("Dialect", ["Grabar", "Ashxarhabar" ])
-     , ("Parallel Scriptures", [ "Grabar", "Russian" ])
-     ]
-
-
-
-data Menu = Menu
- { menu'title :: Text
- , menu'data  :: Text
-
- }
-
-getLanguage :: Int -> Bot Language
-getLanguage userId = do
-  BotConfig{..} <- ask
-  cfg <- getUserConfig (UserId userId)
-  let  lang = config'menuLanguage cfg
-
-  return lang
-
+--  }
 
 
 -- -- | Armenian Menu
