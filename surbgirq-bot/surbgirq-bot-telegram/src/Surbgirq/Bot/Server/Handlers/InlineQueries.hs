@@ -113,7 +113,7 @@ inlineVerse' userId iqId verseRef@VerseReference{..} = do
                                                              Nothing
                                                              -- ^ Thumbnail height
                                                               ) (zip vs (verseRefRange verseRef))
-      request = AnswerInlineQueryRequest iqId inlineQueryResults (Just 1) Nothing Nothing Nothing Nothing
+      request = AnswerInlineQueryRequest iqId inlineQueryResults apiCachTime Nothing Nothing Nothing Nothing
   res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
@@ -159,7 +159,7 @@ inlineSettings iqId = do
                                 -- ^ Thumbnail height
 
       request = AnswerInlineQueryRequest iqId [] -- [inlineSettingResult]
-                                              (Just 1) Nothing Nothing  (Just "Settings") ( Just "settings")
+                                              apiCachTime Nothing Nothing  (Just "Settings") ( Just "settings")
   res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do

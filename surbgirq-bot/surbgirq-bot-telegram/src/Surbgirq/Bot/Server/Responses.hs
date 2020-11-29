@@ -214,7 +214,7 @@ sendTextInlineReplyKb keyboard chatId msg = do
                                 -- ^ Thumbnail height
 
             -- SendMessageRequest chatId msg Nothing Nothing Nothing Nothing (Just keyborad)
-        request = AnswerInlineQueryRequest msg [inlineQuery] (Just 1) Nothing Nothing Nothing Nothing
+        request = AnswerInlineQueryRequest msg [inlineQuery] apiCachTime Nothing Nothing Nothing Nothing
     res <- ($) answerInlineQuery telegramToken request manager
     liftIO $ putStrLn $ show res
     return ()

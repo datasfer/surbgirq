@@ -20,9 +20,16 @@ import Surbgirq.Bot.State
 type State = TVar BotState
 
 data BotConfig = BotConfig
-  { telegramToken       :: Token
-  , botApiHost          :: Text -- custon telegram bot api
+  {
+  -- * Api wide settins
+    telegramToken       :: Token
+  -- ^ telegram bot token
+  , botApiHost          :: Text
+  -- ^ telegram bot api server host
   , botApiPort          :: Int
+  -- ^ telegram bot api server port
+  , apiCachTime         :: Maybe Int
+  -- ^ api wide cach time
 
   , facebookVerifyToken :: Text
   , facebookPageToken   :: Text
@@ -30,6 +37,7 @@ data BotConfig = BotConfig
   , facebookManager     :: Manager
   , ref                 :: IORef Int
   , state               :: State
+
   }
 
 

@@ -194,19 +194,11 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
           editRespuesta chatId msg_id [qc|Parallel Nareks - choosed {pSet}|] $
                         Just (parallelNareksKeyboardMarkup lang pSet)
 
-      --onCommand cfg (T.stripPrefix "parallel-armBible#" -> Just _) = editRespuesta chatId msg_id "Parallel Armenian Bibles config" $ Just armBiblesKeyboardMarkup
-      -- onCommand cfg (T.stripPrefix "ruBible#" -> Just _) = editRespuesta chatId msg_id "Russian Bibles" $ Just ruBiblesKeyboardMarkup
-      -- onCommand cfg (T.stripPrefix "parallel-ruBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just ruBiblesKeyboardMarkup
-      -- onCommand cfg (T.stripPrefix "parallel-enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible translations" $ Just enBiblesKeyboardMarkup
-      -- onCommand cfg (T.stripPrefix "enBible#" -> Just _) = editRespuesta chatId msg_id "Arm Bible- translations" $ Just enBiblesKeyboardMarkup
 
-
-
-      -- Menu language
-
-      -- Pagination btn callbacks
-
+      -- | verse pagination
       onCommand UserSettings{..} (T.stripPrefix "go_to_verseRef#" -> Just args) = do
+        liftIO $ putStrLn [qc|=========== verse pagination {args}|]
+
         case parseVerseRef args of
           Right verseRef@VerseReference{..} -> do
             let dialect = case config'bible of
@@ -229,6 +221,9 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
           Left e         -> error $ " failed parse verse in pagination " ++ show e
 
 
+
+
+      -- | pagination ellipsing logic demo
       onCommand cfg (T.stripPrefix "go_to#" -> Just args) = do
 
         let all@(x:y:_) = T.splitOn " " $ T.strip args
@@ -242,12 +237,6 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
         editRespuesta chatId msg_id [qc|Pagination  {page} bible subscribtion is currently <b>enabled</b>|] $ Just $ InlineKeyboardMarkup buttons --  subscriptionKeyboardMarkup
 
 
-      -- onCommand (T.stripPrefix "template#" -> Just tName) = do
-      --   let insult = "<- liftIO $ insultTemplate (T.unpack tName) >>= evalInsult"
-      --   respuesta chatId telegramToken manager insult
-      -- onCommand (T.stripPrefix "wordgroup#" -> Just wgName) = do
-      --   let ws = ["liftIO $ wordGroupWords", "(T.unpack wgName)"]
-      --   respuesta chatId telegramToken manager $ concat $ intersperse ", " ws
       onCommand _ _                                    = return ()
 
 

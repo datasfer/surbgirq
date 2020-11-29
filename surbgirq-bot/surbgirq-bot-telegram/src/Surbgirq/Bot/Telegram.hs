@@ -77,6 +77,7 @@ startApp dbName botApiUrl port = do
         { telegramToken = Token $ T.pack $ "bot" <> telegramToken'
         , botApiHost = T.pack botApiUrl
         , botApiPort = port
+        , apiCachTime = Just 333 --  amount of time in seconds that the result may be cached on the server.
         , facebookVerifyToken = fbVerifyToken
         , facebookPageToken = fbPageToken
         , manager = manager'
