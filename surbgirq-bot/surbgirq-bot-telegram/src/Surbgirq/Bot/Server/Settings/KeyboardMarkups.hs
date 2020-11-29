@@ -72,29 +72,41 @@ booksBible :: Language -> [ [(Text,Text)] ]
 booksBible lang =
     let toMsg = i18n lang
         grabar = toMsg  Grabar1805
-    in [ [(grabar, "v1805-T")]
-       , [("«Էջմիածին» թարգմանություն 1994", "e1994-T")]
-       , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "e2004-T")]
-       , [("Sinodial", "ruSinodial#")]
-       , [("KJV", "kjv-T"), ("EVN", "envBible#")]
+    in [ [(grabar, "v1805T")]
+       , [("«Էջմիածին» թարգմանություն 1994", "e1994T")]
+       , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "e2004T")]
+       , [("Sinodial", "sinodialT")]
+       , [("KJV", "KJVT"), ("EVN", "EVNT")]
        ]
 
 -- narek#
-booksNarek :: [ [(Text,Text)] ]
-booksNarek = [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խերանյան)", "xerNarek#")]
-             , [("Նարեկ(Գևորգյան)", "gevNarek#"), ("Նարեկ(Գօչունեան)", "gochNarek#")]
-             , [("Книга скорбных песнопений", "ruNarek#")]
-             , [("Book of Lamentations", "enNarek#")]
-             ]
+booksNarek :: Language ->  [ [(Text,Text)] ]
+booksNarek lang =
+    [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խերանյան)", "xerNarek#")]
+    , [("Նարեկ(Գևորգյան)", "gevNarek#"), ("Նարեկ(Գօչունեան)", "gochNarek#")]
+    , [("Книга скорбных песнопений", "ruNarek#")]
+    , [("Book of Lamentations", "enNarek#")]
+    ]
 
 -- subscribe-dailybible#
-subscriptionKeyboardMarkup = InlineKeyboardMarkup subscriptionKeyboard
-subscriptionKeyboard =
-    let subscribtionMode = mkInlineBtn "Turn Subscription mode on" "subscribtion-on#"
+subscriptionKeyboard caption =
+    let subscribtionMode = mkInlineBtn caption "subscribtion-on#"
     in [[subscribtionMode], [backToSetting]]
 
 
+--  Armenian Bible's sub menu
+biblesKeyboardMarkup :: Language -> Text -> InlineKeyboardMarkup
+biblesKeyboardMarkup lang chName = InlineKeyboardMarkup (biblesKeyboard lang chName)
 
+biblesKeyboard :: Language -> Text -> [[InlineKeyboardButton]]
+biblesKeyboard lang chName = map (map (toKbd chName)) (booksBible lang) ++ [[backToSetting]]
+    where
+      toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
+      toKbd checkedName (title, cb_data) =
+          let name = if checkedName == cb_data
+                     then [qc|{title} ✝|]
+                     else title
+          in mkInlineBtn name [qc|bibleItem# {cb_data}|]
 
 
 parallelBiblesKeyboardMarkup :: Language -> Set Text -> InlineKeyboardMarkup
@@ -111,15 +123,36 @@ parallelBiblesKeyboard lang cmdPrefix xs = map (map toKbd ) (booksBible lang) ++
           in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
 
 
-parallelNareksKeyboardMarkup = InlineKeyboardMarkup parallelNareksKeyboard
-parallelNareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title [qc|parallelNarek# {d}|])
-                         in map toKbd booksNarek ++ [[backToSetting]]
+parallelNareksKeyboardMarkup lang ss = InlineKeyboardMarkup (parallelNareksKeyboard lang "parallelNarekItem#" ss)
+parallelNareksKeyboard :: Language -> Text -> Set Text -> [[InlineKeyboardButton]]
+parallelNareksKeyboard lang cmdPrefix xs = map (map toKbd ) (booksNarek lang) ++ [[backToSetting]]
+    where
+      toKbd :: (Text,Text) -> InlineKeyboardButton
+      toKbd (title, cb_data) =
+          let name = if Set.member cb_data xs
+                     then [qc|{title} ✝|]
+                     else title
+          in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
+
+
+-- parallelNareksKeyboard' = let toKbd = map (\(title, d) -> mkInlineBtn title [qc|parallelNarek# {d}|])
+--                          in map toKbd booksNarek ++ [[backToSetting]]
 
 
 
-nareksKeyboardMarkup = InlineKeyboardMarkup parallelNareksKeyboard
-nareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title d)
-                 in map toKbd booksNarek ++ [[backToSetting]]
+nareksKeyboardMarkup :: Language -> Text -> InlineKeyboardMarkup
+nareksKeyboardMarkup lang chName = InlineKeyboardMarkup (nareksKeyboard lang "narekItem#" chName)
+
+nareksKeyboard :: Language -> Text -> Text -> [[InlineKeyboardButton]]
+nareksKeyboard lang cmdPrefix chName = map (map (toKbd chName)) (booksNarek lang) ++ [[backToSetting]]
+    where
+      toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
+      toKbd checkedName (title, cb_data) =
+          let name = if checkedName == cb_data
+                     then [qc|{title} ✝|]
+                     else title
+          in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
+
 
 
 
@@ -144,21 +177,6 @@ nareksKeyboard = let toKbd = map (\(title, d) -> mkInlineBtn title d)
 
 -- |
 -- Existing bible setting, version, translation and etc
-
---  Armenian Bible's sub menu
-biblesKeyboardMarkup :: Language -> Text -> InlineKeyboardMarkup
-biblesKeyboardMarkup lang chName = InlineKeyboardMarkup (biblesKeyboard lang chName)
-
-biblesKeyboard :: Language -> Text -> [[InlineKeyboardButton]]
-biblesKeyboard lang chName = map (map (toKbd chName)) (booksBible lang) ++ [[backToSetting]]
-    where
-      toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
-      toKbd checkedName (title, cb_data) =
-          let name = if checkedName == cb_data
-                     then [qc|{title} ✝|]
-                     else title
-          in mkInlineBtn name [qc|bibleItem# {cb_data}|]
-
 
 
 -- armBiblesKeyboardMarkup = InlineKeyboardMarkup armBiblesKeyboard

@@ -54,7 +54,7 @@ instance Default BotState where
     def = BotState mempty mempty
 
 instance Default UserSettings where
-    def = UserSettings "e1994#" mempty "gevNarek#" mempty False EN
+    def = UserSettings "e1994T" mempty "gevNarek#" mempty False EN
 
 $(deriveJSON dropPrefixOptions ''BotState)
 

@@ -134,3 +134,36 @@ instance I18n BibleTranslationsMsgs where
         Sinodal    -> "Sinodal"
         KJV        -> "KJV"
 
+data SubMenuTitleMsgs =
+          BiblesTile
+        | ParallelBibleTitle
+        | NarekTitle
+        | ParallelNarekTitle
+        | SubscriptionTitle
+        | SettingsMenuTitle
+
+
+instance I18n SubMenuTitleMsgs where
+  i18n lang v = case lang of
+
+    AM -> case v of
+            BiblesTile         -> "Աստուածաշունչ Մատեան"
+            ParallelBibleTitle -> "Աստուածաշունչ Մատեանի Զւոգահեռ Թարգմանություններ"
+            NarekTitle         -> "Նարեկացի"
+            ParallelNarekTitle -> "Նարեկ Զւոգահեռ Թարգմանություններ"
+            SubscriptionTitle  -> "Բաժանորդագրվել"
+            SettingsMenuTitle  ->  "Կարգավորումներ"
+    RU -> case v of
+            BiblesTile         -> "Библия"
+            ParallelBibleTitle -> "Библия параллельные переводы"
+            NarekTitle         -> "Григор Нарекаци"
+            ParallelNarekTitle -> "Нарекаци параллельные переводы"
+            SubscriptionTitle  -> "Подписаться"
+            SettingsMenuTitle  ->  "Настройки"
+    EN -> case v of
+            BiblesTile         -> "Bibles"
+            ParallelBibleTitle -> "Bibles Parallel Translations"
+            NarekTitle         -> "Narek"
+            ParallelNarekTitle -> "Narek Parallel Translations"
+            SubscriptionTitle  -> "Subscribe"
+            SettingsMenuTitle  ->  "Settings"
