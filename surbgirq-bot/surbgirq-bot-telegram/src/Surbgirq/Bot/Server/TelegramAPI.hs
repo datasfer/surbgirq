@@ -6,6 +6,7 @@ module Surbgirq.Bot.Server.TelegramAPI
     ( sendMessage
     , editMessageText
     , answerInlineQuery
+    , answerCallbackQuery
     , module TelegramBotAPI
     )where
 
@@ -33,6 +34,9 @@ import Surbgirq.Bot.Types
 
 answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> Bot (Either ClientError InlineQueryResponse)
 answerInlineQuery = runM Tg.answerInlineQueryM
+
+answerCallbackQuery :: Token -> AnswerCallbackQueryRequest -> Manager -> Bot (Either ClientError CallbackQueryResponse)
+answerCallbackQuery = runM Tg.answerCallbackQueryM
 
 sendMessage :: Token -> SendMessageRequest -> Manager -> Bot (Either ClientError MessageResponse)
 sendMessage = runM Tg.sendMessageM

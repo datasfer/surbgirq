@@ -37,7 +37,7 @@ import Surbgirq.Types
 mkInlineBtn text callback_data =
     InlineKeyboardButton text Nothing (Just callback_data) Nothing Nothing Nothing Nothing
 
-backToSetting = mkInlineBtn "⮨ Back" "settings#"
+backToSetting = mkInlineBtn "⮨ Back" "goBackToSettings#"
 
 getLanguage :: Int -> Bot Language
 getLanguage userId = do

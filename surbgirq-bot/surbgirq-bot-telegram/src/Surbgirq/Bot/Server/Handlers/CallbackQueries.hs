@@ -19,8 +19,10 @@ import Data.IORef
 import Lucid
 
 import Control.Concurrent.STM        (readTVarIO)
+import Control.Monad                 (void)
 import Control.Monad.Reader          (ask, asks, liftIO)
 import Data.Maybe                    (fromMaybe)
+import Data.Text                     (Text)
 import Text.InterpolatedString.Perl6 (qc)
 
 import qualified Data.Set       as Set
@@ -44,9 +46,9 @@ import Surbgirq.Utils
 ------------------------------------------------------------
 
 handleCallbackQuery :: CallbackQuery -> Bot ()
-handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
+handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
   BotConfig{..} <- ask
-  liftIO $ putStrLn [qc|=========== callback Query {cqy}|]
+  liftIO $ putStrLn [qc|=========== callback Query {cbq}|]
   cfg <- getUserConfig (UserId user_id)
   let  lang = config'menuLanguage cfg
   liftIO $ putStrLn [qc|=========== User settings {cfg}|]
@@ -63,26 +65,32 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
         Just cqMessage -> ChatId $ chat_id $ chat cqMessage
         Nothing        -> ChatId $ fromIntegral $ user_id
 
-      -- | Show settings Menu
-      onCommand cfg (T.stripPrefix "settings#" -> Just _) =
+      -- | Back button - Go back to Settings button handler
+      onCommand cfg (T.stripPrefix "goBackToSettings#" -> Just _) = do
           editRespuesta chatId msg_id "Settings for surbgirq bot" $
                         Just (settingsKeyboardMarkup (config'menuLanguage cfg))
+          showToolTip cqId $ Just "Settings Main Menu"
 
       -- | Top Menu Item Handlers
       onCommand cfg (T.stripPrefix "bibles#" -> Just _) = do
-          let  lang = config'menuLanguage cfg
-               title = T.unpack $ i18n lang BiblesTile
-          editRespuesta chatId msg_id title $ Just (biblesKeyboardMarkup lang $ config'bible cfg)
+        BotConfig{..} <- ask
+        let  lang = config'menuLanguage cfg
+             title = T.unpack $ i18n lang BiblesTile
+        editRespuesta chatId msg_id title $ Just (biblesKeyboardMarkup lang $ config'bible cfg)
+        showToolTip cqId Nothing
+
 
       onCommand cfg (T.stripPrefix "narek#" -> Just _) = do
           let  lang = config'menuLanguage cfg
                title = T.unpack $ i18n lang NarekTitle
           editRespuesta chatId msg_id title $ Just (nareksKeyboardMarkup lang $ config'narek cfg)
+          showToolTip cqId $ Just "Narek's books Sub Menu"
 
       onCommand cfg (T.stripPrefix "parallelNarek#" -> Just _) = do
           let  lang = config'menuLanguage cfg
                title = T.unpack $ i18n lang ParallelNarekTitle
           editRespuesta chatId msg_id title $ Just (parallelNareksKeyboardMarkup lang $ config'parallelNarek cfg)
+          showToolTip cqId $ Just "Parallel Narek's books Sub Menu"
 
       onCommand cfg (T.stripPrefix "parallelBible#" -> Just _) = do
         cfg <- getUserConfig (UserId user_id)
@@ -90,11 +98,14 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
              title = T.unpack $ i18n lang ParallelBibleTitle
 
         editRespuesta chatId msg_id  title $ Just (parallelBiblesKeyboardMarkup lang $ config'parallelBibles cfg)
+        showToolTip cqId $ Just "Parallel Bibles Sub Menu"
 
       onCommand cfg (T.stripPrefix "subscribe-dailybible#" -> Just _) = do
-        tvar <- asks state
-        st <- liftIO $ readTVarIO tvar
-        liftIO $ putStrLn [qc|=========== Bot Config {st}|]
+        BotConfig{..} <- ask
+
+        -- tvar <- asks state
+        -- st <- liftIO $ readTVarIO tvar
+        -- liftIO $ putStrLn [qc|=========== Bot Config {st}|]
 --        buttons <- liftIO $ inline_page_buttons "category" 0
         let buttons = generatePageBtns 0 1 12 "go_to#" "args"
             lang = config'menuLanguage cfg
@@ -104,34 +115,42 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
             title = [qc|{i18n lang SubscriptionTitle} {enabledMode}|]
         editRespuesta chatId msg_id title $
                        -- Just $ InlineKeyboardMarkup buttons
-                      Just (InlineKeyboardMarkup $  subscriptionKeyboard "asd")
+                      Just (InlineKeyboardMarkup $  subscriptionKeyboard enabledMode)
+        showToolTip cqId Nothing
 
       onCommand cfg (T.stripPrefix "subscribe-on#" -> Just _) = return ()
 
       onCommand cfg (T.stripPrefix "menu-amlang#" -> Just _) = do
-        let cfg' = cfg {config'menuLanguage = AM}
-        modifyUserConfig userId cfg'
-        liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'}|]
-        tvar <- asks state
-        st <- liftIO $ readTVarIO tvar
+        BotConfig{..} <- ask
+        -- let cfg' = cfg {config'menuLanguage = AM}
+        -- modifyUserConfig userId cfg'
+        -- liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'}|]
+        -- tvar <- asks state
+        -- st <- liftIO $ readTVarIO tvar
 
-        liftIO $ putStrLn [qc|=========== Bot Config {st}|]
+        -- liftIO $ putStrLn [qc|=========== Bot Config {st}|]
 
         let title = T.unpack $ i18n lang SettingsMenuTitle
             lang = AM
         setLang cfg userId lang
         editRespuesta chatId msg_id title $ Just (settingsKeyboardMarkup lang)
+        showToolTip cqId $ Just "Set Menu language to AM"
 
       onCommand cfg (T.stripPrefix "menu-enlang#" -> Just _) = do
+        BotConfig{..} <- ask
         let title = T.unpack $ i18n lang SettingsMenuTitle
             lang = EN
         setLang cfg userId lang
         editRespuesta chatId msg_id title $ Just (settingsKeyboardMarkup lang)
+        showToolTip cqId $ Just  "Set Menu language to EN"
+
       onCommand cfg (T.stripPrefix "menu-rulang#" -> Just _) = do
+        BotConfig{..} <- ask
         let title = T.unpack $ i18n lang SettingsMenuTitle
             lang = RU
         setLang cfg userId lang
         editRespuesta chatId msg_id title $ Just (settingsKeyboardMarkup lang)
+        showToolTip cqId $ Just "Set Menu language to RU"
 
       -- end Top menu items
 
@@ -145,6 +164,7 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
           liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'} - returned {us}|]
           liftIO $ putStrLn [qc|=========== modifed settings user: {bibleName} |]
           editRespuesta chatId msg_id [qc|Bibles - choosed {bibleName}|] $ Just (biblesKeyboardMarkup lang bibleName)
+          showToolTip cqId $ Just bibleName
 
       -- | Parallel Bible Sub menu items handler
       onCommand cfg (T.stripPrefix "parallelBibleItem#" -> Just arg) = do
@@ -162,6 +182,7 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
           liftIO $ putStrLn [qc|=========== modifed settings user: {bibleName} |]
           editRespuesta chatId msg_id [qc|Parallel Bibles - choosed {pSet}|] $
                         Just (parallelBiblesKeyboardMarkup lang pSet)
+          showToolTip cqId $ Just bibleName
 
 
 
@@ -176,6 +197,7 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
           liftIO $ putStrLn [qc|=========== modifed settings user: {narekTranslationName} |]
           editRespuesta chatId msg_id [qc|Narek - choosed {narekTranslationName}|] $
                         Just (nareksKeyboardMarkup lang narekTranslationName)
+          showToolTip cqId $ Just narekTranslationName
 
 
       onCommand cfg (T.stripPrefix "parallelNarekItem#" -> Just arg) = do
@@ -193,6 +215,7 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
           liftIO $ putStrLn [qc|=========== modifed settings user: {narekName} |]
           editRespuesta chatId msg_id [qc|Parallel Nareks - choosed {pSet}|] $
                         Just (parallelNareksKeyboardMarkup lang pSet)
+          showToolTip cqId $ Just narekName
 
 
       -- | verse pagination
@@ -217,6 +240,7 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
             liftIO $ print buttons
 
             editRespuesta chatId msg_id [qc|{verseHtml}|] $ Just $ InlineKeyboardMarkup buttons
+            showToolTip cqId $ Nothing
 
           Left e         -> error $ " failed parse verse in pagination " ++ show e
 
@@ -241,19 +265,19 @@ handleCallbackQuery cqy@CallbackQuery{cq_from = User{..},..} = do
 
 
 
-respuesta :: ChatId -> String -> Maybe ReplyKeyboard -> Bot ()
-respuesta chatId  msg keyborad = do
-  BotConfig{..} <- ask
-  let request = SendMessageRequest chatId (T.pack msg) Nothing Nothing Nothing Nothing keyborad
-  res <- ($) sendMessage telegramToken request manager
-  liftIO $ putStrLn "response: --------------------"
-  liftIO $ putStrLn $ show res
+-- respuesta :: ChatId -> String -> Maybe ReplyKeyboard -> Bot ()
+-- respuesta chatId  msg keyborad = do
+--   BotConfig{..} <- ask
+--   let request = SendMessageRequest chatId (T.pack msg) Nothing Nothing Nothing Nothing keyborad
+--   res <- ($) sendMessage telegramToken request manager
+--   liftIO $ putStrLn "response: --------------------"
+--   liftIO $ putStrLn $ show res
 
-  let id_ = case res of
-              Right rm -> message_id $ result rm
-              Left e   -> error $ show e
-  liftIO $ writeIORef ref id_
-  return ()
+--   let id_ = case res of
+--               Right rm -> message_id $ result rm
+--               Left e   -> error $ show e
+--   liftIO $ writeIORef ref id_
+--   return ()
 
 editRespuesta :: ChatId -> Int -> String -> Maybe InlineKeyboardMarkup -> Bot ()
 editRespuesta chatId  msgId msg keyborad = do
@@ -266,13 +290,20 @@ editRespuesta chatId  msgId msg keyborad = do
                 Nothing keyborad
   res <- ($) editMessageText telegramToken request manager
   liftIO $ putStrLn $ show res
-  let id_ = case res of
-              Right rm -> message_id $ result rm
-              Left e   -> error $ show e
-  liftIO $ putStrLn $ show id_
-  liftIO $ writeIORef ref id_
+  -- let id_ = case res of
+  --             Right rm -> message_id $ result rm
+  --             Left e   -> error $ show e
+  -- liftIO $ putStrLn $ show id_
+  -- liftIO $ writeIORef ref id_
   return ()
 
+-- | Show notification bar/popup tooltip
+-- and fix the "keep the loading circle turning on Android" issue
+showToolTip :: Text -> Maybe Text -> Bot ()
+showToolTip callback_id msg = do
+  BotConfig{..} <- ask
+  let request = AnswerCallbackQueryRequest callback_id msg Nothing Nothing (Just 0)
+  void $ answerCallbackQuery telegramToken request manager
 
 
 setLang :: UserSettings -> UserId -> Language -> Bot UserSettings

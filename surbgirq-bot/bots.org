@@ -18,6 +18,8 @@
 
       t.timestamps null: false
 
+** telewrap haskell package: wrapper for telegram-api package 
+   https://github.com/hcvst/telegram-wrapper/blob/master/src/Telewrap/Types.hs
    
 * Facebook Bot
 
@@ -39,3 +41,8 @@ https://medium.com/driven-by-code/facebook-messenger-bot-using-webhooks-e481218e
 
 ** sample in haskell
  https://github.com/witoldsz/semux-discord
+
+
+* Problems/issues
+InlineKeyboardButtons keep the loading circle turning on Android
+https://github.com/python-telegram-bot/python-telegram-bot/issues/428
