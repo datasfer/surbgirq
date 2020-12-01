@@ -82,9 +82,9 @@ inlineVerse' userId iqId verseRef@VerseReference{..} = do
   BotConfig{..} <- ask
   cfg <- getUserConfig  userId
   let dialect = case config'bible cfg of
-                  "v1994-T" -> Ashxarhabar
-                  "v1805-T" -> Grabar
-                  _         -> Ashxarhabar
+                  "v1994T" -> Ashxarhabar
+                  "v1805T" -> Grabar
+                  _        -> Ashxarhabar
 
   vs <- liftIO $ getVerses dialect verseRef
          -- liftIO $ case verseRef'to of

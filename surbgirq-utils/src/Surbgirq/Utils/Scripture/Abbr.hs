@@ -164,7 +164,7 @@ mat :: [Text]
 mat = matAm ++ matRu ++ matEn
   where
     matAm = ["Մատթէոս", "Մատթ.", "Մատթ", "Մտ"]
-    matEn = ["Matthew", "Mt", "Mat", "Matt","mat", "matt"]
+    matEn = ["Matthew", "Mt", "Mat", "Matt","mat", "matt", "mt"]
     matRu = []
 
 mark :: [Text]
