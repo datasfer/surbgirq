@@ -89,11 +89,11 @@ sendChapterSections chatId argString = do
       bookRes = (readMaybe  book) :: Maybe Girq
       chRes = ChapterNum <$> readMaybe chapter :: Maybe ChapterNum
       secRes = SectionNum <$>  readMaybe section :: Maybe SectionNum
-      dialect = Ashxarhabar
+      translation = E1994T
   secRes <- liftIO $ case (bookRes, chRes, secRes) of
-    (Just girq, Just chapter, Just section) -> Right <$> getChapterOneSectionHandler dialect girq chapter section
-    (Just girq, Just chapter, Nothing) -> Right <$> getChapterSectionsHandler dialect girq chapter
-    (Just girq, Nothing, Nothing) -> Right <$> getBookSectionsHandler dialect girq
+    (Just girq, Just chapter, Just section) -> Right <$> getChapterOneSectionHandler translation girq chapter section
+    (Just girq, Just chapter, Nothing) -> Right <$> getChapterSectionsHandler translation girq chapter
+    (Just girq, Nothing, Nothing) -> Right <$> getBookSectionsHandler translation girq
     (Nothing, _, _) ->  pure $ Left [qc|Failed parse book: {book}|]
   case secRes of
     Right secs -> do
@@ -146,11 +146,12 @@ getVerse' dialect chatId vRef@VerseReference{..} = getVerses dialect vRef
 getVerses :: Dialect -> VerseReference -> IO [Verse]
 getVerses dialect vRef@VerseReference{..} = do
   maxVerseNum <- getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
+  let translation = E1994T
   case (verseRef'from, verseRef'to) of
-    (Nothing, Nothing)   -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
-    (Just from, Nothing) -> getOneVerseHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)
-    (Just from, Just to) -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum from) (VerseNum <$> Just  to)
-    (Nothing, Just to)   -> getVerseRangeHandler dialect verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just to)
+    (Nothing, Nothing)   -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
+    (Just from, Nothing) -> getOneVerseHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)
+    (Just from, Just to) -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum from) (VerseNum <$> Just  to)
+    (Nothing, Just to)   -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just to)
 
 
 

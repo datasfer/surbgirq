@@ -94,7 +94,7 @@ inlineVerse' userId iqId verseRef@VerseReference{..} = do
   let inlineQueryResults = map (\(verse, vRef) ->
                                     InlineQueryResultArticle (toId vRef)
                                                              -- ^ Unique identifier for this result
-                                                             (Just $ T.pack $ show vRef)
+                                                             (Just $ toRefText vRef)
                                                              -- ^ Title of the result
                                                              (Just $ InputTextMessageContent (html2Text' verse vRef) (Just HTML) Nothing)
                                                              -- ^ Content of the message to be sent

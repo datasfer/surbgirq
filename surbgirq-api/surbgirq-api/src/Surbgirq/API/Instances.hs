@@ -23,6 +23,9 @@ instance ToHttpApiData Girq where
 instance ToHttpApiData Dialect where
   toUrlPiece = pack . capitalized . show
 
+instance ToHttpApiData TranslationID where
+  toUrlPiece = pack . show
+
 instance FromHttpApiData Girq where
   parseUrlPiece = bimap pack id . readEither . capitalized . unpack
 

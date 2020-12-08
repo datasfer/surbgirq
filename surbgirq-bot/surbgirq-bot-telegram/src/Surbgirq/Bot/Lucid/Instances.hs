@@ -13,9 +13,10 @@ import Text.InterpolatedString.Perl6 (qc)
 
 import qualified Data.Aeson      as A
 import qualified Data.Map.Strict as Map
-
+import qualified Data.Text       as T
 
 import Surbgirq.Types
+import Surbgirq.Utils
 
 ------------------------------------------------------------
 --
@@ -51,7 +52,7 @@ instance ToHtml Verse  where
 
 instance ToHtml VerseReference  where
     toHtml vRef@VerseReference{..} = do
-        let b = (bold_ $ toHtml $ show vRef)
+        let b = (bold_ $ toHtml $ T.unpack $ toRefText vRef)
         withNewLine b
     toHtmlRaw = toHtml
 

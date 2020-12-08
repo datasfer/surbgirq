@@ -46,21 +46,21 @@ getBooksHandler = do
 
 
 
-getVerseRangeHandler :: Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> IO [Verse]
-getVerseRangeHandler dialect girq ch v1 v2 = do
+getVerseRangeHandler :: TranslationID -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> IO [Verse]
+getVerseRangeHandler translation girq ch v1 v2 = do
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getVerseRange' dialect girq ch v1 v2 -- mgr
+  mres <- flip runClientM env $ getVerseRange' translation girq ch v1 v2 -- mgr
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a
 
 
-getOneVerseHandler :: Dialect -> Girq -> ChapterNum -> VerseNum -> IO [Verse]
-getOneVerseHandler dialect girq ch v1 = do
+getOneVerseHandler :: TranslationID -> Girq -> ChapterNum -> VerseNum -> IO [Verse]
+getOneVerseHandler translation girq ch v1 = do
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getOneVerse' dialect girq ch v1
+  mres <- flip runClientM env $ getOneVerse' translation girq ch v1
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a
@@ -68,30 +68,31 @@ getOneVerseHandler dialect girq ch v1 = do
 
 
 -- | Sections
-getBookSectionsHandler :: Dialect -> Girq -> IO [Section]
-getBookSectionsHandler dialect girq = do
+getBookSectionsHandler :: TranslationID -> Girq -> IO [Section]
+getBookSectionsHandler translation girq = do
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getBookSections' dialect girq
+  mres <- flip runClientM env $ getBookSections' translation girq
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a
 
-getChapterSectionsHandler :: Dialect -> Girq -> ChapterNum -> IO [Section]
-getChapterSectionsHandler dialect girq ch = do
+getChapterSectionsHandler :: TranslationID -> Girq -> ChapterNum -> IO [Section]
+getChapterSectionsHandler translation girq ch = do
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getChapterSections' dialect girq ch
+  mres <- flip runClientM env $ getChapterSections' translation girq ch
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a
 
 
-getChapterOneSectionHandler :: Dialect -> Girq -> ChapterNum -> SectionNum -> IO [Section]
-getChapterOneSectionHandler dialect girq ch sec = do
+getChapterOneSectionHandler :: TranslationID -> Girq -> ChapterNum -> SectionNum -> IO [Section]
+getChapterOneSectionHandler translation girq ch sec = do
+  let dialect = Ashxarhabar
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getChapterOneSection' dialect girq ch sec
+  mres <- flip runClientM env $ getChapterOneSection' translation girq ch sec
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a

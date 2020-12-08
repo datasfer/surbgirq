@@ -84,7 +84,7 @@ settingsKeyboard lang  =
 booksBible :: Language -> [ [(Text,Text)] ]
 booksBible lang =
     let toMsg = i18n lang
-        grabar = toMsg  Grabar1805
+        grabar = toMsg  V1805T
     in [ [(grabar, "v1805T")]
        , [("«Էջմիածին» թարգմանություն 1994", "e1994T")]
        , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "e2004T")]

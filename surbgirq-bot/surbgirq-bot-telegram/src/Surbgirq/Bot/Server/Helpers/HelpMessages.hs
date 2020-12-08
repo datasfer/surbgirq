@@ -103,36 +103,36 @@ class I18n a where
 
 
 
-data BibleTranslationsMsgs =
-          Grabar1805
-        | E1994
-        | E2004
-        | Sinodal
-        | KJV
+-- data BibleTranslationsMsgs =
+--           Grabar1805
+--         | E1994
+--         | E2004
+--         | Sinodal
+--         | KJV
 
 
 
-instance I18n BibleTranslationsMsgs where
+instance I18n TranslationID where
   i18n lang v = case lang of
 
     AM -> case v of
-        Grabar1805 -> "Գրաբար"
-        E1994      -> "Ս. ԷՋՄԻԱԾԻՆ (1994)"
-        E2004      -> "Ս. ԷՋՄԻԱԾԻՆ (2004)"
-        Sinodal    -> "Սինոդալ"
-        KJV        -> "KJV"
+        V1805T   -> "Գրաբար"
+        E1994T   -> "Ս. ԷՋՄԻԱԾԻՆ (1994)"
+        E2004T   -> "Ս. ԷՋՄԻԱԾԻՆ (2004)"
+        SinodalT -> "Սինոդալ"
+        KJVT     -> "KJV"
     RU -> case v of
-        Grabar1805 -> "RU grabar"
-        E1994      -> "E 1994"
-        E2004      -> "E 2004"
-        Sinodal    -> "Sinodal"
-        KJV        -> "KJV"
+        V1805T   -> "RU grabar"
+        E1994T   -> "E 1994"
+        E2004T   -> "E 2004"
+        SinodalT -> "Sinodal"
+        KJVT     -> "KJV"
     EN -> case v of
-        Grabar1805 -> "Classical Armenian"
-        E1994      -> "E 1994"
-        E2004      -> "E 2004"
-        Sinodal    -> "Sinodal"
-        KJV        -> "KJV"
+        V1805T   -> "Classical Armenian"
+        E1994T   -> "E 1994"
+        E2004T   -> "E 2004"
+        SinodalT -> "Sinodal"
+        KJVT     -> "KJV"
 
 data SubMenuTitleMsgs =
           BiblesTile

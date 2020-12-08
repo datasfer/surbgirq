@@ -20,9 +20,3 @@ import qualified Data.Map.Strict as Map
 import Surbgirq.Types.Girq
 
 
--- (  Մատթ. 3.1-12, Ղուկ. 3.1-18, Յովհ. 1.19-28
-abbrBooksAm :: Map Girq String -- AbbrMap
-abbrBooksAm = Map.fromList
-            [ (Matthew, "Մատթ.")
-            , (Mark, "Ղուկ.")
-            , (John, "Յովհ.")]

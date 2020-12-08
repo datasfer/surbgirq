@@ -25,19 +25,31 @@ import Surbgirq.Types.Girq
 class HasId a where
     toId :: a -> Text
 
+class CmdToken a where
+    cmdToken :: a -> Text
 
-data BibleTranslation = E1994T
-                      | E2004T
-                      | V1805T
-                      | SinodalT
-                      | KJVT
-                 deriving (Eq, Generic)
+data TranslationID = E1994T
+                   | E2004T
+                   | V1805T
+                   | SinodalT
+                   | KJVT
+                 deriving (Eq, Generic, Read)
 
-instance ToJSON BibleTranslation
-instance FromJSON BibleTranslation
-
-instance Show BibleTranslation where
+instance Show TranslationID where
     show t = case t of
+               E1994T   -> "e1994-T"
+               E2004T   -> "e2004-T"
+               V1805T   -> "v1805-T"
+               SinodalT -> "sinodal-T"
+               KJVT     -> "kjv-T"
+
+
+
+instance ToJSON TranslationID
+instance FromJSON TranslationID
+
+instance CmdToken TranslationID where
+    cmdToken t = case t of
                E1994T   -> "e1994#"
                E2004T   -> "e2004#"
                V1805T   -> "v1805#"
@@ -49,8 +61,8 @@ data Testament = Old
                  deriving (Show, Eq,  Read, Generic)
 
 data Dialect = Grabar
-             | Ashxarhabar
-              deriving (Show, Eq, Read, Generic)
+              | Ashxarhabar
+               deriving (Show, Eq, Read, Generic)
 
 data Language = AM
               | RU
@@ -58,6 +70,7 @@ data Language = AM
                 deriving (Show, Eq, Read, Generic)
 
 type ScriptureID = String
+
 
 data Translation = Translation
     { translation'ID          :: Text
@@ -74,22 +87,13 @@ data Translation = Translation
 
 
 data VerseReference = VerseReference
-    { verseRef'book    :: Girq
-    , verseRef'chapter :: Int
-    , verseRef'from    :: Maybe Int
-    , verseRef'to      :: Maybe Int
+    { verseRef'translation :: TranslationID
+    , verseRef'book        :: Girq
+    , verseRef'chapter     :: Int
+    , verseRef'from        :: Maybe Int
+    , verseRef'to          :: Maybe Int
     } deriving (Read)
 
-instance Show VerseReference where
-    show VerseReference{..}  =
-        let girq = case Map.lookup verseRef'book abbrBooksAm of
-                     Nothing -> [qc|{verseRef'book}|]
-                     Just g  -> g
-        in case (verseRef'from, verseRef'to) of
-             (Nothing, Nothing)   -> [qc|{girq} {verseRef'chapter}|]
-             (Just from, Nothing) -> [qc|{girq} {verseRef'chapter}:{from}|]
-             (Just from, Just to) -> [qc|{girq} {verseRef'chapter}.{from}-{to}|]
-             (Nothing, Just to)   ->  [qc|{girq} {verseRef'chapter}:{to}|]
 
 instance HasId VerseReference where
     toId VerseReference{..}  =

@@ -1,0 +1,20 @@
+* Surbgirq Bot
+
+
+
+** Inline messaging
+
+for inline messaging we will use Bible name's abreviations to distinguish bible translations
+e.g. 
+Մտ - Գրաբար
+Մատ - "«Էջմիածին» թարգմանություն 1994"
+Մատթ- "«Էջմիածին» թարգմանություն(Նոր) 2004"
+
+Or we can pass the translation ID to the command and use any bible abbrevation
+e.g.
+
+e1994 mat 
+v1805 mat
+e2004 mat
+kjv mat - King james Version
+sin mat

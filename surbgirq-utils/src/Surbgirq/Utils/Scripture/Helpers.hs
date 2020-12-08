@@ -25,12 +25,13 @@ parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text
      let str = verseRange
          gs = readGirqs str
          ns = readNums str
+         translation = E1994T
      in case gs of
            [] -> Left [qc|Unknown book name: {verseRange}|]
            (girq:_) -> case ns of
-                         (a:b:c:_) -> Right $ VerseReference girq a (Just b) (Just c)
-                         (a:b:_)   -> Right $ VerseReference girq a (Just b) Nothing
-                         (a:_)     -> Right $ VerseReference girq a Nothing Nothing
+                         (a:b:c:_) -> Right $ VerseReference translation girq a (Just b) (Just c)
+                         (a:b:_)   -> Right $ VerseReference translation girq a (Just b) Nothing
+                         (a:_)     -> Right $ VerseReference translation girq a Nothing Nothing
                          []        -> Left "Failed parse verse numbers"
 
 
@@ -47,9 +48,9 @@ readGirqs txt = case T.words txt of
 verseRefRange :: VerseReference -> [VerseReference]
 verseRefRange vRef@VerseReference{..} =
   case (verseRef'from, verseRef'to) of
-    (Nothing, Nothing) -> [ VerseReference  verseRef'book verseRef'chapter (Just v) Nothing | v <- [1..200]]
+    (Nothing, Nothing) -> [ vRef{ verseRef'from = (Just v), verseRef'to = Nothing} | v <- [1..200]]
                           -- ^ all verses from the chapter
     (Just from, Nothing) -> [vRef]
-    (Nothing, Just to) -> [ VerseReference  verseRef'book verseRef'chapter (Just v) Nothing | v <- [1..to]]
-    (Just from, Just to) -> [ VerseReference  verseRef'book verseRef'chapter (Just v) Nothing | v <- [from..to]]
+    (Nothing, Just to) -> [ vRef{ verseRef'from = (Just v), verseRef'to = Nothing} | v <- [1..to]]
+    (Just from, Just to) -> [ vRef{  verseRef'from = (Just v), verseRef'to = Nothing} | v <- [from..to]]
 

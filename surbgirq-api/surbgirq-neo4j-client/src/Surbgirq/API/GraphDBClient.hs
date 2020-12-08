@@ -45,29 +45,29 @@ import Surbgirq.Types
 type GraphDBLocalAPI =
          "scripture" :> "books" :> Get '[JSON] [Book]
 --    :<|> GetVerseRange -- /chapter/verse/matthew/1/1/10"
-       :<|> "scripture" :> Capture "dialect" Dialect
+       :<|> "scripture" :> Capture "translation" TranslationID
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "verses" :> Capture "verseFrom" VerseNum
 --                 :> "to" :> Capture "verseTo" VerseNum
                  :> QueryParam "v2" VerseNum
                  :> Get '[JSON] [Verse]
-       :<|> "scripture" :> Capture "dialect" Dialect
+       :<|> "scripture" :> Capture "translation" TranslationID
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "oneverse" :> Capture "verseNum" VerseNum
                  :> Get '[JSON] [Verse]
-       :<|> "scripture" :> Capture "dialect" Dialect :> Summary "Get chapter's sections"
+       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get chapter's sections"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "sections"
                  :> Get '[JSON] [Section]
-       :<|> "scripture" :> Capture "dialect" Dialect :> Summary "Get chapter's sections by sec num"
+       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get chapter's sections by sec num"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "sections" :> Capture "secNum" SectionNum
                  :> Get '[JSON] [Section]
-       :<|> "scripture" :> Capture "dialect" Dialect :> Summary "Get Book's section"
+       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get Book's section"
                  :> "books" :> Capture "girq" Girq
                  :> "sections"
                  :> Get '[JSON] [Section]
@@ -91,11 +91,11 @@ neo4jApiBaseUrl :: BaseUrl
 neo4jApiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
 
 getAllBooks' :: ClientM [Book]
-getVerseRange' :: Dialect -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> ClientM [Verse]
-getOneVerse' :: Dialect -> Girq -> ChapterNum -> VerseNum -> ClientM [Verse]
-getChapterSections' :: Dialect -> Girq -> ChapterNum -> ClientM [Section]
-getChapterOneSection' :: Dialect -> Girq -> ChapterNum -> SectionNum -> ClientM [Section]
-getBookSections' :: Dialect -> Girq ->  ClientM [Section]
+getVerseRange' :: TranslationID -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> ClientM [Verse]
+getOneVerse' :: TranslationID -> Girq -> ChapterNum -> VerseNum -> ClientM [Verse]
+getChapterSections' :: TranslationID -> Girq -> ChapterNum -> ClientM [Section]
+getChapterOneSection' :: TranslationID -> Girq -> ChapterNum -> SectionNum -> ClientM [Section]
+getBookSections' :: TranslationID -> Girq ->  ClientM [Section]
 getChapterVerseNumber' :: Girq -> ChapterNum -> ClientM Int
 
 ( getAllBooks'

@@ -1,11 +1,13 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
 
 module Surbgirq.Utils.Scripture.Abbr
     ( findByAbbr
-    , abbr
+    , toRefText
     )
     where
 
@@ -17,12 +19,14 @@ import GHC.Generics
 
 import Prelude hiding (lookup)
 
-import           Data.Map.Strict (Map)
+import Data.Map.Strict               (Map)
+import Text.InterpolatedString.Perl6 (qc)
+
 import qualified Data.Map.Strict as Map
 
 
-import Surbgirq.Types.Girq
-
+import Surbgirq.Types
+import Surbgirq.Types
 
 -- newtype  AbbrMap = Map.Map Text Girq
 
@@ -36,7 +40,7 @@ abbr :: [(Girq, [Text])]
 abbr = [ (Matthew, mat)
        , (Mark, mark)
        , (Luke, luke)
-       , (John,    ["Յովհաննէս", "Հովհաննես", "Հովհ", "Հովհ.",   "Յովհ.", "Յովհ", "Յհ", "John", "john"])
+       , (John, ["Յովհաննէս", "Հովհաննես", "Հովհ", "Հովհ.", "Յովհ.", "Յովհ", "Յհ", "John", "john"])
        , (Acts, ["Գրծ", "Acts"])
        , (James, ["Յկ", "Jas", "James" ])
        , (Peter1, ["Ա Պտ", "Peter1", "1Pet", "Pet1"])
@@ -187,3 +191,24 @@ john = johnAm ++ johnRu ++ johnEn
     johnAm = ["Յովհաննէս", "Հովհաննես", "Հովհ", "Հովհ.",   "Յովհ.", "Յովհ", "Յհ"]
     johnEn = ["John"]
     johnRu = []
+
+
+-- (  Մատթ. 3.1-12, Ղուկ. 3.1-18, Յովհ. 1.19-28
+abbrBooksAm :: Map Girq String -- AbbrMap
+abbrBooksAm = Map.fromList
+            [ (Matthew, "Մատթ.")
+            , (Mark, "Մարկ.")
+            , (Luke, "Ղուկ.")
+            , (John, "Յովհ.")]
+
+
+
+toRefText VerseReference{..} =
+   let girq = case Map.lookup verseRef'book abbrBooksAm of
+                Nothing -> [qc|{verseRef'book}|]
+                Just g  -> g
+   in case (verseRef'from, verseRef'to) of
+        (Nothing, Nothing)   -> [qc|{girq} {verseRef'chapter}|]
+        (Just from, Nothing) -> [qc|{girq} {verseRef'chapter}:{from}|]
+        (Just from, Just to) -> [qc|{girq} {verseRef'chapter}.{from}-{to}|]
+        (Nothing, Just to)   ->  [qc|{girq} {verseRef'chapter}:{to}|]

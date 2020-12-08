@@ -231,7 +231,7 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
             vs <- liftIO $ getVerse' dialect chatId verseRef
             let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml verseRef)
 
-            liftIO $ putStrLn $ show verseRef
+            liftIO $ putStrLn $ toRefText verseRef
 
             let currentPage = fromMaybe 1 verseRef'from
                 buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
