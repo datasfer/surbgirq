@@ -243,8 +243,8 @@ generateScripturesCSV configFile path outPath = do
 
 
                -- book csv
-               let bookNodeLabels = intercalate arrayDel [bookName, lang, dialect, bookLabel, bookTestament, "Book"]
-                   bookID = concat [T.unpack book'shortName, translationID, lang, show book'orderNum]
+               let bookNodeLabels = intercalate arrayDel [bookName, bookLabel, bookTestament, "Book"]
+                   bookID = concat [T.unpack book'shortName, translationID, show book'orderNum]
                    bookLine = [qc|{bookID}{del}{book'book}{del}{book'title}{del}{book'orderNum}{del}{book'chapters}{del}{book'testament}{del}{bookNodeLabels}|]
 
                TIO.hPutStrLn outBookh bookLine
