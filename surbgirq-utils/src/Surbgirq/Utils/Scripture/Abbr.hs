@@ -32,13 +32,9 @@ import Surbgirq.Types
 
 
 findByAbbr :: Text -> Maybe (Girq, TranslationID)
-findByAbbr name = tryGetFirst $ map (\ (girq, bs) -> findAbbr name girq bs) abbr
+findByAbbr name = listToMaybe $ catMaybes $ map (\ (girq, bs) -> findAbbr name girq bs) abbr
                                            -- concatMap (\ (AbbrBook t xs) -> any (==name) xs) abbr
   where
-    tryGetFirst :: [Maybe a] -> Maybe a
-    tryGetFirst []    = Nothing
-    tryGetFirst (x:_) = x
-
     findAbbr :: Text -> Girq -> [AbbrBook] -> Maybe (Girq, TranslationID)
     findAbbr _ _ [] = Nothing
     findAbbr name girq (AbbrBook t bs:xs) | any (\b -> T.toLower b == T.toLower name) bs = Just (girq, t)
@@ -164,28 +160,28 @@ mkAbbrBook trans names = AbbrBook trans names
 mat :: [AbbrBook]
 mat = [mkAbbrBook E1994T matAm, mkAbbrBook E1994T matRu, mkAbbrBook V1805T matEn]
   where
-    matAm = ["Մատթէոս", "Մատթ.", "Մատթ", "Մատ", "Մատ.", "Մտ"]
+    matAm = ["Մատթ.", "Մատթէոս",  "Մատթ", "Մատ", "Մատ.", "Մտ"]
     matEn = ["Matthew", "Mt", "Mat", "Matt","mat", "matt", "mt"]
     matRu = ["Матфея", "Мф"]
 
 mark :: [AbbrBook]
 mark = [mkAbbrBook E1994T markAm, mkAbbrBook E1994T markRu, mkAbbrBook E1994T markEn]
   where
-    markAm = ["Մարկոս", "Մարկ.", "Մարկ", "Մր"]
+    markAm = ["Մրկ.", "Մարկոս", "Մարկ.", "Մարկ", "Մր"]
     markEn = ["Mark", "Mk"]
     markRu = ["Марка", "Мк"]
 
 luke :: [AbbrBook]
 luke = [mkAbbrBook E1994T lukeAm, mkAbbrBook E1994T lukeRu, mkAbbrBook E1994T lukeEn]
   where
-    lukeAm = ["Ղուկաս", "Ղուկ.", "Ղուկ", "Ղկ"]
+    lukeAm = ["Ղուկ.", "Ղուկաս", "Ղուկ", "Ղկ"]
     lukeEn = ["Lk", "Luke", "Luk"]
     lukeRu = ["Луки", "Лк"]
 
 john :: [AbbrBook]
 john = [mkAbbrBook E1994T johnAm, mkAbbrBook E1994T johnRu, mkAbbrBook E1994T johnEn]
   where
-    johnAm = ["Յովհաննէս", "Հովհաննես", "Հովհ", "Հովհ.",   "Յովհ.", "Յովհ", "Յհ"]
+    johnAm = ["Յովհ.", "Յովհաննէս", "Հովհաննես", "Հովհ", "Հովհ.", "Յովհ", "Յհ"]
     johnEn = ["John", "Jn"]
     johnRu = ["Иоанн", "Ин"]
 acts :: [AbbrBook]
@@ -206,21 +202,21 @@ james = [mkAbbrBook E1994T jamesAm, mkAbbrBook E1994T jamesRu, mkAbbrBook E1994T
 peter1 :: [AbbrBook]
 peter1 = [mkAbbrBook E1994T peter1Am, mkAbbrBook E1994T peter1Ru, mkAbbrBook E1994T peter1En]
   where
-    peter1Am = ["ԱՊետրոստ", "ԱՊտ"]
+    peter1Am = ["Ա Պտ", "ԱՊետրոս", "ԱՊտ"]
     peter1Ru = ["1Петр"]
     peter1En = ["1Peter", "1Pet", "Pet1", "Peter1"]
 
 peter2 :: [AbbrBook]
 peter2 = [mkAbbrBook E1994T peter2Am, mkAbbrBook E1994T peter2Ru, mkAbbrBook E1994T peter2En]
   where
-    peter2Am = ["ԲՊետրոստ", "ԲՊտ"]
+    peter2Am = ["Բ Պտ", "ԲՊետրոս", "ԲՊտ"]
     peter2Ru = ["2Петр"]
     peter2En = ["2Peter", "2Pet", "Pet2", "Peter2"]
 
 john1 :: [AbbrBook]
 john1 = [mkAbbrBook E1994T john1Am, mkAbbrBook E1994T john1Ru, mkAbbrBook E1994T john1En]
   where
-    john1Am = ["ԱՅովհաննէս", "ԱՅովհ", "ԱՅհ"]
+    john1Am = ["Ա Յովհ.", "ԱՅովհաննէս", "ԱՅովհ", "ԱՅհ"]
     john1Ru = ["Иоанн", "1Ин"]
     john1En = ["John1", "1John", "1Jn", "Jn1"]
 
@@ -251,7 +247,7 @@ romans = [mkAbbrBook E1994T romansAm, mkAbbrBook E1994T romansRu, mkAbbrBook E19
   where
     romansAm = ["Հռոմէացիներ", "Հռոմեացիներ", "Հռ"]
     romansRu = ["Римлянам", "Рим"]
-    romansEn = ["Roans", "Rom"]
+    romansEn = ["Romans", "Rom"]
 
 cor1 :: [AbbrBook]
 cor1 = [mkAbbrBook E1994T cor1Am, mkAbbrBook E1994T cor1Ru, mkAbbrBook E1994T cor1En]
@@ -306,9 +302,9 @@ thess1 = [mkAbbrBook E1994T thess1Am, mkAbbrBook E1994T thess1Ru, mkAbbrBook E19
 thess2 :: [AbbrBook]
 thess2 = [mkAbbrBook E1994T thess2Am, mkAbbrBook E1994T thess2Ru, mkAbbrBook E1994T thess2En]
   where
-    thess2Am = ["ԲԹեսաղոնիկեցիներ", "ԹեսաղոնիկեցիներԲ", "ԲԹեսաղ", "ԹեսաղԲ", "ԲԹս", "ԹսԲ"]
-    thess2Ru = ["1Фессалоникийцам", "1Фес", "Фессалоникийцам1", "Фес1"]
-    thess2En = ["1Thessalonians", "1Thess", "Thessalonians1", "Thess1"]
+    thess2Am = ["Բ Թեսաղոնիկեցիներ", "Բ Թս", "ԲԹեսաղոնիկեցիներ", "ԹեսաղոնիկեցիներԲ", "ԲԹեսաղ", "ԹեսաղԲ", "ԲԹս", "ԹսԲ"]
+    thess2Ru = ["2Фессалоникийцам", "2Фес", "Фессалоникийцам2", "Фес2"]
+    thess2En = ["2Thessalonians", "2Thess", "Thessalonians2", "Thess2"]
 
 hebrews :: [AbbrBook]
 hebrews = [mkAbbrBook E1994T hebAm, mkAbbrBook E1994T hebRu, mkAbbrBook E1994T hebEn]
@@ -365,9 +361,21 @@ abbrBooksAm = Map.fromList
             , (John, "Յովհ.")]
 
 
+-- | book name for verse
+getBookName :: Girq -> TranslationID -> Maybe Text
+getBookName girq translation =
+    let xs  = filter (\(g,bs) -> g == girq) abbr
+    in case xs of
+         ((_, bookAbbrs):_) -> head $ getAbbrNames <$> filter (\(AbbrBook t _) -> t == translation) bookAbbrs
+         []                 -> Nothing
+  where
+    getAbbrNames (AbbrBook _ ns) = listToMaybe $ ns
 
-toRefText VerseReference{..} =
-   let girq = case Map.lookup verseRef'book abbrBooksAm of
+
+toRefText :: TranslationID -> VerseReference -> Text
+toRefText defTrans VerseReference{..} =
+   let translation = fromMaybe defTrans verseRef'translation
+       girq = case getBookName verseRef'book translation of
                 Nothing -> [qc|{verseRef'book}|]
                 Just g  -> g
    in case (verseRef'from, verseRef'to) of

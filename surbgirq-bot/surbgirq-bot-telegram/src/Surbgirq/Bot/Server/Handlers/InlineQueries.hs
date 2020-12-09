@@ -49,8 +49,10 @@ handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
     onCommand (T.stripPrefix "/random" -> Just _)   = return ()
     onCommand (parseVerseRef  -> Right verseRef)    = inlineVerse' (UserId user_id) iqId verseRef
     onCommand (all isSpace . T.unpack   -> True)    = inlineSettings iqId
+    onCommand (parseVerseRef  -> Left error)        = liftIO $ print $ T.append "==== Verse Parse Error:    "  error
+
     onCommand str                                   = do
-                                  liftIO $ print $ T.append "=================== Unknown Command"  str
+                                  liftIO $ print $ T.append "=================== Unknown Command\n"  str
                                   return ()
 
    --  cmdArgs = parseInlineQuery $ query_query iq
@@ -82,7 +84,8 @@ inlineVerse' :: UserId -> Text -> VerseReference -> Bot ()
 inlineVerse' userId iqId verseRef@VerseReference{..} = do
   BotConfig{..} <- ask
   cfg <- getUserConfig  userId
-  let defaultTrans = fromMaybe E1994T $ readTranslation [config'bible cfg]
+  let def1 = fromMaybe E1994T (readTranslation [config'bible cfg])
+      defaultTrans = fromMaybe def1 verseRef'translation
 
   vs <- liftIO $ getVerses defaultTrans verseRef
          -- liftIO $ case verseRef'to of
@@ -92,7 +95,7 @@ inlineVerse' userId iqId verseRef@VerseReference{..} = do
   let inlineQueryResults = map (\(verse, vRef) ->
                                     InlineQueryResultArticle (toId vRef)
                                                              -- ^ Unique identifier for this result
-                                                             (Just $ toRefText vRef)
+                                                             (Just $ toRefText defaultTrans vRef)
                                                              -- ^ Title of the result
                                                              (Just $ InputTextMessageContent (html2Text' verse vRef) (Just HTML) Nothing)
                                                              -- ^ Content of the message to be sent

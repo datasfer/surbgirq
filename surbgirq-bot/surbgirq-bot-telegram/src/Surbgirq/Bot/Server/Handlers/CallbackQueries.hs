@@ -224,12 +224,13 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
 
         case parseVerseRef args of
           Right verseRef@VerseReference{..} -> do
-            let defaultTrans = fromMaybe E1994T $ readTranslation [config'bible]
+            let def1 = fromMaybe E1994T (readTranslation [config'bible])
+                defaultTrans = fromMaybe def1 verseRef'translation
 
             vs <- liftIO $ getVerse' defaultTrans chatId verseRef
             let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml verseRef)
 
-            liftIO $ putStrLn $ toRefText verseRef
+            liftIO $ putStrLn . T.unpack $ toRefText defaultTrans verseRef
 
             let currentPage = fromMaybe 1 verseRef'from
                 buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]

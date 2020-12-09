@@ -8,6 +8,7 @@ module Surbgirq.Bot.Lucid.Instances where
 import Data.List
 import Lucid
 
+import Data.Maybe                    (fromMaybe)
 import Data.Text                     (append, pack, unpack)
 import Text.InterpolatedString.Perl6 (qc)
 
@@ -52,7 +53,8 @@ instance ToHtml Verse  where
 
 instance ToHtml VerseReference  where
     toHtml vRef@VerseReference{..} = do
-        let b = (bold_ $ toHtml $ T.unpack $ toRefText vRef)
+        let translation = fromMaybe E1994T verseRef'translation
+            b = (bold_ $ toHtml $ T.unpack $ toRefText translation vRef)
         withNewLine b
     toHtmlRaw = toHtml
 
