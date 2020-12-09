@@ -224,11 +224,9 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
 
         case parseVerseRef args of
           Right verseRef@VerseReference{..} -> do
-            let dialect = case config'bible of
-                            "e1994T" -> Ashxarhabar
-                            "v1805T" -> Grabar
-                            _        -> Ashxarhabar
-            vs <- liftIO $ getVerse' dialect chatId verseRef
+            let defaultTrans = fromMaybe E1994T $ readTranslation [config'bible]
+
+            vs <- liftIO $ getVerse' defaultTrans chatId verseRef
             let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml verseRef)
 
             liftIO $ putStrLn $ toRefText verseRef

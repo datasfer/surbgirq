@@ -28,6 +28,8 @@ import Surbgirq.Bot.ClientRequests
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Server.Helpers.HelpMessages
+import Surbgirq.Bot.State
+import Surbgirq.Bot.Store
 import Surbgirq.Bot.Types
 import Surbgirq.Types
 import Surbgirq.Utils
@@ -105,19 +107,22 @@ sendChapterSections chatId argString = do
 
 
 -- | verse
-sendVerse :: Bool -> ChatId -> Text -> Bot ()
-sendVerse sendAtOnce chatId verseRef =
+sendVerse :: Bool -> ChatId -> UserId -> Text -> Bot ()
+sendVerse sendAtOnce chatId userId verseRef =
     let res = parseVerseRef verseRef
     in case res of
       Left e     -> sendHtml chatId e
-      Right vRef -> sendVerse' sendAtOnce chatId vRef
+      Right vRef -> sendVerse' sendAtOnce chatId userId  vRef
 
 
-sendVerse' :: Bool -> ChatId -> VerseReference -> Bot ()
-sendVerse' sendAtOnce chatId vRef@VerseReference{..} = do
---      BotConfig{state=BotState{..}} <- ask
+sendVerse' :: Bool -> ChatId -> UserId -> VerseReference -> Bot ()
+sendVerse' sendAtOnce chatId userId vRef@VerseReference{..} = do
+      BotConfig{..} <- ask
+      cfg <- getUserConfig  userId
 
-      vs <- liftIO $ getVerses Ashxarhabar vRef
+      let defaultTrans = fromMaybe E1994T $ readTranslation [config'bible cfg]
+
+      vs <- liftIO $ getVerses defaultTrans vRef
       maxVerseNum <- liftIO $ getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
 
       if sendAtOnce
@@ -139,14 +144,14 @@ sendVerse' sendAtOnce chatId vRef@VerseReference{..} = do
 
 
 
-getVerse' :: Dialect -> ChatId -> VerseReference -> IO [Verse]
-getVerse' dialect chatId vRef@VerseReference{..} = getVerses dialect vRef
+getVerse' :: TranslationID -> ChatId -> VerseReference -> IO [Verse]
+getVerse' defaTrans chatId vRef@VerseReference{..} = getVerses defaTrans vRef
 
 
-getVerses :: Dialect -> VerseReference -> IO [Verse]
-getVerses dialect vRef@VerseReference{..} = do
+getVerses :: TranslationID -> VerseReference -> IO [Verse]
+getVerses defTrans vRef@VerseReference{..} = do
   maxVerseNum <- getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
-  let translation = E1994T
+  let translation = fromMaybe defTrans verseRef'translation
   case (verseRef'from, verseRef'to) of
     (Nothing, Nothing)   -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
     (Just from, Nothing) -> getOneVerseHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)

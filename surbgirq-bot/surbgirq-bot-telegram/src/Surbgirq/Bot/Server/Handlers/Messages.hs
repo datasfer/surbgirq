@@ -67,8 +67,8 @@ handleMessage msg@Message{..} = do
     Just messageText = text
 
     onCommand userId (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
-    onCommand userId (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse True chatId verseRef
-    onCommand userId (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse True chatId verseRef
+    onCommand userId (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse True chatId userId verseRef
+    onCommand userId (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse True chatId userId verseRef
     onCommand userId (T.stripPrefix "/chapter" -> Just args)    = sendChapterSections chatId args
     onCommand userId (T.stripPrefix "/books" -> Just book)      = sendBooks chatId book
     onCommand userId (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
@@ -80,7 +80,7 @@ handleMessage msg@Message{..} = do
 
     onCommand userId (T.stripPrefix "/start" -> Just _)         = showSettings chatId userId
     onCommand userId (T.stripPrefix "/settings" -> Just _)      = showSettings chatId userId
-    onCommand userId (parseVerseRef  -> Right verseRef)         = sendVerse' True chatId verseRef
+    onCommand userId (parseVerseRef  -> Right verseRef)         = sendVerse' True chatId userId verseRef
     onCommand _ _                                               = sendHelpMessage chatId
 
     -- onCommand str                                        = do

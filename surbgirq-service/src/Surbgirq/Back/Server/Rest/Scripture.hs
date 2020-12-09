@@ -91,7 +91,7 @@ scriptureVerseByRefText verseText =  do
                                    [v1, v2] = T.split (=='.') chVerseText
                                    chNum = readMaybe $ T.unpack v1
                                in case (girq, chNum) of
-                                    (Just g, Just ch) -> scriptureVerseByRef g (ChapterNum ch) v2
+                                    (Just (g, translation), Just ch) -> scriptureVerseByRef translation g (ChapterNum ch) v2
                                     _  -> do
                                        liftIO $ print girq
                                        liftIO $ print chNum
@@ -105,8 +105,9 @@ scriptureVerseByRefText verseText =  do
     _  -> error "invalid format for refText"
 
 -- | TODO: add proper comment
-scriptureVerseByRef :: Girq -> ChapterNum -> Text -> AppM [Verse]
-scriptureVerseByRef g c verseRange =  do
+-- use translation
+scriptureVerseByRef :: TranslationID -> Girq -> ChapterNum -> Text -> AppM [Verse]
+scriptureVerseByRef translation g c verseRange =  do
       let vs = T.split (=='-') verseRange
       liftIO $ print verseRange
       liftIO $ print vs

@@ -23,26 +23,45 @@ parseVerseRef :: Text -> Either Text VerseReference
 parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text"
                          | otherwise =
      let str = verseRange
+         ws = T.words str
          gs = readGirqs str
-         ns = readNums str
-         translation = E1994T
+         maybeTranslation = readTranslation $ take 1 ws
+         skip = maybe 1 (const 2) maybeTranslation
+         ns' = readNums skip str
+         ns = if null ns' then readNums 2 str else ns'
      in case gs of
-           [] -> Left [qc|Unknown book name: {verseRange}|]
-           (girq:_) -> case ns of
+           Nothing -> Left [qc|Unknown book name: {verseRange}|]
+           Just (girq, trans) ->
+               let translation = Just $ fromMaybe trans maybeTranslation
+               in case ns of
                          (a:b:c:_) -> Right $ VerseReference translation girq a (Just b) (Just c)
                          (a:b:_)   -> Right $ VerseReference translation girq a (Just b) Nothing
                          (a:_)     -> Right $ VerseReference translation girq a Nothing Nothing
                          []        -> Left "Failed parse verse numbers"
 
 
-readNums :: Text -> [Int]
-readNums  = catMaybes . map (readMaybe . T.unpack) . T.groupBy (\x y -> isDigit x && isDigit y) . T.unwords . drop 1 . T.words
+readNums :: Int -> Text -> [Int]
+readNums n =
+    catMaybes . map (readMaybe . T.unpack) . T.groupBy
+                  (\x y -> isDigit x && isDigit y) . T.unwords . drop n . T.words
 
+readTranslation :: [Text] -> Maybe TranslationID
+readTranslation [] = Nothing
+readTranslation [s] | s `elem` e1994 = Just E1994T
+                    | s `elem` v1805 = Just V1805T
+                    | otherwise  = Nothing
+  where
+    e1994 = ["e1994", "e1994T", "e94", "e94T"]
+    v1805 = ["v1805", "v1805T", "v05", "v05T"]
 
-readGirqs :: Text -> [Girq]
-readGirqs txt = case T.words txt of
-                  (x:xs) -> catMaybes $ [findByAbbr x] -- . T.groupBy (\x y -> isAlpha x && isAlpha y)
-                  _      -> []
+readGirqs :: Text -> Maybe (Girq, TranslationID)
+readGirqs txt =
+    let ws = T.words txt
+        trans = readTranslation $ take 1 ws
+    in case (ws, trans) of
+         ((x:y:xs), Nothing) -> listToMaybe $ catMaybes $ ([findByAbbr x]) ++ ([findByAbbr y])
+         ((_:x:xs), Just _)  -> findByAbbr x -- . T.groupBy (\x y -> isAlpha x && isAlpha y)
+         _                   -> Nothing
 
 
 verseRefRange :: VerseReference -> [VerseReference]

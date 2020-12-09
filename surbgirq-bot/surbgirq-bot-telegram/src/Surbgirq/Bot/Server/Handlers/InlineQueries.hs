@@ -17,9 +17,10 @@ module Surbgirq.Bot.Server.Handlers.InlineQueries
 import Control.Monad.Reader
 import Lucid
 
-import Data.Char (isSpace)
-import Data.List (intercalate, intersperse)
-import Data.Text (Text)
+import Data.Char  (isSpace)
+import Data.List  (intercalate, intersperse)
+import Data.Maybe (fromMaybe)
+import Data.Text  (Text)
 
 import qualified Data.Text      as T
 import qualified Data.Text.Lazy as TL
@@ -81,12 +82,9 @@ inlineVerse' :: UserId -> Text -> VerseReference -> Bot ()
 inlineVerse' userId iqId verseRef@VerseReference{..} = do
   BotConfig{..} <- ask
   cfg <- getUserConfig  userId
-  let dialect = case config'bible cfg of
-                  "v1994T" -> Ashxarhabar
-                  "v1805T" -> Grabar
-                  _        -> Ashxarhabar
+  let defaultTrans = fromMaybe E1994T $ readTranslation [config'bible cfg]
 
-  vs <- liftIO $ getVerses dialect verseRef
+  vs <- liftIO $ getVerses defaultTrans verseRef
          -- liftIO $ case verseRef'to of
          --     Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum <$> verseRef'from)
          --     Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)

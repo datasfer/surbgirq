@@ -18,7 +18,6 @@ import qualified Text.Read       as T
 import Common.Aeson
 import GHC.Generics
 
-import Surbgirq.Types.Abbr
 import Surbgirq.Types.Girq
 
 
@@ -87,7 +86,7 @@ data Translation = Translation
 
 
 data VerseReference = VerseReference
-    { verseRef'translation :: TranslationID
+    { verseRef'translation :: Maybe TranslationID
     , verseRef'book        :: Girq
     , verseRef'chapter     :: Int
     , verseRef'from        :: Maybe Int
