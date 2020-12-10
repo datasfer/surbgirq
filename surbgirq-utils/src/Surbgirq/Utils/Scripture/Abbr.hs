@@ -353,12 +353,6 @@ rev = [mkAbbrBook E1994T revAm, mkAbbrBook E1994T revRu, mkAbbrBook E1994T revEn
 
 
 -- (  Մատթ. 3.1-12, Ղուկ. 3.1-18, Յովհ. 1.19-28
-abbrBooksAm :: Map Girq String -- AbbrMap
-abbrBooksAm = Map.fromList
-            [ (Matthew, "Մատթ.")
-            , (Mark, "Մարկ.")
-            , (Luke, "Ղուկ.")
-            , (John, "Յովհ.")]
 
 
 -- | book name for verse
@@ -371,6 +365,14 @@ getBookName girq translation =
   where
     getAbbrNames (AbbrBook _ ns) = listToMaybe $ ns
 
+getTranslationName :: TranslationID -> Text
+getTranslationName transID =
+    case transID of
+      E1994T   -> "«Էջմիածին» 1994թ."
+      E2004T   -> "«Էջմիածին»(Նոր) 2004թ."
+      V1805T   -> "«Վէնէտիկ» 1805թ."
+      SinodalT -> "sINODAL"
+      KJVT     -> "KJV 1611թ."
 
 toRefText :: TranslationID -> VerseReference -> Text
 toRefText defTrans VerseReference{..} =
@@ -378,8 +380,9 @@ toRefText defTrans VerseReference{..} =
        girq = case getBookName verseRef'book translation of
                 Nothing -> [qc|{verseRef'book}|]
                 Just g  -> g
+       transName = fromMaybe "" (getTranslationName <$> verseRef'translation)
    in case (verseRef'from, verseRef'to) of
-        (Nothing, Nothing)   -> [qc|{girq} {verseRef'chapter}|]
-        (Just from, Nothing) -> [qc|{girq} {verseRef'chapter}:{from}|]
-        (Just from, Just to) -> [qc|{girq} {verseRef'chapter}.{from}-{to}|]
-        (Nothing, Just to)   ->  [qc|{girq} {verseRef'chapter}:{to}|]
+        (Nothing, Nothing)   -> [qc|{girq} {verseRef'chapter}, {transName}|]
+        (Just from, Nothing) -> [qc|{girq} {verseRef'chapter}:{from}, {transName}|]
+        (Just from, Just to) -> [qc|{girq} {verseRef'chapter}.{from}-{to}, {transName}|]
+        (Nothing, Just to)   -> [qc|{girq} {verseRef'chapter}:{to}, {transName}|]
