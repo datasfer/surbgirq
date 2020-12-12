@@ -85,6 +85,12 @@ data Translation = Translation
     } deriving (Show, Read)
 
 
+data BibleDivision = BibleDivision
+    { bibleDivision'ID   :: Text
+    , bibleDivision'name :: Text
+    } deriving (Show, Read)
+
+
 data VerseReference = VerseReference
     { verseRef'translation :: Maybe TranslationID
     , verseRef'book        :: Girq

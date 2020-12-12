@@ -29,9 +29,15 @@ library
                    Surbgirq.Shell.Scraper.Scalpel.BibleScraper
                    Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
                    Surbgirq.Shell.CSV.Generate
+                   Surbgirq.Shell.Theographic.Types
+                   Surbgirq.Shell.Theographic.CsvConverter
+                   Surbgirq.Shell.Theographic.JsonConverter    
+                   Surbgirq.Shell.Theographic.CsvTypes
+                   
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Scripture
                  Surbgirq.Shell.Store.Types
+                 
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
                , surbgirq-types
@@ -55,8 +61,10 @@ library
                , regex-pcre
                , pcre-heavy
                , yaml
-               
-               
+               , bytestring               
+               , cassava
+               , vector
+                      
   default-language: Haskell2010
 
 executable surbgirq-shell

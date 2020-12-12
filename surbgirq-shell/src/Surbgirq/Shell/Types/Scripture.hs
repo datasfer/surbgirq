@@ -35,6 +35,8 @@ import Surbgirq.Types.Scripture
 data Corpora = Corpora
      { corpora'scripturesPath   :: FilePath
      , corpora'translationsPath :: FilePath
+     -- , corpora'bibleDivisionsPath :: FilePath
+     -- , corpora'testamentsPath     :: FilePath
      , corpora'grabar60kPath    :: FilePath
      } deriving (Show, Read)
 
