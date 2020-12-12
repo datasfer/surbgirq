@@ -133,14 +133,17 @@ convertKjvCsv inPath outPath = do
    let chaptersFile = dataFolder </> "Chapters.csv"
    houtChapters <- openFile (outFileRoot </> "chapters.csv") WriteMode
    houtRelation <- openFile (outFileRoot </> "Book_ChapterRel.csv") WriteMode
+   houtPersonChapterRel <- openFile (outFileRoot </> "Person_ChapterRel.csv") WriteMode
    TIO.hPutStrLn houtChapters [qc|id:ID(KJV-CHAPTER-ID){del}chapterNum{del}osisref{del}slug{del}title{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-BOOK-ID){del}:END_ID(KJV-CHAPTER-ID){del}:TYPE|]
+   TIO.hPutStrLn houtPersonChapterRel [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]
 
    readEntity chaptersFile >>= \ v ->
        V.forM_  v $ \ (ChapterCsv{..}) -> do
            let chapterID = [qc|{chapter'osisRef}|]
                chapterTitle = [qc|{chapter'book} {chapter'chapterNum}|]
                chapterRow = [qc|{chapterID}{del}{chapter'chapterNum}{del}{chapter'osisRef}{del}{chapter'slug}{del}{chapterTitle}{del}Chapter|]
+               personChRel = [qc|{chapterID}{del}{chapter'writer}{del}WROTE|]
                relRow = [qc|{chapter'book}{del}{chapterID}{del}CONTAINS|]
            TIO.hPutStrLn houtChapters chapterRow
            TIO.hPutStrLn houtRelation relRow
@@ -148,12 +151,14 @@ convertKjvCsv inPath outPath = do
    hClose houtChapters
    hClose houtRelation
 
-   -- -- Verses
+   -- Verses
    let versesFile = dataFolder </> "Verses.csv"
    houtVerses <- openFile (outFileRoot </> "verses.csv") WriteMode
    houtRelation <- openFile (outFileRoot </> "Chapter_VerseRel.csv") WriteMode
+   houtVersePersonRel <- openFile (outFileRoot </> "Verse_PersonRel.csv") WriteMode
    TIO.hPutStrLn houtVerses [qc|id:ID(KJV-VERSE-ID){del}verseNum{del}fullRef{del}osisRef{del}shortRef{del}mdText{del}verseText{del}title{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
+   TIO.hPutStrLn houtVersePersonRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]
 
    readEntity versesFile >>= \ v ->
        V.forM_  v $ \ (VerseCsv{..}) -> do
@@ -166,7 +171,34 @@ convertKjvCsv inPath outPath = do
                relRow = [qc|{verse'chapter}{del}{verseID}{del}CONTAINS|]
            TIO.hPutStrLn houtVerses verseRow
            TIO.hPutStrLn houtRelation relRow
+           when (verse'peopleCount > 0) $ do
+              let ps = splitOn "," verse'people
+              forM_  ps $ \ person -> do
+                 let versePersonRel = [qc|{verseID}{del}{person}{del}MENTIONS|]
+                 TIO.hPutStrLn houtVersePersonRel versePersonRel
+   hClose houtVerses
+   hClose houtVersePersonRel
+   hClose houtRelation
 
+
+   -- Persons
+   let personsFile = dataFolder </> "Persons.csv"
+   houtPersons <- openFile (outFileRoot </> "persons.csv") WriteMode
+--   houtRelation <- openFile (outFileRoot </> "Chapter_VerseRel.csv") WriteMode
+   TIO.hPutStrLn houtPersons [qc|id:ID(KJV-PERSON-ID){del}name{del}gender{del}slug{del}status{del}title{del}:LABEL|]
+--   TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
+
+   readEntity personsFile >>= \ v ->
+       V.forM_  v $ \ (PersonCsv{..}) -> do
+           let personID = person'personLookup
+               -- shortRef = case splitOn "." verse'osisRef of
+               --              [book, ch, v] -> [qc|{book} {ch}:{v}|]
+               --              _             -> error verse'osisRef
+               personRow = [qc|{personID}{del}{person'name}{del}{person'gender}{del}{person'slug}{del}{person'status}{del}{person'name}{del}Person|]
+--               relRow = [qc|{verse'chapter}{del}{verseID}{del}CONTAINS|]
+  --         TIO.hPutStrLn houtRelation relRow
+           TIO.hPutStrLn houtPersons personRow
+   hClose houtPersons
    -- Words
    -- let wordsFile = dataFolder </> "WordIndex.csv"
    -- readEntity wordsFile >>= \ v ->
@@ -180,6 +212,15 @@ readEntity booksFile = do
   return $ case Cassava.decodeByName csvData of
         Left err      -> error err
         Right  (_, v) -> v
+
+
+demoP :: IO ()
+demoP = do
+    csvData <- BL.readFile "./data/theodata/CSV/Persons.csv"
+    case Cassava.decodeByName csvData of
+        Left err -> putStrLn err
+        Right  (_, v) -> V.forM_  v $ \ (PersonCsv{..}) -> do
+                    print [qc|{person'mother} -- {person'father} = {person'personLookup}|]
 
 
 demoW :: IO ()
