@@ -11,9 +11,9 @@ module Surbgirq.Shell.Theographic.CSV.Converter
 
 
 
-import Surbgirq.Shell.Theographic.CSV.Convert.Books as X
-
-
+import Surbgirq.Shell.Theographic.CSV.Convert.Books  as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Events as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Places as X
 
 -- base
 import           Control.Exception (IOException)
@@ -119,6 +119,8 @@ convertKjvCsv inPath outPath = do
    when exists $ do
        createDirectoryIfMissing True outFileRoot
 
+
+   convertPlaces del dataFolder outFileRoot
    convertBooks del dataFolder outFileRoot
    convertChapters dataFolder outFileRoot
    convertVerses dataFolder outFileRoot
@@ -157,9 +159,11 @@ convertVerses dataFolder outFileRoot = do
    houtVerses <- openFile (outFileRoot </> "verses.csv") WriteMode
    houtRelation <- openFile (outFileRoot </> "Chapter_VerseRel.csv") WriteMode
    houtVersePersonRel <- openFile (outFileRoot </> "Verse_PersonRel.csv") WriteMode
+   houtVersePlaceRel <- openFile (outFileRoot </> "Verse_PlaceRel.csv") WriteMode
    TIO.hPutStrLn houtVerses [qc|id:ID(KJV-VERSE-ID){del}verseNum{del}fullRef{del}osisRef{del}shortRef{del}mdText{del}verseText{del}title{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
    TIO.hPutStrLn houtVersePersonRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]
+   TIO.hPutStrLn houtVersePlaceRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PLACE-ID){del}:TYPE|]
 
    readEntity versesFile >>= \ v ->
        V.forM_  v $ \ (VerseCsv{..}) -> do
@@ -177,8 +181,14 @@ convertVerses dataFolder outFileRoot = do
               forM_  ps $ \ person -> do
                  let versePersonRel = [qc|{verseID}{del}{person}{del}MENTIONS|]
                  TIO.hPutStrLn houtVersePersonRel versePersonRel
+           when (verse'placesCount > 0) $ do
+              let ps = splitOn "," verse'places
+              forM_  ps $ \ place -> do
+                 let versePlaceRel = [qc|{verseID}{del}{place}{del}MENTIONS|]
+                 TIO.hPutStrLn houtVersePlaceRel versePlaceRel
    hClose houtVerses
    hClose houtVersePersonRel
+   hClose houtVersePlaceRel
    hClose houtRelation
 
 

@@ -110,7 +110,7 @@ data VerseCsv = VerseCsv
     , verse'people          :: String
     , verse'peopleCount     :: Int
     , verse'places          :: String
-    , verse'placesCount     :: String
+    , verse'placesCount     :: Int
     , verse'yearNum         :: String
     , verse'peopleGroups    :: String
     , verse'eventsDescribed :: String
