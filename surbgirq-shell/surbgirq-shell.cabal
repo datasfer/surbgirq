@@ -37,6 +37,7 @@ library
                    Surbgirq.Shell.Theographic.CSV.Convert.Books  
                    Surbgirq.Shell.Theographic.CSV.Convert.Places
                    Surbgirq.Shell.Theographic.CSV.Convert.Events   
+                   Surbgirq.Shell.Theographic.CSV.Convert.Periods   
                    Surbgirq.Shell.Theographic.CSV.Convert.Helpers     
 
                    Surbgirq.Shell.Theographic.CSV.Types
@@ -76,6 +77,8 @@ library
                , bytestring               
                , cassava
                , vector
+               , SHA
+               , cryptonite        
                       
   default-language: Haskell2010
 

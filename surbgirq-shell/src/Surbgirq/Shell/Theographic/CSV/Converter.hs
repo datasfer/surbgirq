@@ -11,9 +11,10 @@ module Surbgirq.Shell.Theographic.CSV.Converter
 
 
 
-import Surbgirq.Shell.Theographic.CSV.Convert.Books  as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Events as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Places as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Books   as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Events  as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Periods as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Places  as X
 
 -- base
 import           Control.Exception (IOException)
@@ -120,6 +121,7 @@ convertKjvCsv inPath outPath = do
        createDirectoryIfMissing True outFileRoot
 
 
+   convertPeriods del dataFolder outFileRoot
    convertPlaces del dataFolder outFileRoot
    convertBooks del dataFolder outFileRoot
    convertEvents del dataFolder outFileRoot
