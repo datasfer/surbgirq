@@ -33,8 +33,8 @@ convertPeriods del dataFolder outFileRoot = do
    let periodFile = dataFolder </> "Periods.csv"
    houtPeriods <- openFile (outFileRoot </> "periods.csv") WriteMode
    houtEventYearRel <- openFile (outFileRoot </> "Event_YearRel.csv") WriteMode
-   TIO.hPutStrLn houtPeriods
-          [qc|id:ID(KJV-EVENT-ID){del}formattedYear{del}isoYear{del}year{del}:LABEL|]
+   TIO.hPutStrLn houtPeriods [qc|id:ID(KJV-PERIOD-ID){del}formattedYear{del}isoYear{del}year{del}:LABEL|]
+   TIO.hPutStrLn houtEventYearRel [qc|:START_ID(KJV-EVENT-ID){del}:END_ID(KJV-PERIOD-ID){del}:TYPE|]
    readEntity periodFile >>= \ v -> do
        V.forM_  v $ \ (period@PeriodCsv{..}) -> do
            let
