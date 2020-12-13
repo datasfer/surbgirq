@@ -122,6 +122,7 @@ convertKjvCsv inPath outPath = do
 
    convertPlaces del dataFolder outFileRoot
    convertBooks del dataFolder outFileRoot
+   convertEvents del dataFolder outFileRoot
    convertChapters dataFolder outFileRoot
    convertVerses dataFolder outFileRoot
    convertPersons dataFolder outFileRoot

@@ -49,12 +49,12 @@ instance FromNamedRecord EventCsv where
     m .: "rangeFlag" <*>
     m .: "predecessor" <*>
     m .: "lag" <*>
-    m .: "lag Type" <*>
+    m .: "lagType" <*>
     m .: "partOf" <*>
     m .: "verses" <*>
-    m .: "people (from verses)" <*>
+    m .: "people" <*>
     m .: "participants" <*>
-    m .: "places (from verses)" <*>
+    m .: "places" <*>
     m .: "locations" <*>
     m .: "groups" <*>
     m .: "notes" <*>
