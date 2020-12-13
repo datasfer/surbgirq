@@ -1,12 +1,12 @@
 
 
-module Surbgirq.Shell.Theographic.JsonConverter where
+module Surbgirq.Shell.Theographic.JSON.Converter where
 
 import Data.Aeson
 
 import qualified Data.ByteString.Lazy as B
 
-import Surbgirq.Shell.Theographic.Types
+import Surbgirq.Shell.Theographic.JSON.Types
 
 
 jsonFile = "./data/theodata/json/books.json"

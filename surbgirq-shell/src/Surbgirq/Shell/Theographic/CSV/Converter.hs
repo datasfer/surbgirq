@@ -4,11 +4,14 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 
-module Surbgirq.Shell.Theographic.CsvConverter where
+module Surbgirq.Shell.Theographic.CSV.Converter
+    ( module Surbgirq.Shell.Theographic.CSV.Converter
+    , module X)
+        where
 
 
 
-
+import Surbgirq.Shell.Theographic.CSV.Convert.Books as X
 
 
 
@@ -84,23 +87,27 @@ import Data.List
 import System.FilePath
 
 import Common.Yaml
-import Surbgirq.Shell.Theographic.CsvTypes
+import Surbgirq.Shell.Theographic.CSV.Convert.Helpers
+import Surbgirq.Shell.Theographic.CSV.Types
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
 import Surbgirq.Types.Scripture
 
+-- toTestamentId NewTestament = "new"
+-- toTestamentId OldTestament = "old"
+-- toTestamentId _            = "new"
 
-toTestamentId NewTestament = "new"
-toTestamentId OldTestament = "old"
-toTestamentId _            = "new"
+
+del :: String
+del  = ";"
+
+arrayDel :: String
+arrayDel = "|"
 
 -- | inPath: "./data/theodata/CSV"  outPath: ./data/csv
 --  convertKjvCsv "./data/theodata/CSV" "./data/csv"
 convertKjvCsv :: FilePath -> FilePath -> IO ()
 convertKjvCsv inPath outPath = do
-   let del = ';';
-       arrayDel = "|"
-
    let outRootPath = outPath </> "scriptures"
        outFileRoot = outRootPath </>  "./bible/en/kjv"
        dataFolder = inPath
@@ -112,23 +119,15 @@ convertKjvCsv inPath outPath = do
    when exists $ do
        createDirectoryIfMissing True outFileRoot
 
-   -- Books
-   let booksFile = dataFolder </> "Books.csv"
-   houtBooks <- openFile (outFileRoot </> "books.csv") WriteMode
-   houtRelation <- openFile (outFileRoot </> "Testament_BookRel.csv") WriteMode
-   TIO.hPutStrLn houtBooks [qc|id:ID(KJV-BOOK-ID){del}bookOrder{del}osisref{del}shortName{del}slug{del}title{del}:LABEL|]
-   TIO.hPutStrLn houtRelation [qc|:START_ID(TESTAMENT-ID){del}:END_ID(KJV-BOOK-ID){del}:TYPE|]
-   readEntity booksFile >>= \ v ->
-       V.forM_  v $ \ (BookCsv{..}) -> do
-           let bookID = osisName
-               bookRow = [qc|{bookID}{del}{bookOrder}{del}{osisName}{del}{shortName}{del}{slug}{del}{bookName}{del}Book|]
-               relRow = [qc|{toTestamentId testament}{del}{bookID}{del}CONTAINS|]
-           TIO.hPutStrLn houtBooks bookRow
-           TIO.hPutStrLn houtRelation relRow
+   convertBooks del dataFolder outFileRoot
+   convertChapters dataFolder outFileRoot
+   convertVerses dataFolder outFileRoot
+   convertPersons dataFolder outFileRoot
 
-   hClose houtBooks
-   hClose houtRelation
 
+
+convertChapters :: FilePath -> FilePath -> IO ()
+convertChapters dataFolder outFileRoot = do
    -- Chapters
    let chaptersFile = dataFolder </> "Chapters.csv"
    houtChapters <- openFile (outFileRoot </> "chapters.csv") WriteMode
@@ -151,6 +150,8 @@ convertKjvCsv inPath outPath = do
    hClose houtChapters
    hClose houtRelation
 
+convertVerses ::  FilePath -> FilePath -> IO ()
+convertVerses dataFolder outFileRoot = do
    -- Verses
    let versesFile = dataFolder </> "Verses.csv"
    houtVerses <- openFile (outFileRoot </> "verses.csv") WriteMode
@@ -181,6 +182,8 @@ convertKjvCsv inPath outPath = do
    hClose houtRelation
 
 
+convertPersons :: FilePath -> FilePath -> IO ()
+convertPersons dataFolder outFileRoot = do
    -- Persons
    let personsFile = dataFolder </> "Persons.csv"
    houtPersons <- openFile (outFileRoot </> "persons.csv") WriteMode
@@ -204,14 +207,6 @@ convertKjvCsv inPath outPath = do
    -- readEntity wordsFile >>= \ v ->
    --     V.forM_  v $ \ (WordCsv{..}) -> print [qc|{word'BookID} {word'Word} |]
 
-
--- | "./data/theodata/CSV/Books.csv"
-readEntity :: (FromNamedRecord a) => FilePath -> IO (Vector a)
-readEntity booksFile = do
-  csvData <- BL.readFile booksFile
-  return $ case Cassava.decodeByName csvData of
-        Left err      -> error err
-        Right  (_, v) -> v
 
 
 demoP :: IO ()

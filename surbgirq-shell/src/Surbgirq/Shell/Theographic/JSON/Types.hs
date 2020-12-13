@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
-module Surbgirq.Shell.Theographic.Types where
+module Surbgirq.Shell.Theographic.JSON.Types where
 
 import Data.Aeson
 import GHC.Generics

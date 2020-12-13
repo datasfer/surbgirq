@@ -4,8 +4,19 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 
-module Surbgirq.Shell.Theographic.CsvTypes where
+module Surbgirq.Shell.Theographic.CSV.Types
+    (
+      module Surbgirq.Shell.Theographic.CSV.Types
+    , module X
+    )where
 
+
+
+import Surbgirq.Shell.Theographic.CSV.Types.Event  as X
+import Surbgirq.Shell.Theographic.CSV.Types.Period as X
+import Surbgirq.Shell.Theographic.CSV.Types.Person as X
+import Surbgirq.Shell.Theographic.CSV.Types.Place  as X
+import Surbgirq.Shell.Theographic.CSV.Types.Token  as X
 
 import GHC.Generics
 
@@ -167,138 +178,72 @@ instance FromNamedRecord BookCsv where
 
 
 
-data WordCsv = WordCsv
+
+
+
+
+
+
+
+
+
+-- | Easton's Bible Dictionary
+
+data EastonCsv = EastonCsv
  {
-   word'BookID     :: String
- , word'Chapter    :: String
- , word'ParaID     :: String
- , word'SentID     :: String
- , word'VerseID    :: String
- , word'VerseNum   :: String
- , word'VersePos   :: String
- , word'WordID     :: String
- , word'Word       :: String
- , word'Punc       :: String
- , word'Italic     :: String
- , word'cParen     :: String
- , word'oParen     :: String
- , word'PlaceID    :: String
- , word'Syllables  :: String
- , word'YearNum    :: String
- , word'PersonID   :: String
- , word'RunCharLen :: String
+   easton'dictLookup   :: String
+ , easton'index        :: String
+ , easton'termID       :: String
+ , easton'termLabel    :: String
+ , easton'dictText     :: String
+ , easton'itemNum      :: String
+ , easton'matchType    :: String
+ , easton'matchSlugs   :: String
+ , easton'personLookup :: String
+ , easton'placeLookup  :: String
  } deriving (Eq, Show, Generic)
 
-
-
-instance FromNamedRecord WordCsv where
-  parseNamedRecord m = WordCsv <$>
-    m .: "BookID" <*>
-    m .: "Chapter" <*>
-    m .: "ParaID" <*>
-    m .: "SentID" <*>
-    m .: "VerseID" <*>
-    m .: "VerseNum" <*>
-    m .: "VersePos" <*>
-    m .: "WordID" <*>
-    m .: "Word" <*>
-    m .: "Punc" <*>
-    m .: "Italic" <*>
-    m .: "cParen" <*>
-    m .: "oParen" <*>
-    m .: "PlaceID" <*>
-    m .: "Syllables" <*>
-    m .: "YearNum" <*>
-    m .: "PersonID" <*>
+instance FromNamedRecord EastonCsv where
+  parseNamedRecord m = EastonCsv <$>
+    m .: "dictLookup" <*>
+    m .: "index" <*>
+    m .: "termID" <*>
+    m .: "termLabel" <*>
+    m .: "dictText" <*>
+    m .: "itemNum" <*>
+    m .: "matchType" <*>
+    m .: "matchSlugs" <*>
+    m .: "personLookup" <*>
     m .: "RunCharLen"
 
-
-instance DefaultOrdered WordCsv
-
+instance DefaultOrdered EastonCsv
 
 
 
--- | Person
-data PersonCsv = PersonCsv
-    {
-      person'personLookup           :: String
-    , person'status                 :: String
-    , person'personID               :: String
-    , person'displayTitle           :: String
-    , person'name                   :: String
-    , person'surname                :: String
-    , person'alsoCalled             :: String
-    , person'isProperName           :: String
-    , person'ambiguous              :: String
-    , person'Disambiguation         :: String
-    , person'gender                 :: String
-    , person'occupations            :: String
-    , person'birthYear              :: String
-    , person'minYear                :: String
-    , person'deathYear              :: String
-    , person'maxYear                :: String
-    , person'birthPlace             :: String
-    , person'deathPlace             :: String
-    , person'memberOf               :: String
-    , person'eastons                :: String
-    , person'dictText               :: String
-    , person'events                 :: String
-    , person'eventGroups            :: String
-    , person'verseCount             :: Int
-    , person'verses                 :: String
-    , person'mother                 :: String
-    , person'father                 :: String
-    , person'partners               :: String
-    , person'children               :: String
-    , person'siblings               :: String
-    , person'halfSiblingsSameFather :: String
-    , person'halfSiblingsSameMother :: String
-    , person'chaptersWritten        :: String
-    , person'alphaGroup             :: String
-    , person'slug                   :: String
-    , person'modified               :: String
-    } deriving (Show, Read, Generic)
 
-instance DefaultOrdered PersonCsv
+-- | Event group
+data EventGroupCsv = EventGroupCsv
+ {
+    eventGroup'groupName  :: String
+  , eventGroup'members    :: String
+  , eventGroup'partOf     :: String
+  , eventGroup'verses     :: String
+  , eventGroup'events     :: String
+  , eventGroup'modified   :: String
+  , eventGroup'events_dev :: String
+ } deriving (Eq, Show, Generic)
 
-instance FromNamedRecord PersonCsv where
-  parseNamedRecord m = PersonCsv <$>
-    m .: "personLookup" <*>
-    m .: "status" <*>
-    m .: "personID" <*>
-    m .: "displayTitle" <*>
-    m .: "name" <*>
-    m .: "surname" <*>
-    m .: "alsoCalled" <*>
-    m .: "isProperName" <*>
-    m .: "ambiguous" <*>
-    m .: "Disambiguation (temp)" <*>
-    m .: "gender" <*>
-    m .: "occupations" <*>
-    m .: "birthYear" <*>
-    m .: "minYear" <*>
-    m .: "deathYear" <*>
-    m .: "maxYear" <*>
-    m .: "birthPlace" <*>
-    m .: "deathPlace" <*>
-    m .: "memberOf" <*>
-    m .: "eastons" <*>
-    m .: "dictText" <*>
-    m .: "events" <*>
-    m .: "eventGroups" <*>
-    m .: "verseCount" <*>
+instance FromNamedRecord EventGroupCsv where
+  parseNamedRecord m = EventGroupCsv <$>
+    m .: "groupName" <*>
+    m .: "members" <*>
+    m .: "partOf" <*>
     m .: "verses" <*>
-    m .: "mother" <*>
-    m .: "father" <*>
-    m .: "partners" <*>
-    m .: "children" <*>
-    m .: "siblings" <*>
-    m .: "halfSiblingsSameMother" <*>
-    m .: "halfSiblingsSameFather" <*>
-    m .: "chaptersWritten" <*>
-    m .: "alphaGroup" <*>
-    m .: "slug" <*>
-    m .: "modified"
+    m .: "events" <*>
+    m .: "modified" <*>
+    m .: "events_dev"
+
+instance DefaultOrdered EventGroupCsv
 
 
 

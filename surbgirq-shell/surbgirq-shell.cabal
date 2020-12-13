@@ -29,11 +29,21 @@ library
                    Surbgirq.Shell.Scraper.Scalpel.BibleScraper
                    Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
                    Surbgirq.Shell.CSV.Generate
-                   Surbgirq.Shell.Theographic.Types
-                   Surbgirq.Shell.Theographic.CsvConverter
-                   Surbgirq.Shell.Theographic.JsonConverter    
-                   Surbgirq.Shell.Theographic.CsvTypes
                    
+                   Surbgirq.Shell.Theographic.JSON.Types
+                   Surbgirq.Shell.Theographic.JSON.Converter    
+
+                   Surbgirq.Shell.Theographic.CSV.Converter
+                   Surbgirq.Shell.Theographic.CSV.Convert.Books     
+                   Surbgirq.Shell.Theographic.CSV.Convert.Helpers     
+
+                   Surbgirq.Shell.Theographic.CSV.Types
+                   Surbgirq.Shell.Theographic.CSV.Types.Place    
+                   Surbgirq.Shell.Theographic.CSV.Types.Period     
+                   Surbgirq.Shell.Theographic.CSV.Types.Person     
+                   Surbgirq.Shell.Theographic.CSV.Types.Event     
+                   Surbgirq.Shell.Theographic.CSV.Types.Token
+
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Scripture
                  Surbgirq.Shell.Store.Types
