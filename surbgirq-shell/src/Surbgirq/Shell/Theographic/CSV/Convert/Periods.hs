@@ -33,8 +33,10 @@ convertPeriods del dataFolder outFileRoot = do
    let periodFile = dataFolder </> "Periods.csv"
    houtPeriods <- openFile (outFileRoot </> "periods.csv") WriteMode
    houtEventYearRel <- openFile (outFileRoot </> "Event_YearRel.csv") WriteMode
+   houtPersonYearRel <- openFile (outFileRoot </> "Person_YearRel.csv") WriteMode
    TIO.hPutStrLn houtPeriods [qc|id:ID(KJV-PERIOD-ID){del}formattedYear{del}isoYear{del}year{del}:LABEL|]
    TIO.hPutStrLn houtEventYearRel [qc|:START_ID(KJV-EVENT-ID){del}:END_ID(KJV-PERIOD-ID){del}:TYPE|]
+   TIO.hPutStrLn houtPersonYearRel [qc|:START_ID(KJV-PERSON-ID){del}:END_ID(KJV-PERIOD-ID){del}:TYPE|]
    readEntity periodFile >>= \ v -> do
        V.forM_  v $ \ (period@PeriodCsv{..}) -> do
            let
@@ -48,8 +50,26 @@ convertPeriods del dataFolder outFileRoot = do
                  let eventYearRel = [qc|{strip event}{del}{periodID}{del}OCCURRED_IN|]
                  TIO.hPutStrLn houtEventYearRel eventYearRel
 
+           let bps = splitOn "," $ strip period'peopleBorn
+               m = length $ filter (\x -> (length $ strip x) > 0) bps
+           when (m > 0) $ do
+              forM_  bps $ \ bornPerson -> do
+                 let personYearRel = [qc|{strip bornPerson}{del}{periodID}{del}BORN_IN|]
+                 TIO.hPutStrLn houtPersonYearRel personYearRel
+
+           let dps = splitOn "," $ strip period'peopleDied
+               o = length $ filter (\x -> (length $ strip x) > 0) dps
+           when (o > 0) $ do
+              forM_  dps $ \ diedPerson -> do
+                 let personYearRel = [qc|{strip diedPerson}{del}{periodID}{del}DIED_IN|]
+                 TIO.hPutStrLn houtPersonYearRel personYearRel
 
            TIO.hPutStrLn houtPeriods periodRow
 
    hClose houtPeriods
    hClose houtEventYearRel
+   hClose houtPersonYearRel
+
+
+
+
