@@ -12,11 +12,13 @@ module Surbgirq.Shell.Theographic.CSV.Types
 
 
 
-import Surbgirq.Shell.Theographic.CSV.Types.Event  as X
-import Surbgirq.Shell.Theographic.CSV.Types.Period as X
-import Surbgirq.Shell.Theographic.CSV.Types.Person as X
-import Surbgirq.Shell.Theographic.CSV.Types.Place  as X
-import Surbgirq.Shell.Theographic.CSV.Types.Token  as X
+import Surbgirq.Shell.Theographic.CSV.Types.Easton     as X
+import Surbgirq.Shell.Theographic.CSV.Types.Event      as X
+import Surbgirq.Shell.Theographic.CSV.Types.EventGroup as X
+import Surbgirq.Shell.Theographic.CSV.Types.Period     as X
+import Surbgirq.Shell.Theographic.CSV.Types.Person     as X
+import Surbgirq.Shell.Theographic.CSV.Types.Place      as X
+import Surbgirq.Shell.Theographic.CSV.Types.Token      as X
 
 import GHC.Generics
 
@@ -187,63 +189,7 @@ instance FromNamedRecord BookCsv where
 
 
 
--- | Easton's Bible Dictionary
 
-data EastonCsv = EastonCsv
- {
-   easton'dictLookup   :: String
- , easton'index        :: String
- , easton'termID       :: String
- , easton'termLabel    :: String
- , easton'dictText     :: String
- , easton'itemNum      :: String
- , easton'matchType    :: String
- , easton'matchSlugs   :: String
- , easton'personLookup :: String
- , easton'placeLookup  :: String
- } deriving (Eq, Show, Generic)
-
-instance FromNamedRecord EastonCsv where
-  parseNamedRecord m = EastonCsv <$>
-    m .: "dictLookup" <*>
-    m .: "index" <*>
-    m .: "termID" <*>
-    m .: "termLabel" <*>
-    m .: "dictText" <*>
-    m .: "itemNum" <*>
-    m .: "matchType" <*>
-    m .: "matchSlugs" <*>
-    m .: "personLookup" <*>
-    m .: "RunCharLen"
-
-instance DefaultOrdered EastonCsv
-
-
-
-
--- | Event group
-data EventGroupCsv = EventGroupCsv
- {
-    eventGroup'groupName  :: String
-  , eventGroup'members    :: String
-  , eventGroup'partOf     :: String
-  , eventGroup'verses     :: String
-  , eventGroup'events     :: String
-  , eventGroup'modified   :: String
-  , eventGroup'events_dev :: String
- } deriving (Eq, Show, Generic)
-
-instance FromNamedRecord EventGroupCsv where
-  parseNamedRecord m = EventGroupCsv <$>
-    m .: "groupName" <*>
-    m .: "members" <*>
-    m .: "partOf" <*>
-    m .: "verses" <*>
-    m .: "events" <*>
-    m .: "modified" <*>
-    m .: "events_dev"
-
-instance DefaultOrdered EventGroupCsv
 
 
 

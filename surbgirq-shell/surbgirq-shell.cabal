@@ -21,6 +21,8 @@ source-repository head
 library
   exposed-modules: Surbgirq.Shell.Types
                    Surbgirq.Shell.Scraper
+                   Surbgirq.Shell.Theographic
+
                    Surbgirq.Shell.Store.SQLite.Selda
                    Surbgirq.Shell.Store.ParseFile
                    Surbgirq.Shell.Store.Neo4j
@@ -38,6 +40,10 @@ library
                    Surbgirq.Shell.Theographic.CSV.Convert.Places
                    Surbgirq.Shell.Theographic.CSV.Convert.Events   
                    Surbgirq.Shell.Theographic.CSV.Convert.Periods   
+                   Surbgirq.Shell.Theographic.CSV.Convert.Verses   
+                   Surbgirq.Shell.Theographic.CSV.Convert.Persons   
+                   Surbgirq.Shell.Theographic.CSV.Convert.Chapters   
+                   Surbgirq.Shell.Theographic.CSV.Convert.Eastons   
                    Surbgirq.Shell.Theographic.CSV.Convert.Helpers     
 
                    Surbgirq.Shell.Theographic.CSV.Types
@@ -45,6 +51,8 @@ library
                    Surbgirq.Shell.Theographic.CSV.Types.Period     
                    Surbgirq.Shell.Theographic.CSV.Types.Person     
                    Surbgirq.Shell.Theographic.CSV.Types.Event     
+                   Surbgirq.Shell.Theographic.CSV.Types.EventGroup     
+                   Surbgirq.Shell.Theographic.CSV.Types.Easton     
                    Surbgirq.Shell.Theographic.CSV.Types.Token
 
   other-modules: Paths_surbgirq_shell
@@ -153,4 +161,22 @@ test-suite surbgirq-shell-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends: base >=4.7 && <5
                , surbgirq-shell
+  default-language: Haskell2010
+
+
+
+executable theographic
+  main-is: Main.hs
+  other-modules: Paths_surbgirq_shell
+  hs-source-dirs: app/Theographic
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends: base >=4.7 && <5
+               , surbgirq-shell
+               , surbgirq-types
+               , optparse-applicative
+               , directory
+               , interpolatedstring-perl6
+               , filepath
+               , text
+               , mtl
   default-language: Haskell2010

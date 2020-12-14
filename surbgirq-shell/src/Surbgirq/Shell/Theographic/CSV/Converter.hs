@@ -11,10 +11,14 @@ module Surbgirq.Shell.Theographic.CSV.Converter
 
 
 
-import Surbgirq.Shell.Theographic.CSV.Convert.Books   as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Events  as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Periods as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Places  as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Books    as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Chapters as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Eastons  as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Events   as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Periods  as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Persons  as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Places   as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Verses   as X
 
 -- base
 import           Control.Exception (IOException)
@@ -41,63 +45,20 @@ import           Data.Csv
 import qualified Data.Csv as Cassava
 
 -- text
-import           Data.Text          (Text)
-import qualified Data.Text.Encoding as Text
-
--- vector
-import           Data.Vector (Vector)
-import qualified Data.Vector as Vector
-
-----------------------------------------------
-
-
-
-
-import Control.Exception             (bracket)
-import Control.Monad.Except          (MonadError, MonadIO, catchError, liftIO)
-import Data.Maybe                    (fromMaybe)
-import Data.Text                     (Text, pack)
-import System.FilePath.Posix         (takeBaseName, takeDirectory)
+import Data.Text                     (Text)
 import Text.InterpolatedString.Perl6 (qc)
 
-import Prelude         hiding (catch)
-import System.IO.Error hiding (catch)
-
-import qualified Data.ByteString.Lazy    as B
-import qualified Data.Text               as T
-import qualified Data.Text.Encoding      as TE
-import qualified Data.Text.IO            as TIO
-import qualified Data.Text.Lazy          as TL
-import qualified Data.Text.Lazy.Builder  as TB
-import           Data.Text.Lazy.Encoding as TLE
-
-
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Text.IO         as TIO
+import qualified Data.Vector          as V
 
-import qualified Data.Vector as V
-
-import Control.Exception
--- import Data.Aeson
-import Data.Char
-import Options.Applicative
-import System.Directory
-import System.IO
 
 import Control.Monad
-import Data.List
+import System.Directory
 import System.FilePath
+import System.IO
 
-import Common.Yaml
-import Surbgirq.Shell.Theographic.CSV.Convert.Helpers
 import Surbgirq.Shell.Theographic.CSV.Types
-import Surbgirq.Shell.Types
-import Surbgirq.Types.Girq
-import Surbgirq.Types.Scripture
-
--- toTestamentId NewTestament = "new"
--- toTestamentId OldTestament = "old"
--- toTestamentId _            = "new"
-
 
 del :: String
 del  = ";"
@@ -125,100 +86,14 @@ convertKjvCsv inPath outPath = do
    convertPlaces del dataFolder outFileRoot
    convertBooks del dataFolder outFileRoot
    convertEvents del dataFolder outFileRoot
-   convertChapters dataFolder outFileRoot
-   convertVerses dataFolder outFileRoot
-   convertPersons dataFolder outFileRoot
+   convertChapters del dataFolder outFileRoot
+   convertVerses del dataFolder outFileRoot
+   convertPersons del dataFolder outFileRoot
+   convertEastons del dataFolder outFileRoot
 
 
 
-convertChapters :: FilePath -> FilePath -> IO ()
-convertChapters dataFolder outFileRoot = do
-   -- Chapters
-   let chaptersFile = dataFolder </> "Chapters.csv"
-   houtChapters <- openFile (outFileRoot </> "chapters.csv") WriteMode
-   houtRelation <- openFile (outFileRoot </> "Book_ChapterRel.csv") WriteMode
-   houtPersonChapterRel <- openFile (outFileRoot </> "Person_ChapterRel.csv") WriteMode
-   TIO.hPutStrLn houtChapters [qc|id:ID(KJV-CHAPTER-ID){del}chapterNum{del}osisref{del}slug{del}title{del}:LABEL|]
-   TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-BOOK-ID){del}:END_ID(KJV-CHAPTER-ID){del}:TYPE|]
-   TIO.hPutStrLn houtPersonChapterRel [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]
 
-   readEntity chaptersFile >>= \ v ->
-       V.forM_  v $ \ (ChapterCsv{..}) -> do
-           let chapterID = [qc|{chapter'osisRef}|]
-               chapterTitle = [qc|{chapter'book} {chapter'chapterNum}|]
-               chapterRow = [qc|{chapterID}{del}{chapter'chapterNum}{del}{chapter'osisRef}{del}{chapter'slug}{del}{chapterTitle}{del}Chapter|]
-               personChRel = [qc|{chapterID}{del}{chapter'writer}{del}WROTE|]
-               relRow = [qc|{chapter'book}{del}{chapterID}{del}CONTAINS|]
-           TIO.hPutStrLn houtChapters chapterRow
-           TIO.hPutStrLn houtRelation relRow
-
-   hClose houtChapters
-   hClose houtRelation
-
-convertVerses ::  FilePath -> FilePath -> IO ()
-convertVerses dataFolder outFileRoot = do
-   -- Verses
-   let versesFile = dataFolder </> "Verses.csv"
-   houtVerses <- openFile (outFileRoot </> "verses.csv") WriteMode
-   houtRelation <- openFile (outFileRoot </> "Chapter_VerseRel.csv") WriteMode
-   houtVersePersonRel <- openFile (outFileRoot </> "Verse_PersonRel.csv") WriteMode
-   houtVersePlaceRel <- openFile (outFileRoot </> "Verse_PlaceRel.csv") WriteMode
-   TIO.hPutStrLn houtVerses [qc|id:ID(KJV-VERSE-ID){del}verseNum{del}fullRef{del}osisRef{del}shortRef{del}mdText{del}verseText{del}title{del}:LABEL|]
-   TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
-   TIO.hPutStrLn houtVersePersonRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]
-   TIO.hPutStrLn houtVersePlaceRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PLACE-ID){del}:TYPE|]
-
-   readEntity versesFile >>= \ v ->
-       V.forM_  v $ \ (VerseCsv{..}) -> do
-           let verseID = verse'verseID
-               shortRef = case splitOn "." verse'osisRef of
-                            [book, ch, v] -> [qc|{book} {ch}:{v}|]
-                            _             -> error verse'osisRef
-               verseTitle = shortRef
-               verseRow = [qc|{verseID}{del}{verse'verseNum}{del}{verse'osisRef}{del}{verse'osisRef}{del}{shortRef}{del}"{verse'mdText}"{del}"{verse'verseText}"{del}{verseTitle}{del}Verse|]
-               relRow = [qc|{verse'chapter}{del}{verseID}{del}CONTAINS|]
-           TIO.hPutStrLn houtVerses verseRow
-           TIO.hPutStrLn houtRelation relRow
-           when (verse'peopleCount > 0) $ do
-              let ps = splitOn "," verse'people
-              forM_  ps $ \ person -> do
-                 let versePersonRel = [qc|{verseID}{del}{person}{del}MENTIONS|]
-                 TIO.hPutStrLn houtVersePersonRel versePersonRel
-           when (verse'placesCount > 0) $ do
-              let ps = splitOn "," verse'places
-              forM_  ps $ \ place -> do
-                 let versePlaceRel = [qc|{verseID}{del}{place}{del}MENTIONS|]
-                 TIO.hPutStrLn houtVersePlaceRel versePlaceRel
-   hClose houtVerses
-   hClose houtVersePersonRel
-   hClose houtVersePlaceRel
-   hClose houtRelation
-
-
-convertPersons :: FilePath -> FilePath -> IO ()
-convertPersons dataFolder outFileRoot = do
-   -- Persons
-   let personsFile = dataFolder </> "Persons.csv"
-   houtPersons <- openFile (outFileRoot </> "persons.csv") WriteMode
---   houtRelation <- openFile (outFileRoot </> "Chapter_VerseRel.csv") WriteMode
-   TIO.hPutStrLn houtPersons [qc|id:ID(KJV-PERSON-ID){del}name{del}gender{del}slug{del}status{del}title{del}:LABEL|]
---   TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
-
-   readEntity personsFile >>= \ v ->
-       V.forM_  v $ \ (PersonCsv{..}) -> do
-           let personID = person'personLookup
-               -- shortRef = case splitOn "." verse'osisRef of
-               --              [book, ch, v] -> [qc|{book} {ch}:{v}|]
-               --              _             -> error verse'osisRef
-               personRow = [qc|{personID}{del}{person'name}{del}{person'gender}{del}{person'slug}{del}{person'status}{del}{person'name}{del}Person|]
---               relRow = [qc|{verse'chapter}{del}{verseID}{del}CONTAINS|]
-  --         TIO.hPutStrLn houtRelation relRow
-           TIO.hPutStrLn houtPersons personRow
-   hClose houtPersons
-   -- Words
-   -- let wordsFile = dataFolder </> "WordIndex.csv"
-   -- readEntity wordsFile >>= \ v ->
-   --     V.forM_  v $ \ (WordCsv{..}) -> print [qc|{word'BookID} {word'Word} |]
 
 
 
