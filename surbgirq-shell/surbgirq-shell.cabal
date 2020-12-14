@@ -54,11 +54,16 @@ library
                    Surbgirq.Shell.Theographic.CSV.Types.Event     
                    Surbgirq.Shell.Theographic.CSV.Types.PersonGroup     
                    Surbgirq.Shell.Theographic.CSV.Types.Easton     
+                   Surbgirq.Shell.Theographic.CSV.Types.Chapter     
+                   Surbgirq.Shell.Theographic.CSV.Types.Verse     
+                   Surbgirq.Shell.Theographic.CSV.Types.Book     
                    Surbgirq.Shell.Theographic.CSV.Types.Token
 
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Scripture
                  Surbgirq.Shell.Store.Types
+                 Surbgirq.Shell.Theographic.CSV.Types.Testament     
+                 Surbgirq.Shell.Theographic.CSV.Types.Helpers     
                  
   hs-source-dirs: src
   build-depends: base >=4.7 && <5

@@ -122,7 +122,7 @@ instance RecordValue Verse where
     exact (S Structure {fields = (I i : L labels : M props : _)}) | T "Verse" `elem` labels =
         do
             chNum <- exact =<< props `at` "chapter"
-            secNum <- exact =<< props `at` "section"
+--            secNum <- exact =<< props `at` "section"
             secTitle <- exact =<< props `at` "section_title"
             prgNum <- exact =<< props `at` "paragraph"
             verseNum <- exact =<< props `at` "num"
@@ -132,7 +132,7 @@ instance RecordValue Verse where
             lbs   <- traverse exact labels
             verseID  <-  exact =<< props `at` "verseID"
 
-            return $ Verse i verseID lbs girq chNum secNum secTitle prgNum verseNum content
+            return $ Verse i verseID lbs girq chNum  secTitle prgNum verseNum content
     exact x = fail $ show x ++ " is not a Verse Node"
 
 

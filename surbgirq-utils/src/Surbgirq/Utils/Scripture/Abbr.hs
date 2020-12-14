@@ -157,42 +157,45 @@ abbr = [ -- * New Testament
 
 
 mkAbbrBook trans names = AbbrBook trans names
+
+kjvBooks = mkAbbrBook KJVT
+
 mat :: [AbbrBook]
-mat = [mkAbbrBook E1994T matAm, mkAbbrBook E1994T matRu, mkAbbrBook V1805T matEn]
+mat = [mkAbbrBook E1994T matAm, mkAbbrBook E1994T matRu,  kjvBooks matEn]
   where
     matAm = ["Մատթ.", "Մատթէոս",  "Մատթ", "Մատ", "Մատ.", "Մտ"]
     matEn = ["Matthew", "Mt", "Mat", "Matt","mat", "matt", "mt"]
     matRu = ["Матфея", "Мф"]
 
 mark :: [AbbrBook]
-mark = [mkAbbrBook E1994T markAm, mkAbbrBook E1994T markRu, mkAbbrBook E1994T markEn]
+mark = [mkAbbrBook E1994T markAm, mkAbbrBook E1994T markRu, kjvBooks markEn]
   where
     markAm = ["Մրկ.", "Մարկոս", "Մարկ.", "Մարկ", "Մր"]
     markEn = ["Mark", "Mk"]
     markRu = ["Марка", "Мк"]
 
 luke :: [AbbrBook]
-luke = [mkAbbrBook E1994T lukeAm, mkAbbrBook E1994T lukeRu, mkAbbrBook E1994T lukeEn]
+luke = [mkAbbrBook E1994T lukeAm, mkAbbrBook E1994T lukeRu, kjvBooks lukeEn]
   where
     lukeAm = ["Ղուկ.", "Ղուկաս", "Ղուկ", "Ղկ"]
     lukeEn = ["Lk", "Luke", "Luk"]
     lukeRu = ["Луки", "Лк"]
 
 john :: [AbbrBook]
-john = [mkAbbrBook E1994T johnAm, mkAbbrBook E1994T johnRu, mkAbbrBook E1994T johnEn]
+john = [mkAbbrBook E1994T johnAm, mkAbbrBook E1994T johnRu, kjvBooks johnEn]
   where
     johnAm = ["Յովհ.", "Յովհաննէս", "Հովհաննես", "Հովհ", "Հովհ.", "Յովհ", "Յհ"]
     johnEn = ["John", "Jn"]
     johnRu = ["Иоанн", "Ин"]
 acts :: [AbbrBook]
-acts = [mkAbbrBook E1994T actsAm, mkAbbrBook E1994T actsRu, mkAbbrBook E1994T actsEn]
+acts = [mkAbbrBook E1994T actsAm, mkAbbrBook E1994T actsRu, kjvBooks actsEn]
   where
     actsAm = ["Գործք", "Գրծ"]
     actsRu = ["Деяния", "Деян"]
     actsEn = ["Acts"]
 
 james :: [AbbrBook]
-james = [mkAbbrBook E1994T jamesAm, mkAbbrBook E1994T jamesRu, mkAbbrBook E1994T jamesEn]
+james = [mkAbbrBook E1994T jamesAm, mkAbbrBook E1994T jamesRu, kjvBooks jamesEn]
   where
     jamesAm = ["Յակոբոս", "Յկ"]
     jamesRu = ["Иаков", " Иакова", "Иак"]
@@ -200,35 +203,35 @@ james = [mkAbbrBook E1994T jamesAm, mkAbbrBook E1994T jamesRu, mkAbbrBook E1994T
 
 
 peter1 :: [AbbrBook]
-peter1 = [mkAbbrBook E1994T peter1Am, mkAbbrBook E1994T peter1Ru, mkAbbrBook E1994T peter1En]
+peter1 = [mkAbbrBook E1994T peter1Am, mkAbbrBook E1994T peter1Ru, kjvBooks peter1En]
   where
     peter1Am = ["Ա Պտ", "ԱՊետրոս", "ԱՊտ"]
     peter1Ru = ["1Петр"]
     peter1En = ["1Peter", "1Pet", "Pet1", "Peter1"]
 
 peter2 :: [AbbrBook]
-peter2 = [mkAbbrBook E1994T peter2Am, mkAbbrBook E1994T peter2Ru, mkAbbrBook E1994T peter2En]
+peter2 = [mkAbbrBook E1994T peter2Am, mkAbbrBook E1994T peter2Ru, kjvBooks peter2En]
   where
     peter2Am = ["Բ Պտ", "ԲՊետրոս", "ԲՊտ"]
     peter2Ru = ["2Петр"]
     peter2En = ["2Peter", "2Pet", "Pet2", "Peter2"]
 
 john1 :: [AbbrBook]
-john1 = [mkAbbrBook E1994T john1Am, mkAbbrBook E1994T john1Ru, mkAbbrBook E1994T john1En]
+john1 = [mkAbbrBook E1994T john1Am, mkAbbrBook E1994T john1Ru, kjvBooks john1En]
   where
     john1Am = ["Ա Յովհ.", "ԱՅովհաննէս", "ԱՅովհ", "ԱՅհ"]
     john1Ru = ["Иоанн", "1Ин"]
     john1En = ["John1", "1John", "1Jn", "Jn1"]
 
 john2 :: [AbbrBook]
-john2 = [mkAbbrBook E1994T john2Am, mkAbbrBook E1994T john2Ru, mkAbbrBook E1994T john2En]
+john2 = [mkAbbrBook E1994T john2Am, mkAbbrBook E1994T john2Ru, kjvBooks john2En]
   where
     john2Am = ["ԲՅովհաննէս", "ԲՅովհ",  "ԲՅհ"]
     john2Ru = ["Иоанн", "2Ин"]
     john2En = ["John2", "2John", "2Jn", "Jn2"]
 
 john3 :: [AbbrBook]
-john3 = [mkAbbrBook E1994T john3Am, mkAbbrBook E1994T john3Ru, mkAbbrBook E1994T john3En]
+john3 = [mkAbbrBook E1994T john3Am, mkAbbrBook E1994T john3Ru, kjvBooks john3En]
   where
     john3Am = ["ԳՅովհաննէս", "ԳՅովհ",  "ԳՅհ"]
     john3Ru = ["Иоанн", "3Ин"]
@@ -236,42 +239,42 @@ john3 = [mkAbbrBook E1994T john3Am, mkAbbrBook E1994T john3Ru, mkAbbrBook E1994T
 
 
 jude :: [AbbrBook]
-jude = [mkAbbrBook E1994T judeAm, mkAbbrBook E1994T judeRu, mkAbbrBook E1994T judeEn]
+jude = [mkAbbrBook E1994T judeAm, mkAbbrBook E1994T judeRu, kjvBooks judeEn]
   where
     judeAm = ["Յուդա", "Հուդա", "Յդ"]
     judeRu = ["Иуда", "Иуд"]
     judeEn = ["Jude"]
 
 romans :: [AbbrBook]
-romans = [mkAbbrBook E1994T romansAm, mkAbbrBook E1994T romansRu, mkAbbrBook E1994T romansEn]
+romans = [mkAbbrBook E1994T romansAm, mkAbbrBook E1994T romansRu, kjvBooks romansEn]
   where
     romansAm = ["Հռոմէացիներ", "Հռոմեացիներ", "Հռ"]
     romansRu = ["Римлянам", "Рим"]
     romansEn = ["Romans", "Rom"]
 
 cor1 :: [AbbrBook]
-cor1 = [mkAbbrBook E1994T cor1Am, mkAbbrBook E1994T cor1Ru, mkAbbrBook E1994T cor1En]
+cor1 = [mkAbbrBook E1994T cor1Am, mkAbbrBook E1994T cor1Ru, kjvBooks cor1En]
   where
     cor1Am = ["ԱԿորնթացիներ", "ԿորնթացիներԱ", "ԱԿր", "ԿրԱ"]
     cor1Ru = ["1Коринфянам", "1Коринфян", "Коринфянам1", "Коринфян1", "1Кор", "Кор1"]
     cor1En = ["1Corinthians", "1Cor", "Corinthians1", "Cor1"]
 
 cor2 :: [AbbrBook]
-cor2 = [mkAbbrBook E1994T cor2Am, mkAbbrBook E1994T cor2Ru, mkAbbrBook E1994T cor2En]
+cor2 = [mkAbbrBook E1994T cor2Am, mkAbbrBook E1994T cor2Ru, kjvBooks cor2En]
   where
     cor2Am = ["ԲԿորնթացիներ", "ԿորնթացիներԲ", "ԲԿր", "ԿրԲ"]
     cor2Ru = ["2Коринфянам", "2Коринфян", "Коринфянам2", "Коринфян2", "2Кор", "Кор2"]
     cor2En = ["2Corinthians", "2Cor", "Corinthians2", "Cor2"]
 
 gal :: [AbbrBook]
-gal = [mkAbbrBook E1994T galAm, mkAbbrBook E1994T galRu, mkAbbrBook E1994T galEn]
+gal = [mkAbbrBook E1994T galAm, mkAbbrBook E1994T galRu, kjvBooks galEn]
   where
     galAm = ["Գաղատացիներին", "Գաղ", "Գաղատ", "Գղ"]
     galRu = ["Галатам", "Гал"]
     galEn = ["Galatians", "Gal"]
 
 ephesians :: [AbbrBook]
-ephesians = [mkAbbrBook E1994T ephAm, mkAbbrBook E1994T ephRu, mkAbbrBook E1994T ephEn]
+ephesians = [mkAbbrBook E1994T ephAm, mkAbbrBook E1994T ephRu, kjvBooks ephEn]
   where
     ephAm = ["Եփեսացիներ", "Եփես", "Եփ"]
     ephRu = ["Ефесянам", "Еф"]
@@ -279,35 +282,35 @@ ephesians = [mkAbbrBook E1994T ephAm, mkAbbrBook E1994T ephRu, mkAbbrBook E1994T
 
 
 philippians :: [AbbrBook]
-philippians = [mkAbbrBook E1994T philAm, mkAbbrBook E1994T philRu, mkAbbrBook E1994T philEn]
+philippians = [mkAbbrBook E1994T philAm, mkAbbrBook E1994T philRu, kjvBooks philEn]
   where
     philAm = ["Փիլիպեցիներ", "Փիլիպ", "Փիլ", "Փպ"]
     philRu = ["Филиппийцам", "Филип", "Фил", "Флп"]
     philEn = ["Philippians", "Phil"]
 
 colossians :: [AbbrBook]
-colossians = [mkAbbrBook E1994T colAm, mkAbbrBook E1994T colRu, mkAbbrBook E1994T colEn]
+colossians = [mkAbbrBook E1994T colAm, mkAbbrBook E1994T colRu, kjvBooks colEn]
   where
     colAm = ["Կողոսացիներ", "Կողոս", "Կող", "Կղ"]
     colRu = ["Колоссянам", "Кол"]
     colEn = ["Colossians", "Col"]
 
 thess1 :: [AbbrBook]
-thess1 = [mkAbbrBook E1994T thess1Am, mkAbbrBook E1994T thess1Ru, mkAbbrBook E1994T thess1En]
+thess1 = [mkAbbrBook E1994T thess1Am, mkAbbrBook E1994T thess1Ru, kjvBooks thess1En]
   where
     thess1Am = ["ԱԹեսաղոնիկեցիներ", "ԹեսաղոնիկեցիներԱ", "ԱԹեսաղ", "ԹեսաղԱ", "ԱԹս", "ԹսԱ"]
     thess1Ru = ["1Фессалоникийцам", "1Фес", "Фессалоникийцам1", "Фес1"]
     thess1En = ["1Thessalonians", "1Thess", "Thessalonians1", "Thess1"]
 
 thess2 :: [AbbrBook]
-thess2 = [mkAbbrBook E1994T thess2Am, mkAbbrBook E1994T thess2Ru, mkAbbrBook E1994T thess2En]
+thess2 = [mkAbbrBook E1994T thess2Am, mkAbbrBook E1994T thess2Ru, kjvBooks thess2En]
   where
     thess2Am = ["Բ Թեսաղոնիկեցիներ", "Բ Թս", "ԲԹեսաղոնիկեցիներ", "ԹեսաղոնիկեցիներԲ", "ԲԹեսաղ", "ԹեսաղԲ", "ԲԹս", "ԹսԲ"]
     thess2Ru = ["2Фессалоникийцам", "2Фес", "Фессалоникийцам2", "Фес2"]
     thess2En = ["2Thessalonians", "2Thess", "Thessalonians2", "Thess2"]
 
 hebrews :: [AbbrBook]
-hebrews = [mkAbbrBook E1994T hebAm, mkAbbrBook E1994T hebRu, mkAbbrBook E1994T hebEn]
+hebrews = [mkAbbrBook E1994T hebAm, mkAbbrBook E1994T hebRu, kjvBooks hebEn]
   where
     hebAm = ["Եբրայեցիներին", "Եբր", "Եբ"]
     hebRu = ["Евреям", "Евр"]

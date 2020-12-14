@@ -78,18 +78,49 @@ data Paragraph = Paragraph
     } deriving (Show, Eq, Generic)
 
 data Verse = Verse
-    { verse'id            :: Int
-    , verse'verseID       :: Text
-    , verse'labels        :: [Text]
-    , verse'book          :: Girq
-    , verse'chapter       :: Int
-    , verse'sectionNumber :: Int
-    , verse'sectionTitle  :: Text
-    , verse'paragraph     :: Int
-    , verse'verse         :: Int
-    , verse'content       :: Text
+    { verse'id           :: Int
+    , verse'verseID      :: Text
+    , verse'labels       :: [Text]
+    , verse'book         :: Girq
+    , verse'chapter      :: Int
+--    , verse'sectionNumber :: Int
+    , verse'sectionTitle :: Text
+    , verse'paragraph    :: Int
+    , verse'verse        :: Int
+    , verse'content      :: Text
     } deriving (Show, Eq, Generic)
 
+-- instance FromJSON Verse where
+--  parseJSON (Object v) = Verse <$>
+--    v .: "<id>" <*>
+--    v .:? "verseID" .!= "-?-" <*>
+--    v .:? "labels" .!= [] <*>
+--    v .:  "book" <*>
+--    v .:? "chapter" .!= 0 <*>
+--    v .:? "section" .!= 0 <*>
+--    v .:? "title" .!= "-?-" <*>
+--    v .:? "paragraph" .!= 0 <*>
+--    v .: "verse" <*>
+--    v .: "verseText"
+
+
+instance FromJSON Verse where
+  parseJSON = withObject "verse" $ \o -> do
+    verse'id  <- o .: "<id>"
+    verse'verseID  <- o .:? "verseID" .!= "-?-"
+    verse'book  <- o .:? "book" .!= Matthew
+    verse'sectionTitle  <- o .:? "title" .!= "-?-"
+  --  verse'sectionNumber <- o .: "section" .!= 0
+    verse'chapter       <- o .:? "chapter" .!= 0
+    verse'paragraph       <- o .:? "paragraph" .!= 0
+--    verse'testament     <- o .: "testament"
+    verse'content       <- o .: "verseText"
+    verse'verse         <- o .: "verse"
+    let book'translation = "translation"
+    csvLables <- o .: "labels"
+    let verse'labels = T.split (==',') csvLables
+
+    return Verse{..}
 
 $(deriveJSON dropPrefixOptions ''Chapter)
 $(deriveToJSON dropPrefixOptions ''Section)
@@ -119,23 +150,6 @@ instance FromJSON Book where
 
 
 
-instance FromJSON Verse where
-  parseJSON = withObject "verse" $ \o -> do
-    verse'id  <- o .: "<id>"
-    verse'verseID  <- o .: "verseID"
-    verse'book  <- o .: "book"
-    verse'sectionTitle  <- o .:? "title" .!= "no title"
-    verse'sectionNumber <- o .: "section"
-    verse'chapter       <- o .: "chapter"
-    verse'paragraph       <- o .: "paragraph"
---    verse'testament     <- o .: "testament"
-    verse'content       <- o .: "verseText"
-    verse'verse         <- o .: "verse"
-    let book'translation = "translation"
-    csvLables <- o .: "labels"
-    let verse'labels = T.split (==',') csvLables
-
-    return Verse{..}
 
 
 --     { verse'id            :: Int
