@@ -11,14 +11,15 @@ module Surbgirq.Shell.Theographic.CSV.Converter
 
 
 
-import Surbgirq.Shell.Theographic.CSV.Convert.Books    as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Chapters as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Eastons  as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Events   as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Periods  as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Persons  as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Places   as X
-import Surbgirq.Shell.Theographic.CSV.Convert.Verses   as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Books        as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Chapters     as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Eastons      as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Events       as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Periods      as X
+import Surbgirq.Shell.Theographic.CSV.Convert.PersonGroups as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Persons      as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Places       as X
+import Surbgirq.Shell.Theographic.CSV.Convert.Verses       as X
 
 -- base
 import           Control.Exception (IOException)

@@ -12,13 +12,13 @@ module Surbgirq.Shell.Theographic.CSV.Types
 
 
 
-import Surbgirq.Shell.Theographic.CSV.Types.Easton     as X
-import Surbgirq.Shell.Theographic.CSV.Types.Event      as X
-import Surbgirq.Shell.Theographic.CSV.Types.EventGroup as X
-import Surbgirq.Shell.Theographic.CSV.Types.Period     as X
-import Surbgirq.Shell.Theographic.CSV.Types.Person     as X
-import Surbgirq.Shell.Theographic.CSV.Types.Place      as X
-import Surbgirq.Shell.Theographic.CSV.Types.Token      as X
+import Surbgirq.Shell.Theographic.CSV.Types.Easton      as X
+import Surbgirq.Shell.Theographic.CSV.Types.Event       as X
+import Surbgirq.Shell.Theographic.CSV.Types.Period      as X
+import Surbgirq.Shell.Theographic.CSV.Types.Person      as X
+import Surbgirq.Shell.Theographic.CSV.Types.PersonGroup as X
+import Surbgirq.Shell.Theographic.CSV.Types.Place       as X
+import Surbgirq.Shell.Theographic.CSV.Types.Token       as X
 
 import GHC.Generics
 

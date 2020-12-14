@@ -31,7 +31,7 @@ convertVerses del dataFolder outFileRoot = do
    houtVersePersonRel <- openFile (outFileRoot </> "Verse_PersonRel.csv") WriteMode
    houtVersePlaceRel <- openFile (outFileRoot </> "Verse_PlaceRel.csv") WriteMode
    houtVerseEventRel <- openFile (outFileRoot </> "Verse_EventRel.csv") WriteMode
-   TIO.hPutStrLn houtVerses [qc|id:ID(KJV-VERSE-ID){del}verseNum{del}fullRef{del}osisRef{del}shortRef{del}mdText{del}verseText{del}title{del}:LABEL|]
+   TIO.hPutStrLn houtVerses [qc|id:ID(KJV-VERSE-ID){del}verse{del}fullRef{del}osisRef{del}shortRef{del}mdText{del}verseText{del}title{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
    TIO.hPutStrLn houtVersePersonRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]
    TIO.hPutStrLn houtVersePlaceRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PLACE-ID){del}:TYPE|]

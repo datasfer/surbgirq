@@ -42,6 +42,7 @@ library
                    Surbgirq.Shell.Theographic.CSV.Convert.Periods   
                    Surbgirq.Shell.Theographic.CSV.Convert.Verses   
                    Surbgirq.Shell.Theographic.CSV.Convert.Persons   
+                   Surbgirq.Shell.Theographic.CSV.Convert.PersonGroups   
                    Surbgirq.Shell.Theographic.CSV.Convert.Chapters   
                    Surbgirq.Shell.Theographic.CSV.Convert.Eastons   
                    Surbgirq.Shell.Theographic.CSV.Convert.Helpers     
@@ -51,7 +52,7 @@ library
                    Surbgirq.Shell.Theographic.CSV.Types.Period     
                    Surbgirq.Shell.Theographic.CSV.Types.Person     
                    Surbgirq.Shell.Theographic.CSV.Types.Event     
-                   Surbgirq.Shell.Theographic.CSV.Types.EventGroup     
+                   Surbgirq.Shell.Theographic.CSV.Types.PersonGroup     
                    Surbgirq.Shell.Theographic.CSV.Types.Easton     
                    Surbgirq.Shell.Theographic.CSV.Types.Token
 

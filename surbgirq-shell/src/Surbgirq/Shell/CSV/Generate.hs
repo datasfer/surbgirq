@@ -177,7 +177,7 @@ generateScripturesCSV configFile path outPath = do
      TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
      TIO.hPutStrLn outTranslationh [qc|id:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
      TIO.hPutStrLn outScriptureh [qc|scriptureID:ID{del}title|]
-     TIO.hPutStrLn outScriptureBookRelth [qc|:START_ID{del}:END_ID{del}:TYPE|]
+     TIO.hPutStrLn outScriptureBookRelth [qc|:START_ID(TRANSLATION-ID){del}:END_ID{del}:TYPE|]
 
         
      TIO.putStrLn "Reading Translations ..."
