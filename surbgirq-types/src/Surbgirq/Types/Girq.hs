@@ -60,11 +60,11 @@ data Girq =
           -- ^ 19. Հուդիթ
           | Tobith
           -- ^ 20. Տոբիթ
-          | Makabai1
+          | Maccabees1
           -- ^ 21. Ա Մակաբայեցիներ
-          | Makabai2
+          | Maccabees2
           -- ^ 22. Բ Մակաբայեցիներ
-          | Makabai3
+          | Maccabees3
           -- ^ 23. Գ Մակաբայեցիներ
           | Psalms
           -- ^ 24. Սաղմոս (Դավթի Սաղմոսներ)
