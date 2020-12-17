@@ -22,11 +22,14 @@ source-repository head
 library
   hs-source-dirs: src
   exposed-modules: Surbgirq.Types
-                   Surbgirq.Types.Scripture
                    Surbgirq.Types.Girq
+                   Surbgirq.Types.Scripture
+                   -- ^ these tow modules used by shell types
   other-modules: Paths_surbgirq_types
                  Surbgirq.Types.ApiInfo
                  Surbgirq.Types.Entities
+                 Surbgirq.Types.Instances
+                 Surbgirq.Types.Abbr
 
   build-depends: base >=4.7 && <5
                , common

@@ -14,7 +14,8 @@ module Surbgirq.Types.Entities (
  , VerseNum(..)
  ) where
 
-import Data.Aeson (Value)
+import Data.Aeson
+import Data.Char  (toUpper)
 import Data.Text  (Text)
 
 import qualified Data.Text as T
@@ -23,6 +24,7 @@ import GHC.Generics
 
 import Common.Aeson
 import Data.Aeson
+import Surbgirq.Types.Abbr
 import Surbgirq.Types.Girq
 import Surbgirq.Types.Scripture
 
@@ -134,13 +136,16 @@ $(deriveToJSON dropPrefixOptions ''Book)
 instance FromJSON Book where
   parseJSON = withObject "book" $ \o -> do
     book'Id  <- o .: "<id>"
-    book'bookId  <- o .: "bookID"
+    book'bookId  <- o .:? "bookID" .!= "-?-"
     book'book  <- o .: "book"
     book'title  <- o .:? "title" .!= "no title"
     book'number       <- o .: "bookOrder"
-    book'chapters       <- o .: "chapters"
-    book'testament       <- o .: "testament"
-    let book'translation = "translation"
+    book'chapters       <- o .:? "chapters" .!= 0
+    te  <-  capitalized <$> o .: "testament"
+    let book'testament   = case te of
+                             "New" -> New
+                             _     -> Old
+        book'translation = "translation"
     csvLables <- o .: "labels"
     let ls = T.split (==',') csvLables
 
@@ -172,4 +177,23 @@ instance FromJSON Section where
     section'num    <- o .: "num"
     section'title  <- o .: "title"
     return Section{..}
+
+
+
+capitalized :: String -> String
+capitalized []          = []
+capitalized (head:tail) = toUpper head : tail
+
+
+
+-- | Girtq type instances
+instance ToJSON Girq where
+    toJSON a  = object ["book" .= T.pack (show a)]
+
+instance FromJSON Girq where
+    parseJSON (String g) = do
+        case (findByAbbr g) of
+            Just (girq, _) -> return girq
+            Nothing        ->  error $ "Girq parsed to nothing: " ++ T.unpack  g
+    parseJSON v = error $ "Girq typemismatch: " ++ show  v
 

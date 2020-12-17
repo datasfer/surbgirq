@@ -10,9 +10,7 @@ import           Data.Maybe
 import           Data.Text                     (Text)
 import qualified Data.Text                     as T
 import           GHC.Unicode
-import           Surbgirq.Types.Girq
-import           Surbgirq.Types.Scripture
-import           Surbgirq.Utils.Scripture.Abbr
+import           Surbgirq.Types
 import           Text.InterpolatedString.Perl6 (qc)
 import           Text.Read
 

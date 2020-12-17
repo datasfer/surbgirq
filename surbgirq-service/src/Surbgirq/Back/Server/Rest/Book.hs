@@ -61,9 +61,9 @@ getBooksHandler = do
   env <- liftIO $ mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <- liftIO $ newManager tlsManagerSettings
 --  mres <- liftIO $ flip runClientM env $ getAllBooks'
-  mres <- liftIO $ getAllBooks  mgr
+  let mres = Right [] :: Either String [Book] --  <- liftIO $ getAllBooks  mgr
   case mres of
-    Left e  -> error $ show e -- throwIO $ ClientError e
+    Left e  -> error $  e -- throwIO $ ClientError e
     Right a -> pure a
 -- runQ queryBooks
 

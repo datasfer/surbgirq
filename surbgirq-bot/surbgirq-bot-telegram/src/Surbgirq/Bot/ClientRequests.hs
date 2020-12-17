@@ -35,11 +35,11 @@ import Surbgirq.Types
 
 
 
-getBooksHandler :: IO [Book]
-getBooksHandler = do
+getBooksHandler :: TranslationID -> IO [Book]
+getBooksHandler translation = do
   env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
   mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getAllBooks' -- mgr
+  mres <- flip runClientM env $ getAllBooks' translation -- mgr
   case mres of
     Left e  -> error $ show e -- throwIO $ ClientError e
     Right a -> pure a

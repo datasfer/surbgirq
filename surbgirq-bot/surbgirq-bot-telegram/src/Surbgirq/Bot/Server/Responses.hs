@@ -64,13 +64,13 @@ sendBooks chatId book | T.null book = allBooks chatId
 
 allBooks :: ChatId -> Bot ()
 allBooks chatId = do
-    books <- liftIO getBooksHandler
+    books <- liftIO $ getBooksHandler E1994T
     sendAsParts chatId books
 --    forM_ books $ \book -> let htmlText = TL.toStrict . renderText $ toHtml book in sendHtml chatId htmlText
 
 sendBooks_ :: ChatId -> Bot ()
 sendBooks_ chatId = do
-    books <- liftIO getBooksHandler
+    books <- liftIO $ getBooksHandler E1994T
     let booksHtml =  TL.toStrict . renderText $ toHtml books
     sendHtml chatId  booksHtml
 

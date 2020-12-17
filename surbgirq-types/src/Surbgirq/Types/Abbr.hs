@@ -5,7 +5,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 
-module Surbgirq.Utils.Scripture.Abbr
+module Surbgirq.Types.Abbr
     ( findByAbbr
     , toRefText
     )
@@ -26,10 +26,13 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text       as T
 
 
-import Surbgirq.Types
-
+import Surbgirq.Types.Girq
+import Surbgirq.Types.Scripture
 -- newtype  AbbrMap = Map.Map Text Girq
 
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 findByAbbr :: Text -> Maybe (Girq, TranslationID)
 findByAbbr name = listToMaybe $ catMaybes $ map (\ (girq, bs) -> findAbbr name girq bs) abbr
@@ -62,7 +65,7 @@ abbr = [ -- * New Testament
        -- ^ 3. Ղևտական (Ղևտացվոց գիրք)
        , (Numbers, num)
        -- ^ 4. Թվեր
-       , (Deuteronomium, deut)
+       , (Deuteronomy, deut)
        -- ^ 5. Երկրորդ օրենք (Երկրորդումն օրինաց)
        , (Joshua, joshua)
        -- ^ 6. Հեսու Նավե (Հեսուի գիրք)
@@ -392,7 +395,7 @@ deut = [e1994Books deutAm, v1805Books deutGr, sinodalBooks deutRu, kjvBooks deut
     deutGr = ["Ա Օրէնք"]
     deutAm = ["Ա Օրենք", "Ա Օր", "Երկրորդ Օրենք", "2Օրենք", "2Օր", "Օրենք2", "Օր2"]
     deutRu = ["Второзаконие","Втор"]
-    deutEn = ["Deuteronomy", "Deut"]
+    deutEn = ["Deuteronomy", "Deut", "Deuteronomium"]
 
 
 joshua :: [AbbrBook]
@@ -427,7 +430,7 @@ kings1 = [e1994Books kgsAm, v1805Books kgsGr, sinodalBooks kgsRu, kjvBooks kgsEn
     kgsGr = ["Թագաւորութիւններ Ա"]
     kgsAm = ["Ա Թագ", "ԱԹագ", "ԹագԱ", "Թագ Ա"]
     kgsRu = ["Первая книга Царств","1 Цар", "1Цар", "Цар1"]
-    kgsEn = ["1Kings", "1Samuel", "1Sam"]
+    kgsEn = ["1Kings", "1Samuel", "1 Samuel", "1Sam", "Kings1"]
 
 
 kings2 :: [AbbrBook]
@@ -436,7 +439,7 @@ kings2 = [e1994Books kgsAm, v1805Books kgsGr, sinodalBooks kgsRu, kjvBooks kgsEn
     kgsGr = ["Թագաւորութիւններ Բ"]
     kgsAm = ["Բ Թագ", "ԲԹագ", "ԹագԲ", "Թագ Բ"]
     kgsRu = ["Вторая книга Царств","2 Цар", "2Цар", "Цар2"]
-    kgsEn = ["2Kings", "2Samuel", "2Sam"]
+    kgsEn = ["2Kings", "2Samuel", "2 Samuel", "2Sam", "Kings2"]
 
 
 kings3 :: [AbbrBook]
@@ -445,7 +448,7 @@ kings3 = [e1994Books kgsAm, v1805Books kgsGr, sinodalBooks kgsRu, kjvBooks kgsEn
     kgsGr = ["Թագաւորութիւններ Գ"]
     kgsAm = ["Գ Թագ", "ԳԹագ", "ԹագԳ", "Թագ Գ"]
     kgsRu = ["Третья книга Царств","3 Цар", "3Цар", "Цар3"]
-    kgsEn = ["3Kings", "3Samuel", "3Sam"]
+    kgsEn = ["3Kings", "3Samuel", "3Sam", "Kings3"]
 
 
 kings4 :: [AbbrBook]
@@ -454,7 +457,7 @@ kings4 = [e1994Books kgsAm, v1805Books kgsGr, sinodalBooks kgsRu, kjvBooks kgsEn
     kgsGr = ["Թագաւորութիւններ Դ"]
     kgsAm = ["Դ Թագ", "ԴԹագ", "ԹագԴ", "Թագ Դ"]
     kgsRu = ["Четвертая книга Царств","4 Цар", "4Цар", "Цар4"]
-    kgsEn = ["4Kings", "4Samuel", "4Sam"]
+    kgsEn = ["4Kings", "4Samuel", "4Sam", "Kings4"]
 
 
 chron1 :: [AbbrBook]
@@ -463,7 +466,7 @@ chron1 = [e1994Books chronAm, v1805Books chronGr, sinodalBooks chronRu, kjvBooks
     chronGr = ["Ա Մնացորդաց"]
     chronAm = ["Ա Մնաց", "Ա Մն", "Մն Ա" ]
     chronRu = ["Первая книга Паралипоменон","1 Пар", "1Пар", "Пар1"]
-    chronEn = ["1 Chron", "1Chronicles"]
+    chronEn = ["1 Chron", "1Chronicles", "Chronicles1"]
 
 
 chron2 :: [AbbrBook]
@@ -472,7 +475,7 @@ chron2 = [e1994Books chronAm, v1805Books chronGr, sinodalBooks chronRu, kjvBooks
     chronGr = ["Բ Մնացորդաց"]
     chronAm = ["Բ Մնաց", "Բ Մն", "Մն Բ" ]
     chronRu = ["Вторая книга Паралипоменон","2 Пар", "2Пар", "Пар2"]
-    chronEn = ["2 Chron", "2Chronicles"]
+    chronEn = ["2 Chron", "2Chronicles", "Chronicles2"]
 
 
 
@@ -482,7 +485,7 @@ ezra1 = [e1994Books ezraAm, v1805Books ezraGr, sinodalBooks ezraRu, kjvBooks ezr
     ezraGr = [""]
     ezraAm = ["Ա Եզրաս", "Ա Եզր"]
     ezraRu = ["Первая книга Ездры","1 Езд", "1Езд", "Езд1"]
-    ezraEn = ["1Ezra", "1Esdras"]
+    ezraEn = ["1Ezra", "1Esdras", "Ezra1", "Ezra 1"]
 
 
 ezra2 :: [AbbrBook]
@@ -491,7 +494,7 @@ ezra2 = [e1994Books ezraAm, v1805Books ezraGr, sinodalBooks ezraRu, kjvBooks ezr
     ezraGr = [""]
     ezraAm = ["Բ Եզրաս", "Բ Եզր", "ԲԵզր", "ԵզրԲ", "Եզր Բ" ]
     ezraRu = ["Вторая книга Ездры","2 Езд", "2Езд", "Езд2"]
-    ezraEn = ["2Ezra", "2Esdras"]
+    ezraEn = ["2Ezra", "2Esdras", "Ezra 2", "Ezra2"]
 
 neh :: [AbbrBook]
 neh = [e1994Books nehAm, v1805Books nehGr, sinodalBooks nehRu, kjvBooks nehEn]
@@ -525,7 +528,7 @@ tob = [e1994Books tobAm, v1805Books tobGr, sinodalBooks tobRu, kjvBooks tobEn]
     tobGr = [""]
     tobAm = ["Տոբիթ", "Տոբ"]
     tobRu = ["Книга Товита","Товит", "Тов"]
-    tobEn = ["Tobit", "Tob"]
+    tobEn = ["Tobit", "Tob", "Tobith"]
 
 
 mac1 :: [AbbrBook]
@@ -534,7 +537,7 @@ mac1 = [e1994Books macAm, v1805Books macGr, sinodalBooks macRu, kjvBooks macEn]
     macGr = [""]
     macAm = ["Ա Մակաբայեցիներ", "Ա Մկ", "ԱՄկ", "ՄկԱ" ]
     macRu = ["Первая книга Маккавейская","1 Макк", "1Макк", "Макк 1", "Макк1"]
-    macEn = ["1 Maccabees", "1 Mac", "Mac1", "1Mac"]
+    macEn = ["1 Maccabees",  "1 Mac", "Mac1", "1Mac", "Makabai1"]
 
 
 mac2 :: [AbbrBook]
@@ -543,15 +546,15 @@ mac2 = [e1994Books macAm, v1805Books macGr, sinodalBooks macRu, kjvBooks macEn]
     macGr = [""]
     macAm = ["Բ Մակաբայեցիներ", "Բ Մկ", "ԲՄկ", "ՄկԲ"]
     macRu = ["Первая книга Маккавейская","2 Макк", "2Макк", "Макк 2", "Макк2"]
-    macEn = ["2 Maccabees", "2 Mac", "Mac2", "2Mac"]
+    macEn = ["2 Maccabees", "2 Mac", "Mac2", "2Mac", "Makabai2"]
 
 mac3 :: [AbbrBook]
 mac3 = [e1994Books macAm, v1805Books macGr, sinodalBooks macRu, kjvBooks macEn]
   where
     macGr = [""]
-    macAm = ["Բ Մակաբայեցիներ", "Բ Մկ", "ԲՄկ", "ՄկԲ"]
-    macRu = ["Первая книга Маккавейская","2 Макк", "2Макк", "Макк 2", "Макк2"]
-    macEn = ["2 Maccabees", "2 Mac", "Mac2", "2Mac"]
+    macAm = ["Դ Մակաբայեցիներ", "Դ Մկ", "ԴՄկ", "ՄկԴ"]
+    macRu = ["Первая книга Маккавейская","3 Макк", "3Макк", "Макк 3", "Макк3"]
+    macEn = ["3 Maccabees", "3 Mac", "Mac3", "3Mac", "Makabai3"]
 
 
 

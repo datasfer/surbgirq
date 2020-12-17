@@ -11,8 +11,6 @@ module Surbgirq.API.GraphDBClient
     , getChapterOneSection'
     , getBookSections'
     , getChapterVerseNumber'
-
-    , getAllBooks
     )where
 
 import Control.Applicative
@@ -43,7 +41,7 @@ import Surbgirq.Types
 -- haskell neo4j driver doesnot support neo4j 4.* this is the reason
 -- we develope net core web api to get neo4j data
 type GraphDBLocalAPI =
-         "scripture" :> "books" :> Get '[JSON] [Book]
+         "scripture" :> "translation" :> Capture "translation" TranslationID :> "books" :> Get '[JSON] [Book]
 --    :<|> GetVerseRange -- /chapter/verse/matthew/1/1/10"
        :<|> "scripture" :> Capture "translation" TranslationID
                  :> "books" :> Capture "girq" Girq
@@ -90,7 +88,7 @@ graphDBAPI = Proxy
 neo4jApiBaseUrl :: BaseUrl
 neo4jApiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
 
-getAllBooks' :: ClientM [Book]
+getAllBooks' :: TranslationID -> ClientM [Book]
 getVerseRange' :: TranslationID -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> ClientM [Verse]
 getOneVerse' :: TranslationID -> Girq -> ChapterNum -> VerseNum -> ClientM [Verse]
 getChapterSections' :: TranslationID -> Girq -> ChapterNum -> ClientM [Section]
@@ -110,11 +108,11 @@ getChapterVerseNumber' :: Girq -> ChapterNum -> ClientM Int
 
 
 
-getAllBooks
-  :: Manager
-  -> IO (Either ClientError [Book])
-getAllBooks mgr = runClientM getAllBooks'
-                                   (ClientEnv mgr neo4jApiBaseUrl Nothing)
+-- getAllBooks
+--   :: Manager
+--   -> IO (Either ClientError [Book])
+-- getAllBooks mgr = runClientM getAllBooks'
+--                                    (ClientEnv mgr neo4jApiBaseUrl Nothing)
 
 
 

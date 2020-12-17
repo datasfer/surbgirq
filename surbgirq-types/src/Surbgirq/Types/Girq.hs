@@ -1,18 +1,20 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
-
 
 module Surbgirq.Types.Girq where
+
+import Data.Aeson
+import GHC.Generics
 
 import Data.Aeson (Value)
 import Data.Text  (Text)
 
+import qualified Data.Text as T
 import qualified Text.Read as T
 
-import GHC.Generics
-
-import Common.Aeson
+------------------------------------------------------------
+--
+------------------------------------------------------------
 
 data Girq =
           -- Հնգամատյան (Tora - օրենք)
@@ -25,7 +27,7 @@ data Girq =
           -- ^ 3. Ղևտական (Ղևտացվոց գիրք)
           | Numbers
           -- ^ 4. Թվեր
-          | Deuteronomium
+          | Deuteronomy
           -- ^ 5. Երկրորդ օրենք (Երկրորդումն օրինաց)
 
           --
@@ -198,4 +200,4 @@ data Group = Pentateuch
 -- | Book -> Scripture -> Chapter -> Section -> Paragraph -> Verse -> Words
 
 
-$(deriveJSON dropPrefixOptions ''Girq)
+
