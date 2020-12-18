@@ -47,10 +47,12 @@ convertVerses del dataFolder outFileRoot = do
                verseTitle = shortRef
                verseRow = [qc|{verseID}{del}{verse'verseNum}{del}{verse'osisRef}{del}{verse'osisRef}{del}{shortRef}{del}"{verse'mdText}"{del}"{verse'verseText}"{del}{verseTitle}{del}Verse|]
                relRow = [qc|{verse'chapter}{del}{verseID}{del}CONTAINS|]
-               describeRel = [qc|{verseID}{del}verse'eventsDescribed}{del}DESCRIBES|]
            TIO.hPutStrLn houtVerses verseRow
            TIO.hPutStrLn houtRelation relRow
-           TIO.hPutStrLn houtRelation relRow
+
+           when (length verse'eventsDescribed > 0 ) $ do
+               let describeRel = [qc|{verseID}{del}{verse'eventsDescribed}{del}DESCRIBES|]
+               TIO.hPutStrLn houtVerseEventRel describeRel
 
            when (verse'peopleCount > 0) $ do
               let ps = splitOn "," verse'people
