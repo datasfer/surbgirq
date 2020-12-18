@@ -179,6 +179,28 @@ generateScripturesCSV configFile path outPath = do
      TIO.hPutStrLn outScriptureh [qc|scriptureID:ID{del}title|]
      TIO.hPutStrLn outScriptureBookRelth [qc|:START_ID{del}:END_ID{del}:TYPE|]
 
+     TIO.hPutStrLn outDivisionh [qc|divisionId:ID;name;:LABEL|]
+     TIO.hPutStrLn outDivisionh [qc|MinP;Minor Prophets;Division
+     TIO.hPutStrLn outDivisionh [qc|P;Pentateuch;Division|]
+     TIO.hPutStrLn outDivisionh [qc|MajP;Major Prophets;Division|]
+     TIO.hPutStrLn outDivisionh [qc|G;Gospels;Division|]
+     TIO.hPutStrLn outDivisionh [qc|A;Acts;Division|]
+     TIO.hPutStrLn outDivisionh [qc|PW;Poetry-Wisdom;Division|]
+     TIO.hPutStrLn outDivisionh [qc|R;Revelation;Division|]
+     TIO.hPutStrLn outDivisionh [qc|H;Historical;Division|]
+     TIO.hPutStrLn outDivisionh [qc|GE;General Epistles;Division|]
+     TIO.hPutStrLn outDivisionh [qc|PE;Pauline Epistles;Division|]
+
+     TIO.hPutStrLn outTestamenth [qc|testamentId:ID(TESTAMENT-ID);name;:LABEL|]
+     TIO.hPutStrLn outTestamenth [qc|new;New Testament;Testament|]
+     TIO.hPutStrLn outTestamenth [qc|old;Old Testament;Testament|]
+
+     outCommentariesh <- openFile (outRootPath </> [qc|commentaries.csv|]) WriteMode
+
+     TIO.hPutStrLn outCommentariesh [qc|id:ID(COMMENTARY-ID);name;description;:LABEL|]
+     TIO.hPutStrLn outCommentariesh [qc|eastons;Easton's Bible Dictionary;"The Illustrated Bible Dictionary,[a] better known as Easton's Bible Dictionary, is a reference work on topics related to the Christian Bible compiled by Matthew George Easton";Commentary|]
+     hClose outCommentariesh
+
         
      TIO.putStrLn "Reading Translations ..."
      translations :: [Translation] <- readYaml (corpora'translationsPath corpora)
@@ -243,7 +265,7 @@ generateScripturesCSV configFile path outPath = do
 
 
                -- book csv
-               let bookNodeLabels = intercalate arrayDel [bookName, bookLabel, bookTestament, "Book"]
+               let bookNodeLabels = intercalate arrayDel ["Book"]
                    bookID = concat [T.unpack book'shortName, translationID, show book'orderNum]
                    bookLine = [qc|{bookID}{del}{book'book}{del}{book'title}{del}{book'orderNum}{del}{book'chapters}{del}{book'testament}{del}{bookNodeLabels}|]
 
@@ -350,8 +372,8 @@ generateScripturesCSV configFile path outPath = do
     wordLabels :: Text -> String -> String -> String -> String
     wordLabels w lang dialect arrayDel =
         if isLower $ T.head w
-        then concat [lang, arrayDel, dialect, arrayDel, "Word"]
-        else concat [lang, arrayDel, dialect, arrayDel, "Capitalized", arrayDel, "Word"]
+        then concat [ "Word"]
+        else concat [ "Capitalized", arrayDel, "Word"]
 
     tail' :: [a] -> [a]
     tail' []     = []
