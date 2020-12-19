@@ -103,23 +103,23 @@ abbr = [ -- * New Testament
        -- ^ 22. Բ Մակաբայեցիներ
        , (Maccabees3, mac3)
        -- ^ 23. Գ Մակաբայեցիներ
-       , (Psalms, [])
+       , (Psalms, psalms)
        -- ^ 24. Սաղմոս (Դավթի Սաղմոսներ)
-       , (Proverbs, [])
+       , (Proverbs, proverbs)
        -- ^ 25. Առակներ
-       , (Ecclesiastes, [])
+       , (Ecclesiastes, eccles)
        -- ^ 26. Ժողովող
-       , (Songs, [])
+       , (Songs, songs)
        -- ^ 27. Երգ Երգոց
-       , (Wisdom, [])
+       , (Wisdom, wisdoms)
        -- ^ 28. Իմաստություն Սողոմոնի
-       , (Sirach, [])
+       , (Sirach, sirak)
        -- ^ 29. Սիրաքի իմաստություն
-       , (Job, [])
+       , (Job, job)
        -- ^ 30. Հոբ
-       , (Esai, [])
+       , (Esai, esai)
        -- ^ 31. Եսայու Մարգարեություն
-       , (Hosea, [])
+       , (Hosea, hosea)
        -- ^ 32. Օսէէի Մարգարեություն
        , (Amos, [])
        -- ^ 33. Ամոսի Մարգարեություն
@@ -555,6 +555,88 @@ mac3 = [e1994Books macAm, v1805Books macGr, sinodalBooks macRu, kjvBooks macEn]
     macAm = ["Դ Մակաբայեցիներ", "Դ Մկ", "ԴՄկ", "ՄկԴ"]
     macRu = ["Первая книга Маккавейская","3 Макк", "3Макк", "Макк 3", "Макк3"]
     macEn = ["3 Maccabees", "3 Mac", "Mac3", "3Mac", "Makabai3"]
+
+
+psalms :: [AbbrBook]
+psalms = [e1994Books psalmAm, v1805Books psalmGr, sinodalBooks psalmRu, kjvBooks psalmEn]
+  where
+    psalmGr = [""]
+    psalmAm = ["Սաղմոս", "Սղ"]
+    psalmRu = ["Псалтирь", "Пс"]
+    psalmEn = ["Psalms", "Ps"]
+
+
+proverbs :: [AbbrBook]
+proverbs = [e1994Books proverbAm, v1805Books proverbGr, sinodalBooks proverbRu, kjvBooks proverbEn]
+  where
+    proverbGr = [""]
+    proverbAm = ["Առակներ", "Առ"]
+    proverbRu = ["Книга Притчей Соломоновых", "Притч"]
+    proverbEn = ["Proverbs", "Prov"]
+
+eccles :: [AbbrBook]
+eccles = [e1994Books ecclesAm, v1805Books ecclesGr, sinodalBooks ecclesRu, kjvBooks ecclesEn]
+  where
+    ecclesGr = [""]
+    ecclesAm = ["Ժողովող", "Ժող"]
+    ecclesRu = ["Книга Екклесиаста", "Екклесиаст", "Еккл"]
+    ecclesEn = ["Ecclesiastes", "Eccles"]
+
+
+songs :: [AbbrBook]
+songs = [e1994Books songAm, v1805Books songGr, sinodalBooks songRu, kjvBooks songEn]
+  where
+    songGr = [""]
+    songAm = ["Երգ Երգոց", "Երգոց"]
+    songRu = ["Книга Песни Песней Соломона", "Песни Песней"]
+    songEn = ["Song of Solomon", "Song", "Еккл"]
+
+wisdoms :: [AbbrBook]
+wisdoms = [e1994Books wisdomAm, v1805Books wisdomGr, sinodalBooks wisdomRu, kjvBooks wisdomEn]
+  where
+    wisdomGr = [""]
+    wisdomAm = ["Իմաստութիւն Սողոմոնի", "Իմաստութիւն"]
+    wisdomRu = ["Книга Песни Песней Соломона", "Песни Песней"]
+    wisdomEn = ["Wisdoms", "Wis"]
+
+
+
+sirak :: [AbbrBook]
+sirak = [e1994Books sirakAm, v1805Books sirakGr, sinodalBooks sirakRu, kjvBooks sirakEn]
+  where
+    sirakGr = [""]
+    sirakAm = ["Սիրաք", "Սր"]
+    sirakRu = ["Книга Премудрости Иисуса сына Сирахова", "Сир"]
+    sirakEn = ["Sirak", "Sirach", "Sir"]
+
+
+job :: [AbbrBook]
+job = [e1994Books jobAm, v1805Books jobGr, sinodalBooks jobRu, kjvBooks jobEn]
+  where
+    jobGr = [""]
+    jobAm = ["Յոբ"]
+    jobRu = ["Книга Иова", "Иов"]
+    jobEn = ["Job"]
+
+
+esai :: [AbbrBook]
+esai = [e1994Books esaiAm, v1805Books esaiGr, sinodalBooks esaiRu, kjvBooks esaiEn]
+  where
+    esaiGr = [""]
+    esaiAm = ["Եսայի", "Ես"]
+    esaiRu = ["Книга пророка Исаии", "Ис"]
+    esaiEn = ["Isaiah", "Is", "Isa", "Esai"]
+
+
+hosea :: [AbbrBook]
+hosea = [e1994Books hosAm, v1805Books hosGr, sinodalBooks hosRu, kjvBooks hosEn]
+  where
+    hosGr = [""]
+    hosAm = ["Օսէէ", "Ովս"]
+    hosRu = ["Книга пророка Осии", "Оси", "Ос"]
+    hosEn = ["Hosea", "Hos"]
+
+
 
 
 
