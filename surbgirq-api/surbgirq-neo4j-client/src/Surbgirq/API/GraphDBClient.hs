@@ -11,6 +11,8 @@ module Surbgirq.API.GraphDBClient
     , getChapterOneSection'
     , getBookSections'
     , getChapterVerseNumber'
+
+    , GraphDBLocalAPI
     )where
 
 import Control.Applicative
@@ -23,6 +25,8 @@ import Data.Proxy
 import GHC.Generics
 import Servant.API
 import Servant.Client
+
+import Servant.HTML.Lucid
 
 import Data.Text           (Text)
 import Network.HTTP.Client (Manager)
@@ -41,30 +45,30 @@ import Surbgirq.Types
 -- haskell neo4j driver doesnot support neo4j 4.* this is the reason
 -- we develope net core web api to get neo4j data
 type GraphDBLocalAPI =
-         "scripture" :> "translation" :> Capture "translation" TranslationID :> "books" :> Get '[JSON] [Book]
---    :<|> GetVerseRange -- /chapter/verse/matthew/1/1/10"
-       :<|> "scripture" :> Capture "translation" TranslationID
+            "scripture" :> Capture "translation" TranslationID :> Summary "Get Books of translation"
+                        :> "books" :> Get '[JSON, HTML] [Book]
+       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get verse range"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "verses" :> Capture "verseFrom" VerseNum
 --                 :> "to" :> Capture "verseTo" VerseNum
                  :> QueryParam "v2" VerseNum
-                 :> Get '[JSON] [Verse]
-       :<|> "scripture" :> Capture "translation" TranslationID
+                 :> Get '[JSON, HTML] [Verse]
+       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get a verse"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "oneverse" :> Capture "verseNum" VerseNum
-                 :> Get '[JSON] [Verse]
+                 :> Get '[JSON, HTML] [Verse]
        :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get chapter's sections"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "sections"
-                 :> Get '[JSON] [Section]
+                 :> Get '[JSON, HTML] [Section]
        :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get chapter's sections by sec num"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "sections" :> Capture "secNum" SectionNum
-                 :> Get '[JSON] [Section]
+                 :> Get '[JSON, HTML] [Section]
        :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get Book's section"
                  :> "books" :> Capture "girq" Girq
                  :> "sections"

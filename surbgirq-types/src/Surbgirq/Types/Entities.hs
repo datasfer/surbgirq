@@ -90,6 +90,8 @@ data Verse = Verse
     , verse'paragraph    :: Int
     , verse'verse        :: Int
     , verse'content      :: Text
+    , verse'translation  :: Text
+    , verse'bookTitle    :: Text
     } deriving (Show, Eq, Generic)
 
 -- instance FromJSON Verse where
@@ -121,6 +123,8 @@ instance FromJSON Verse where
     let book'translation = "translation"
     csvLables <- o .: "labels"
     let verse'labels = T.split (==',') csvLables
+    verse'translation         <- o .: "translation"
+    verse'bookTitle         <- o .: "bookTitle"
 
     return Verse{..}
 
@@ -145,7 +149,7 @@ instance FromJSON Book where
     let book'testament   = case te of
                              "New" -> New
                              _     -> Old
-        book'translation = "translation"
+    book'translation <- o .: "translation"
     csvLables <- o .: "labels"
     let ls = T.split (==',') csvLables
 

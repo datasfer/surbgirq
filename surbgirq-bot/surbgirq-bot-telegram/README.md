@@ -49,3 +49,45 @@ https://api.telegram.org/bot<token>/getMe
 
 - logout cloud Bot API server
 https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/logOut
+
+
+check ssl certificate onlien
+https://www.geocerts.com/ssl-checker
+
+# let's encrypt
+
+for creating certificate make sure you disable nginx config for your site to
+pass acme challange, ususaly for bot webhook you use ssl but for acme challange you need
+enable port 80.
+>>  sudo certbot certonly --nginx -d bot.datasfer.com
+maybe some more folder will have to delete, e.g. /etc/letsencrypt/archive/*
+after creating enable nginx config for your bot and reload nginx
+>> sudo systemctl restart nginx
+
+To check the status of webhook
+>> https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/getWebHookInfo
+sample of reply
+{"ok":true,
+"result":{"url":"https://bot.datasfer.com/tg-webhook",
+"has_custom_certificate":false,
+"pending_update_count":4,"last_error_date":1614437701,
+"last_error_message":"Connection refused",
+"max_connections":40,
+"ip_address":"192.0.2.10"}}
+
+## renewal process
+
+>> sudo certbot renew --dry-run
+if get error on renewal check the folders
+>> ls -la /etc/letsencrypt/renewal/
+>> sudo ls -l /etc/letsencrypt/live/
+
+## AUTOMATING THE SSL CERTIFICATE RENEWAL FOR NGINX
+>> edit /etc/cron.d/certbot or create it
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 */12 * * * root certbot -q renew --nginx
+
+
+This will run the renew process twice daily, exactly as above when you ran it manually. The -q flag is provided to prevent any output being logged.

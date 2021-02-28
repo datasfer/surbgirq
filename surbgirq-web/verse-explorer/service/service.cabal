@@ -1,0 +1,76 @@
+name:           service
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/servant#readme>
+homepage:       https://github.com/githubuser/servant#readme
+bug-reports:    https://github.com/githubuser/servant/issues
+author:         Arthur Vardanyan
+maintainer:     arthur@datasfer.com
+copyright:      2020 Arthur Vardanyan
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/servant
+
+library
+  exposed-modules:  VerseExplorer
+  other-modules:    Paths_service
+                    VerseExplorer.App
+                    VerseExplorer.Types
+                    Lucid.Helper
+                    Lucid.Instances
+
+--  ghc-options:     -Wall -Werror
+  hs-source-dirs:   src/
+  build-depends:    base >=4.7 && <5
+                  , surbgirq-types
+                  , surbgirq-neo4j-client
+                  , surbgirq-bot-telegram
+                  , servant
+                  , servant-websockets
+                  , servant-server
+                  , servant-lucid
+                  , interpolatedstring-perl6
+                  , lens
+                  , wai
+                  , websockets
+                  , http-api-data
+                  , text
+                  , casing
+                  , aeson
+                  , time
+                  , bytestring
+                  , transformers
+                  , mtl
+                  , wai-cors
+                  , wai-extra
+                  , servant-lucid
+                  , lucid
+                  , monad-logger
+                  , data-dword
+                  , gitrev >= 1.3.1
+                  , sqlite-simple
+                  , containers
+  default-language: Haskell2010
+  default-extensions:
+    TemplateHaskell
+
+test-suite service-spec
+  ghc-options:      -Wall
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Spec.hs
+  other-modules:    BE.Server
+                    Paths_service
+  build-depends:    base >=4.7 && <5
+                  , bytestring
+                  , hspec
+                  , QuickCheck
+                  , quickcheck-instances
+  default-language: Haskell2010

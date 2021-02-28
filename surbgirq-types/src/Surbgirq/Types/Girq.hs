@@ -78,40 +78,40 @@ data Girq =
           -- ^ 27. Երգ Երգոց
           | Wisdom
           -- ^ 28. Իմաստություն Սողոմոնի
-          | Sirach
+          | Sirach -- Sirak
           -- ^ 29. Սիրաքի իմաստություն
           | Job
           -- ^ 30. Հոբ
 
-          | Esai
+          | Esai -- Isaiah
           -- ^ 31. Եսայու Մարգարեություն
           | Hosea
           -- ^ 32. Օսէէի Մարգարեություն
           | Amos
           -- ^ 33. Ամոսի Մարգարեություն
-          | Micah
+          | Micah --
           -- ^ 34. Միքիայի Մարգարեություն
-          | Hovel
+          | Hovel -- Joel
           -- ^ 35. Հովելի Մարգարեություն
-          | Abdiu
+          | Abdiu -- Obadiah
           -- ^ 36. Աբդիույի Մարգարեություն
-          | Hovnan
+          | Hovnan -- Jonah
           -- ^ 37. Հովնանի Մարգարեություն
-          | Navum
+          | Navum -- Nahum
           -- ^ 38. Նավումի Մարգարեություն
-          | Habakkuk
+          | Habakkuk --
           -- ^ 39. Ամբակումի Մարգարեություն
-          | Sohonia
+          | Sohonia -- Zephaniah
           -- ^ 40. Սոփոնիայի Մարգարեություն
-          | Angei
+          | Angei -- Haggai
           -- ^ 41. Անգեի Մարգարեություն
-          | Zaqaria
+          | Zaqaria -- Zechariah
           -- ^ 42. Զաքարիայի Մարգարեություն
-          | Maxaqia
+          | Maxaqia -- Malachi
           -- ^ 43. Մաղաքիայի Մարգարեություն
           | Jeremiah
           -- ^ 44. Երեմիայի Մարգարեություն
-          | Baruq
+          | Baruq -- Baruk
           -- ^ 45. Բարուքի Մարգարեություն
           | Voxb
           -- ^ 46. Ողբ (Երեմիա Մարգարեի ողբը)
@@ -156,7 +156,9 @@ data Girq =
           | Revelation
 
 
-            deriving(Show, Eq, Generic, Enum, T.Read, Ord)
+            deriving(Show, Eq, Generic, Read, Enum, Ord)
+
+
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին
 -- ^ Պողոս առաքյալի առաջին նամակը Կորնթացիներին (Ա Կորնթացիներ)

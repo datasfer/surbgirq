@@ -132,7 +132,8 @@ instance RecordValue Verse where
             lbs   <- traverse exact labels
             verseID  <-  exact =<< props `at` "verseID"
 
-            return $ Verse i verseID lbs girq chNum  secTitle prgNum verseNum content
+            -- ToDo: dummy translation and book title
+            return $ Verse i verseID lbs girq chNum  secTitle prgNum verseNum content "" ""
     exact x = fail $ show x ++ " is not a Verse Node"
 
 

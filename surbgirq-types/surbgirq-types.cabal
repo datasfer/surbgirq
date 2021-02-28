@@ -23,14 +23,15 @@ library
   hs-source-dirs: src
   exposed-modules: Surbgirq.Types
                    Surbgirq.Types.Girq
+                   Surbgirq.Types.Abbr
                    Surbgirq.Types.Scripture
                    -- ^ these tow modules used by shell types
   other-modules: Paths_surbgirq_types
                  Surbgirq.Types.ApiInfo
                  Surbgirq.Types.Entities
                  Surbgirq.Types.Instances
-                 Surbgirq.Types.Abbr
-
+                 Surbgirq.Types.Abbreviation.GirqAbbr
+                 Surbgirq.Types.Abbreviation.TranslationIDAbbr
   build-depends: base >=4.7 && <5
                , common
                , aeson

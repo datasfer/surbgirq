@@ -44,13 +44,8 @@ readNums n =
                   (\x y -> isDigit x && isDigit y) . T.unwords . drop n . T.words
 
 readTranslation :: [Text] -> Maybe TranslationID
-readTranslation [] = Nothing
-readTranslation [s] | s `elem` e1994 = Just E1994T
-                    | s `elem` v1805 = Just V1805T
-                    | otherwise  = Nothing
-  where
-    e1994 = ["e1994", "e1994T", "e94", "e94T"]
-    v1805 = ["v1805", "v1805T", "v05", "v05T"]
+readTranslation []  = Nothing
+readTranslation [s] = findTransByAbbr s
 
 readGirqs :: Text -> Maybe (Girq, TranslationID)
 readGirqs txt =

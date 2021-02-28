@@ -32,7 +32,6 @@ main = do
   SurbgirqSettings{..} <- getSurbgirqSettings
   let port = serverPort surbgirq'server
       staticPath = serverStaticDir surbgirq'server
-      newsPath = serverNewsDir surbgirq'server
       dbName = sqliteConfig'dbName $ storeSpec'sqlite surbgirq'stores
       neo4jConfig = storeSpec'neo4j surbgirq'stores
 

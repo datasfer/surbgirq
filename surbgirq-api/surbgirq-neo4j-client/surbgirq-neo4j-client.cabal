@@ -29,6 +29,7 @@ library
                , interpolatedstring-perl6
                , mtl
                , servant
+               , servant-lucid
                , servant-client      >= 0.16
                , servant-client-core >= 0.16
                , http-client-tls

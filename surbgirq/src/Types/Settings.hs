@@ -12,7 +12,6 @@ module Types.Settings where
 
 import Data.Aeson
 import Data.String
-import Katip
 
 import Data.Text                (Text)
 import Network.Wai.Handler.Warp (HostPreference)
@@ -32,21 +31,17 @@ instance FromJSON HostPreference where
   parseJSON = withText "HostPreference" $ \t ->
     pure $ fromString . T.unpack $ t
 
+
+data ExplorerSettings = ExplorerSettings
+  { explorer'server     :: !ServerSettings
+  } deriving (Show)
+
 data ServerSettings = ServerSettings
   { serverHost                   :: !HostPreference
-  -- ^ Server host name
   , serverPort                   :: !Int
-  -- ^ Server port number
-  -- , serverTlsConf              :: !(Maybe TlsConfig)
-  -- -- ^ Tls files for https
-  -- , serverTlsParams            :: !HttpQueryTlsParams
-  -- -- ^ How to query worker over http
   , serverDetailedRequestLogging :: !Bool
   , serverStaticDir              :: !FilePath
-  , serverNewsDir                :: !FilePath
   , serverIpFromHeader           :: !Bool
-  -- ^ If set, HTTP log would be more readable
-  , serverMonitoringPort         :: !(Maybe Int)
   } deriving (Eq, Show)
 
 
@@ -83,22 +78,24 @@ data LogSpec = LogSpec
 
 data LocalNeo4jApiConfig = LocalNeo4jApiConfig
     { localNeo4jApiConfig'baseUrl :: Text
-    , localNeo4jApiConfig'port :: Int
+    , localNeo4jApiConfig'port    :: Int
     } deriving(Show)
 
 -- | Surbgirq settings
 data SurbgirqSettings = SurbgirqSettings
-  { surbgirq'server :: !ServerSettings
+  { surbgirq'server        :: !ServerSettings
   -- ^ the server front settings, port ...
-  , surbgirq'logs   :: !LogSpec
+  , surbgirq'logs          :: !LogSpec
   -- ^ the logs settings
-  , surbgirq'stores :: !StoreSpec
+  , surbgirq'stores        :: !StoreSpec
   -- ^ the storage settings
   , surbgirq'localNeo4jApi :: !LocalNeo4jApiConfig
   -- ^ the storage settings
   } deriving (Show)
 
 $(deriveFromJSON dropPrefixOptions ''SurbgirqSettings)
+$(deriveFromJSON dropPrefixOptions     ''ExplorerSettings)
+
 $(deriveJSON dropPrefixOptions     ''LogSpec)
 $(deriveFromJSON dropPrefixOptions ''ServerSettings)
 $(deriveJSON dropPrefixOptions     ''SqliteConfig)

@@ -20,7 +20,6 @@ import GHC.Generics
 
 import Surbgirq.Types.Girq
 
-
 class HasId a where
     toId :: a -> Text
 
