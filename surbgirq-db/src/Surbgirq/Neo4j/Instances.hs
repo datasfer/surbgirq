@@ -133,7 +133,7 @@ instance RecordValue Verse where
             verseID  <-  exact =<< props `at` "verseID"
 
             -- ToDo: dummy translation and book title
-            return $ Verse i verseID lbs girq chNum  secTitle prgNum verseNum content "" ""
+            return $ Verse i verseID lbs girq chNum  secTitle prgNum verseNum content "" "" Nothing
     exact x = fail $ show x ++ " is not a Verse Node"
 
 
