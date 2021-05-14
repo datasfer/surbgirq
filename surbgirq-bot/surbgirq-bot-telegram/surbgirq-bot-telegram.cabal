@@ -78,7 +78,6 @@ library
                , lucid
                , mtl
                , bytestring
-               , telegram-bot-simple
                , text
                , interpolatedstring-perl6
                , time

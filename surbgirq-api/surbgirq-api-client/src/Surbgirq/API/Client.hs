@@ -73,14 +73,14 @@ getAllBooks
   :: Manager
   -> IO (Either ClientError [Book])
 getAllBooks mgr = runClientM getAllBooks'
-                                   (ClientEnv mgr apiBaseUrl Nothing)
+                                   (ClientEnv mgr apiBaseUrl Nothing defaultMakeClientRequest)
 
 
 getVerseRange
   :: Manager
-  -> Girq -> ChapterNum -> VerseNum -> VerseNum 
+  -> Girq -> ChapterNum -> VerseNum -> VerseNum
   -> IO (Either ClientError [Verse])
-getVerseRange mgr girq ch from to = runClientM (getVerseRange' girq ch from to) 
-                                   (ClientEnv mgr apiBaseUrl Nothing)
+getVerseRange mgr girq ch from to = runClientM (getVerseRange' girq ch from to)
+                                   (ClientEnv mgr apiBaseUrl Nothing defaultMakeClientRequest)
 
 

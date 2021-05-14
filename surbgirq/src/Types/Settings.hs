@@ -19,8 +19,8 @@ import Network.Wai.Handler.Warp (HostPreference)
 import qualified Data.Text as T
 
 import Common.Aeson
-import Surbgirq.Neo4j
-import Surbgirq.Service
+-- import Surbgirq.Neo4j
+-- import Surbgirq.Service
 import Types.Logger
 
 ------------------------------------------------------------

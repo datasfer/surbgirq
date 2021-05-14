@@ -15,7 +15,7 @@ import Database.Bolt
 
 import qualified Network.Wai.Handler.Warp as Warp
 
-import Surbgirq.Service
+-- import Surbgirq.Service
 -- import Surbgirq.State
 import Settings
 import Sigterm
@@ -39,7 +39,7 @@ main = do
   putStrLn $ mconcat ["Start surbgirq on port: ", show  port] -- , " with db: ", dbName]
 --  state <- newTVarIO def
 --  withDatabase dbName $ \c ->
-  Warp.run port $ staticPolicy (noDots >-> addBase staticPath) $ app (ServerEnv pool undefined)
+  -- Warp.run port $ staticPolicy (noDots >-> addBase staticPath) $ app (ServerEnv pool undefined)
 
 
 

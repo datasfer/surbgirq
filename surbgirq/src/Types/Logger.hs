@@ -14,8 +14,8 @@ Types for Logging types
 module Types.Logger where
 
 import Data.Aeson
-import Katip
-import Katip.Scribes.ElasticSearch
+--import Katip
+--import Katip.Scribes.ElasticSearch
 
 import Control.Monad (unless)
 import Data.Text     (Text)
@@ -57,8 +57,8 @@ data ScribeSpec = ScribeSpec
     -- ^ Type of scribe to use
   , scribe'path      :: !(Maybe FilePath)
     -- ^ Log file if not specified will log to stdout
-  , scribe'severity  :: !Severity
-  , scribe'verbosity :: !Verbosity
+  , scribe'severity  :: !Text
+  , scribe'verbosity :: !Text
   }
   deriving (Show,Eq,Ord,Generic)
 

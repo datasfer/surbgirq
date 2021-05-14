@@ -23,13 +23,11 @@ executable surbgirq
                        Types
   build-depends:       base >=4.11 && <5
                      , common
-                     , surbgirq-service
-                     , surbgirq-db
+                     -- , surbgirq-service
+                     -- , surbgirq-db
                      , hasbolt
                      , resource-pool
                      , warp
-                     , katip
-                     , katip-elasticsearch
                      , wai
                      , aeson
                      , text
@@ -72,14 +70,14 @@ executable verse-explorer
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends: base >=4.7 && <5
                , service
-               , surbgirq-service
-               , surbgirq-db
+              -- , surbgirq-service
+              -- , surbgirq-db
                , wai-middleware-static
                , wai-extra
                , warp
                , unix
-               , katip
-               , katip-elasticsearch
+               -- , katip
+               -- , katip-elasticsearch
                , optparse-applicative   >= 0.14
                , aeson
                , common

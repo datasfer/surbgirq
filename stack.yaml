@@ -1,15 +1,16 @@
 #resolver: lts-16.18
-resolver: lts-14.23
+#resolver: lts-14.23
+resolver: lts-17.11 # ghc-8.10.4
 
 packages:
 - surbgirq-types
 - surbgirq-utils
-- surbgirq-service
 - surbgirq-api/surbgirq-api
 - surbgirq-api/surbgirq-api-client
 - surbgirq-api/surbgirq-neo4j-client
 - surbgirq-shell
-- surbgirq-db
+#- surbgirq-db
+# - surbgirq-service
 - surbgirq-bot/surbgirq-bot-telegram
 - surbgirq-bot/surbgirq-bot-state
 - surbgirq-bot/surbgirq-bot-store
@@ -25,31 +26,27 @@ allow-newer: true
 extra-deps:
   - wai-middleware-prometheus-1.0.0
   - wai-middleware-static-embedded-0.1.0.0
-  - katip-0.8.2.0
-  - katip-elasticsearch-0.6.0.0
-  - bloodhound-0.16.0.0
   - containers-0.5.11.0
   - guid-0.1.0
   - serialise-0.2.1.0
-  - hasbolt-0.1.3.3           
-  - hasbolt-extras-0.0.0.16
+  - hasbolt-0.1.4.5           
+  - hasbolt-extras-0.0.1.7
   - servant-swagger-ui-jensoleg-0.3.2
   - tasty-hedgehog-1.0.0.1
   - hedgehog-1.0
-  - scalpel-0.6.0
-  - scalpel-core-0.6.0
+  - scalpel-0.6.2
+  - scalpel-core-0.6.2
   - binary-0.8.7.0
   - servant-websockets-2.0.0
   - text-1.2.4.0
-#  - git: git@github.com:ArthurVard/telegram-bot-simple.git # https://github.com/fizruk/telegram-bot-simple.git
-#    commit: 7e109f2bb29652ee6387eb1a8b44fc5549537043
-  - git: https://github.com/anpryl/telegram-bot-simple
-    commit: 8e459a59efa9ca42d933119a28cb41b512445e68
   - o-clock-1.1.0@sha256:941ac2bc1732e6622b165831c4badb1a8e846f451620bd028064339f5b284224,5043
-  - git: https://github.com/klappvisor/haskell-telegram-api.git                                                                                                                                                                               
-    commit: abbfd76c40f2783c113b660184a03cc94d58e751
+  - git: https://github.com/ArthurVard/haskell-telegram-api.git                                                                                                                                                                               
+    commit: 8c156dc9a5208b1963072cdfde8e497611671507
   - git: git@github.com:ArthurVard/fbmessenger-api-hs.git
-    commit: 36ee2725c0022f8cbf26b079a3bceb316615a09b
+    commit: 409b9369d3989077c09f693c33629a3abe4bac44
+  - Cabal-3.4.0.0@sha256:74ca2bc93297dc20b291c8dc721055278aa4a7942b0b5aca86766d407e3cbe5f,30533
+  - parsec-3.1.14.0@sha256:72d5c57e6e126adaa781ab97b19dc76f68490c0a3d88f14038219994cabe94e1,4356
+  - servant-lucid-0.9.0.2@sha256:693278d574dba7313e931200118424762c02682bbc654e8866be4e6d1c73d816,1803
   
 
 nix:
