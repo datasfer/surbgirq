@@ -34,7 +34,7 @@ library
                , servant-client-core >= 0.16
                , http-client-tls
                , text
-               , surbgirq-api
+               , surbgirq-api-instances
                , surbgirq-types
   default-language: Haskell2010
 

@@ -28,13 +28,14 @@ import Servant.Client
 
 import Servant.HTML.Lucid
 
-import Data.Text           (Text)
+import Data.Char           (toLower, toUpper)
+import Data.Text           (Text, pack)
 import Network.HTTP.Client (Manager)
 
 import qualified Data.Text    as T
 import qualified Data.Text.IO as T
 
-import Surbgirq.API
+import Surbgirq.API.Instances
 import Surbgirq.Types
 
 -------------------------------------------------------------------------------

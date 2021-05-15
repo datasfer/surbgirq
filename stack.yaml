@@ -5,12 +5,13 @@ resolver: lts-17.11 # ghc-8.10.4
 packages:
 - surbgirq-types
 - surbgirq-utils
-- surbgirq-api/surbgirq-api
-- surbgirq-api/surbgirq-api-client
+#- surbgirq-api/surbgirq-api
+#- surbgirq-api/surbgirq-api-client
+- surbgirq-api/surbgirq-api-instances
 - surbgirq-api/surbgirq-neo4j-client
 - surbgirq-shell
 #- surbgirq-db
-# - surbgirq-service
+#- surbgirq-service
 - surbgirq-bot/surbgirq-bot-telegram
 - surbgirq-bot/surbgirq-bot-state
 - surbgirq-bot/surbgirq-bot-store

@@ -1,0 +1,49 @@
+* Surbgirq
+
+** Projects
+
+** common
+** surbgirq
+** surbgirq-api
+ - surbgirq-api *
+ not used, the hasbolt doesnot support neo4j protocol of version 4.*
+ depricated, this project describition of the haskell api to access the neo4j db, but which at this moment
+ cannot be used
+ - api-client *
+ depricated, the surbgirq-api client endpoints
+
+ - surbgirq-api-instances
+ the Instances for parse and convert to url the surbgirq types
+ this module seperated from surbgirq-api, duplicate, later we will remove this module from surbgir-api
+
+ - surbgirq-neo4j-client
+ Here we describe all endoints using Types (Servant) of .net core web app.
+ From Surbgirq.Bot.ClientRequests module we call these endpoints.
+
+ Due to hasbolt do not support new 4.* protocol of neo4j server, we develope the web api using .net core neo4j
+ provider which support new protocol and this way we have access to our neo4j graph DB. but all other parts of our
+ pp in Haskell, hence we need call that .net web api to get data.
+
+** surbgirq-bot
+   Create the bot using botfather https://telegram.me/botfather
+ - surbgirq-bot-types
+ - surbgirq-bot-state
+ - surbgirq-bot-store
+ - surbgirq-bot-telegram
+
+** surbgirq-db *
+   not used, the hasbolt doesnot support neo4j protocol of version 4.*
+** surbgirq-service *
+   not used, the hasbolt doesnot support neo4j protocol of version 4.*
+** surbgirq-shell
+** surbgirq-types
+** surbgirq-utils
+** surbgirq-web/verse-explorer
+ - front
+ - service
+
+
+
+
+
+
