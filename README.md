@@ -1,10 +1,12 @@
-* Surbgirq
+![Telegram bot inline mode demo 01](images/inlinequery_mode_01_demo.gif)
 
-** Projects
+# Surbgirq
 
-** common
-** surbgirq
-** surbgirq-api
+## Projects
+
+## common
+## surbgirq
+## surbgirq-api
  - surbgirq-api *
  not used, the hasbolt doesnot support neo4j protocol of version 4.*
  depricated, this project describition of the haskell api to access the neo4j db, but which at this moment
@@ -24,30 +26,30 @@
  provider which support new protocol and this way we have access to our neo4j graph DB. but all other parts of our
  pp in Haskell, hence we need call that .net web api to get data.
 
-** surbgirq-bot
+## surbgirq-bot
    Create the bot using botfather https://telegram.me/botfather
  - surbgirq-bot-types
  - surbgirq-bot-state
  - surbgirq-bot-store
  - surbgirq-bot-telegram
 
-** surbgirq-db *
+## surbgirq-db *
    not used, the hasbolt doesnot support neo4j protocol of version 4.*
-** surbgirq-service *
+## surbgirq-service *
    not used, the hasbolt doesnot support neo4j protocol of version 4.*
-** surbgirq-shell
-** surbgirq-types
-** surbgirq-utils
-** surbgirq-web/verse-explorer
- - front
+## surbgirq-shell
+## surbgirq-types
+## surbgirq-utils
+## surbgirq-web/verse-explorer
+ - [front using Lucid package](http://192.0.2.10:8009/)
  - service
 
 
 
 
-* Telegram bot User's manual
+# Telegram bot User's manual
 
-** Inline mode
+## Inline mode
 
 Inline mode in telegram give posibility to post the bot's result without navigate to bot direct messaging.
 e.g. entering following commands in any direct chat, grou pchat or channel window you will get the result to choose.
