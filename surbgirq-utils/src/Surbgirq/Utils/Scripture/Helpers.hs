@@ -27,14 +27,15 @@ parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text
          skip = maybe 1 (const 2) maybeTranslation
          ns' = readNums skip str
          ns = if null ns' then readNums 2 str else ns'
+         combine = T.any (\x -> x ==':' || x =='-') str
      in case gs of
            Nothing -> Left [qc|Unknown book name: {verseRange}|]
            Just (girq, trans) ->
                let translation = Just $ fromMaybe trans maybeTranslation
                in case ns of
-                         (a:b:c:_) -> Right $ VerseReference translation girq a (Just b) (Just c)
-                         (a:b:_)   -> Right $ VerseReference translation girq a (Just b) Nothing
-                         (a:_)     -> Right $ VerseReference translation girq a Nothing Nothing
+                         (a:b:c:_) -> Right $ VerseReference translation girq a (Just b) (Just c) combine
+                         (a:b:_)   -> Right $ VerseReference translation girq a (Just b) Nothing False
+                         (a:_)     -> Right $ VerseReference translation girq a Nothing Nothing False
                          []        -> Left "Failed parse verse numbers"
 
 

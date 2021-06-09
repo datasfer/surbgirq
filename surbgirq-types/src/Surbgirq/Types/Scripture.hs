@@ -96,7 +96,9 @@ data VerseReference = VerseReference
     , verseRef'chapter     :: Int
     , verseRef'from        :: Maybe Int
     , verseRef'to          :: Maybe Int
-    } deriving (Read)
+    , verseRef'combine     :: Bool
+    -- ^ combine resutl to one record from till to verses
+    } deriving (Read, Show)
 
 
 instance HasId VerseReference where

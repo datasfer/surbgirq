@@ -91,6 +91,7 @@ inlineVerse' userId iqId verseRef@VerseReference{..} = do
          -- liftIO $ case verseRef'to of
          --     Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum <$> verseRef'from)
          --     Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
+  _ <- liftIO $ putStrLn $ "Inline Ref: " ++ (show verseRef)
 
   let inlineQueryResults = map (\(verse, vRef) ->
                                     InlineQueryResultArticle (toId vRef)
@@ -114,7 +115,34 @@ inlineVerse' userId iqId verseRef@VerseReference{..} = do
                                                              Nothing
                                                              -- ^ Thumbnail height
                                                               ) (zip vs (verseRefRange verseRef))
-      request = AnswerInlineQueryRequest iqId inlineQueryResults apiCachTime Nothing Nothing Nothing Nothing
+
+
+      miKtorovInlineQueryResults = [InlineQueryResultArticle (toId verseRef)
+                                                             -- ^ Unique identifier for this result
+                                                             (Just $ toRefText defaultTrans verseRef)
+                                                             -- ^ Title of the result
+                                                             -- (Just $ InputTextMessageContent (html2Text' verse vRef) (Just HTML) Nothing)
+                                                             (Just $ InputTextMessageContent (html2Text' vs verseRef) (Just HTML) Nothing)
+
+                                                             -- ^ Content of the message to be sent
+                                                             Nothing
+                                                             -- ^ Inline keyboard attached to the message
+                                                             Nothing
+                                                             -- ^ URL of the result
+                                                             Nothing
+                                                             -- ^ Pass True, if you don't want the URL to be shown in the message
+                                                             (Just $ T.take 100 $  html2Text' vs verseRef)
+                                                             -- ^ Short description of the result
+                                                             Nothing
+                                                             -- ^ Url of the thumbnail for the result
+                                                             Nothing
+                                                             -- ^ Thumbnail width
+                                                             Nothing
+                                                             -- ^ Thumbnail height
+                                   ]
+      request = case verseRef'combine of
+                  True  -> AnswerInlineQueryRequest iqId miKtorovInlineQueryResults apiCachTime Nothing Nothing Nothing Nothing
+                  False -> AnswerInlineQueryRequest iqId inlineQueryResults apiCachTime Nothing Nothing Nothing Nothing
   res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
@@ -126,6 +154,10 @@ inlineVerse' userId iqId verseRef@VerseReference{..} = do
   where
     html2Text = TL.toStrict . renderText . toHtml
     html2Text' a b = TL.toStrict . renderText $ (toHtml a <> toHtml b)
+
+--    miKtorov = TL.toStrict . renderText . toHtml
+
+
 
 
 

@@ -45,5 +45,23 @@
 
 
 
+* Telegram bot User's manual
+
+** Inline mode
+
+Inline mode in telegram give posibility to post the bot's result without navigate to bot direct messaging.
+e.g. entering following commands in any direct chat, grou pchat or channel window you will get the result to choose.
+- > @surbgirq Mat 1
+Will be the list of all verses from chapter 1 of Matthew, and then you can choose on of vers and it willbe past.
+w> @surbgirq Mat 1 4
+Will bring exact one verse Mat 1.4, this command can be modified to bring list starting from 4
+- > @surbgirq Mat 1 4 12
+Will show the list of all verses from chapter 1 of Matthew starting verse 4 till verse 12
+- > @surbgirq Mat 1 4:12 or @surbgirq Mat 1 4-12
+Will show exactly one item on list which is combined verse starting from 4 to 12
+`
+
+
+
 
 
