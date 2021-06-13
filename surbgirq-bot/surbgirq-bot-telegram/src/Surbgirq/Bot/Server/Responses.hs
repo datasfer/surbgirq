@@ -115,6 +115,8 @@ sendVerse sendAtOnce chatId userId verseRef =
       Right vRef -> sendVerse' sendAtOnce chatId userId  vRef
 
 
+-- | if sendAtOnce True then send all verses of chapter as one text post
+-- otherwise will send sperae post, and only for last verse ill have next button
 sendVerse' :: Bool -> ChatId -> UserId -> VerseReference -> Bot ()
 sendVerse' sendAtOnce chatId userId vRef@VerseReference{..} = do
       BotConfig{..} <- ask

@@ -17,15 +17,17 @@ module Surbgirq.Bot.Server.Handlers.InlineQueries
 import Control.Monad.Reader
 import Lucid
 
-import Data.Char  (isSpace)
-import Data.List  (intercalate, intersperse)
-import Data.Maybe (fromMaybe)
-import Data.Text  (Text)
+import Data.Char                     (isSpace)
+import Data.List                     (intercalate, intersperse)
+import Data.Maybe                    (fromMaybe)
+import Data.Text                     (Text)
+import Text.InterpolatedString.Perl6 (qc)
 
 import qualified Data.Text      as T
 import qualified Data.Text.Lazy as TL
 
 import Surbgirq.Bot.Monad
+import Surbgirq.Bot.Server.Helpers.Pagination
 import Surbgirq.Bot.Server.Responses
 import Surbgirq.Bot.Server.TelegramAPI
 import Surbgirq.Bot.State
@@ -47,6 +49,7 @@ handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
   where
     iqId = query_id
     onCommand (T.stripPrefix "/random" -> Just _)   = return ()
+    onCommand (T.stripPrefix "read" -> Just verseRef)  = inlineReadVerses (UserId user_id) iqId verseRef
     onCommand (parseVerseRef  -> Right verseRef)    = inlineVerse' (UserId user_id) iqId verseRef
     onCommand (all isSpace . T.unpack   -> True)    = inlineSettings iqId
     onCommand (parseVerseRef  -> Left error)        = liftIO $ print $ T.append "==== Verse Parse Error:    "  error
@@ -68,6 +71,69 @@ handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
 --                                     | otherwise -> return ()
 --                     Nothing -> return ()
 
+inlineReadVerses :: UserId -> Text -> Text -> Bot ()
+inlineReadVerses userId iqId verseRef =
+    let res = parseVerseRef verseRef
+    in case res of
+      Left e     -> liftIO $ putStrLn $ "Error: " ++ (show e)
+      Right vRef -> inlineReadVerses' userId iqId vRef
+
+inlineReadVerses' :: UserId -> Text -> VerseReference -> Bot ()
+inlineReadVerses' userId iqId verseRef@VerseReference{..} = do
+  BotConfig{..} <- ask
+  cfg <- getUserConfig  userId
+  let def1 = fromMaybe E1994T (readTranslation [config'bible cfg])
+      defaultTrans = fromMaybe def1 verseRef'translation
+
+  vs <- liftIO $ getVerses defaultTrans verseRef
+
+  let
+      currentPage = fromMaybe 1 verseRef'from
+      buttons = prevNextPageBtns currentPage 20 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+      verseNum = fromMaybe 1 verseRef'from
+      verseToShow = case  filter ((== verseNum) . snd) $ zip vs [1..]  of
+                      [(v, _)] -> v
+                      []       -> error "Error: there are no verses to select one."
+                      _        -> vs!!0
+
+      verseHtml = TL.toStrict . renderText $ (toHtml verseToShow <> toHtml verseRef)
+
+
+      miKtorovInlineQueryResults = [InlineQueryResultArticle (toId verseRef)
+                                                             -- ^ Unique identifier for this result
+                                                             (Just $ toRefText defaultTrans verseRef)
+                                                             -- ^ Title of the result
+                                                             -- (Just $ InputTextMessageContent (html2Text' verse vRef) (Just HTML) Nothing)
+                                                             (Just $ InputTextMessageContent verseHtml (Just HTML) Nothing)
+                                                             -- ^ Content of the message to be sent
+                                                             (Just $ InlineKeyboardMarkup buttons)
+                                                             -- ^ Inline keyboard attached to the message
+                                                             Nothing
+                                                             -- ^ URL of the result
+                                                             Nothing
+                                                             -- ^ Pass True, if you don't want the URL to be shown in the message
+                                                             (Just $ T.take 100 $  html2Text' verseToShow verseRef)
+                                                             -- ^ Short description of the result
+                                                             Nothing
+                                                             -- ^ Url of the thumbnail for the result
+                                                             Nothing
+                                                             -- ^ Thumbnail width
+                                                             Nothing
+                                                             -- ^ Thumbnail height
+                                   ]
+      request = AnswerInlineQueryRequest iqId miKtorovInlineQueryResults apiCachTime Nothing Nothing Nothing Nothing
+
+  res <- ($) answerInlineQuery telegramToken request manager
+  case res of
+    Left e -> do
+      _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
+      return ()
+    Right r -> do
+      _ <- liftIO $ putStrLn $ "Response: " ++ (show r)
+      return ()
+  where
+    -- html2Text = TL.toStrict . renderText . toHtml
+    html2Text' a b = TL.toStrict . renderText $ (toHtml a <> toHtml b)
 
 
 inlineVerse :: UserId -> Text -> [String] -> Bot ()

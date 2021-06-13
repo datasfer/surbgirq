@@ -17,7 +17,7 @@
  - surbgirq-api-instances
  the Instances for parse and convert to url the surbgirq types
  this module seperated from surbgirq-api, duplicate, later we will remove this module from surbgir-api
-
+.net core REST API swagger endpoint http://192.0.2.10:33010/swagger/index.html
  - surbgirq-neo4j-client
  Here we describe all endoints using Types (Servant) of .net core web app.
  From Surbgirq.Bot.ClientRequests module we call these endpoints.
@@ -62,6 +62,8 @@ Will show the list of all verses from chapter 1 of Matthew starting verse 4 till
 - > @surbgirq Mat 1 4:12 or @surbgirq Mat 1 4-12
 Will show exactly one item on list which is combined verse starting from 4 to 12
 `
+
+## read command
 
 
 

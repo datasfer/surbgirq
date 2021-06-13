@@ -68,7 +68,7 @@ handleMessage msg@Message{..} = do
 
     onCommand userId (T.stripPrefix "/help" -> Just _)          = sendHelpMessage chatId
     onCommand userId (T.stripPrefix "/verse" -> Just verseRef)  = sendVerse True chatId userId verseRef
-    onCommand userId (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse True chatId userId verseRef
+    onCommand userId (T.stripPrefix "/_verse" -> Just verseRef) = sendVerse False chatId userId verseRef
     onCommand userId (T.stripPrefix "/chapter" -> Just args)    = sendChapterSections chatId args
     onCommand userId (T.stripPrefix "/books" -> Just book)      = sendBooks chatId book
     onCommand userId (T.stripPrefix "/_books" -> Just _)        = sendBooks_ chatId
