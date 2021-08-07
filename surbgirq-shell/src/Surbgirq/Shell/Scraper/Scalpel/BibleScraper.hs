@@ -169,8 +169,7 @@ parseVerse fs = do
   vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
   versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
 
-  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.strip $  T.pack rawVerseHtml
-
+  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.strip $ T.pack rawVerseHtml
       rs :: [(String, [String])]
       rs = PCRE.scan refRegex rawVerseHtml
 
