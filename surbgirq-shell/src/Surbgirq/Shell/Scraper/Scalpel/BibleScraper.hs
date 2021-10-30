@@ -46,27 +46,6 @@ import           Text.Regex.PCRE
 import qualified Text.Regex.PCRE.Heavy as PCRE
 
 
-data BookData = BookData
- { book'title    :: Text
- , book'chapters :: [ChapterData]
- } deriving (Show, Generic)
-data ChapterData = ChapterData
- { chapterNum       :: Text
- , chapter'sections :: [SectionData]
- } deriving(Show, Generic)
-
-data SectionData = SectionData
- { title  :: Text
- , p_ref  :: Text
- , verses :: [VerseData]
- } deriving(Show, Generic)
-
-data VerseData = VerseData
- { verse'num   :: Text
- , verse'verse :: Text
- } deriving(Show, Generic)
-
-
 data Book' = Book'
  { b'title     :: Text
  , b'chapters  :: [Chapter]
@@ -76,10 +55,7 @@ data Book' = Book'
 data FootnoteData = FootnoteData Text Text
                   deriving (Show, Generic)
 
-instance ToJSON VerseData
-instance ToJSON SectionData
-instance ToJSON ChapterData
-instance ToJSON BookData
+
 instance ToJSON Book'
 instance ToJSON FootnoteData
 
@@ -98,7 +74,7 @@ test = do
     case (ts, gs) of
       (Just xs, Just fs )  -> do
               case xs of
-                [b] -> forM_ (b'chapters b) $ \ ch@Chapeter{..} -> do
+                [b] -> forM_ (b'chapters b) $ \ ch@Chapter{..} -> do
                                 print chapter'number
               encodeFile "matt-parseHtml.yaml" xs
               A.encodeFile "matt-parseHtml.json" xs
@@ -148,7 +124,7 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
                 createDirectoryIfMissing True outDir
 
                 forM_ xs $ \book -> do
-                  forM_ (b'chapters book) $ \ ch@Chapeter{..} -> do
+                  forM_ (b'chapters book) $ \ ch@Chapter{..} -> do
                             let file = outDir </> if chapter'number < 10
                                                   then [qc|0{chapter'number}.yaml|]
                                                   else [qc|{chapter'number}.yaml|]
@@ -237,33 +213,33 @@ parseBibleHtml = do
             ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse fs
             return $ Section sectionTitle 111 p_ref $ [Paragraph 1 $ concat ps]
          let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = n}) [1..] sections
-         return $ Chapeter chNum "" "" secs
+         return $ Chapter chNum "" "" secs
        return $ Book' title   chapters []
 
 
 
 
-printBook hFile BookData{..} = do
-   TIO.putStrLn (T.append "    " book'title)
-   TIO.hPutStrLn hFile (T.append "    " book'title)
-   forM_ book'chapters $ printChapter hFile
+-- printBook hFile BookData{..} = do
+--    TIO.putStrLn (T.append "    " book'title)
+--    TIO.hPutStrLn hFile (T.append "    " book'title)
+--    forM_ book'chapters $ printChapter hFile
 
-printChapter hFile  ChapterData{..} = do
-           TIO.putStrLn (T.append "    " chapterNum)
-           TIO.hPutStrLn hFile (T.append "    " chapterNum)
-           forM_ chapter'sections $ printSection hFile
+-- printChapter hFile  ChapterData{..} = do
+--            TIO.putStrLn (T.append "    " chapterNum)
+--            TIO.hPutStrLn hFile (T.append "    " chapterNum)
+--            forM_ chapter'sections $ printSection hFile
 
-printSection hFile SectionData{..} = do
-    (TIO.putStrLn . T.append "      ")  title
-    (TIO.putStrLn . T.append "      ")  p_ref
-    (TIO.hPutStrLn hFile . T.append "      ")  title
-    (TIO.hPutStrLn hFile . T.append "      ")  p_ref
---    forM_ verses $ printVerse'
+-- printSection hFile SectionData{..} = do
+--     (TIO.putStrLn . T.append "      ")  title
+--     (TIO.putStrLn . T.append "      ")  p_ref
+--     (TIO.hPutStrLn hFile . T.append "      ")  title
+--     (TIO.hPutStrLn hFile . T.append "      ")  p_ref
+-- --    forM_ verses $ printVerse'
 
-printVerse hFile VerseData{..} = do
-  TIO.putStrLn "{#}"
-  TIO.hPutStrLn hFile verse'verse
-  TIO.putStrLn verse'verse
+-- printVerse hFile VerseData{..} = do
+--   TIO.putStrLn "{#}"
+--   TIO.hPutStrLn hFile verse'verse
+--   TIO.putStrLn verse'verse
 
 
 -- printVerse' VerseData{..} = do

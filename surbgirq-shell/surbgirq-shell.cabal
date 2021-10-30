@@ -30,6 +30,8 @@ library
                    Surbgirq.Shell.Scraper.Hxt
                    Surbgirq.Shell.Scraper.Scalpel.BibleScraper
                    Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
+                   Surbgirq.Shell.Scraper.Scalpel.Narek
+                   Surbgirq.Shell.Scraper.Scalpel.Narek.XeranyanScraper
                    Surbgirq.Shell.CSV.Generate
                    
                    Surbgirq.Shell.Theographic.JSON.Types
@@ -58,7 +60,7 @@ library
                    Surbgirq.Shell.Theographic.CSV.Types.Verse     
                    Surbgirq.Shell.Theographic.CSV.Types.Book     
                    Surbgirq.Shell.Theographic.CSV.Types.Token
-
+                   
   other-modules: Paths_surbgirq_shell
                  Surbgirq.Shell.Types.Scripture
                  Surbgirq.Shell.Store.Types

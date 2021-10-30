@@ -282,7 +282,7 @@ generateScripturesCSV configFile path outPath = do
                -- a file == a chapter
                -- Chapter
                forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
-                 ch@Chapeter{..} <- readChapter (bookDir </> file)
+                 ch@Chapter{..} <- readChapter (bookDir </> file)
                  let chapterID = concat [bookID, "-", show chapter'number ]
                      chNode = [qc|{chapterID}{del}Գլ. {chapter'number}{del}{chapter'number}{del}{show book'book}|]
                      bookRel  = [qc|{bookID}{del}{chapter'number}{del}{chapterID}|]
@@ -510,7 +510,7 @@ generateVerseCsv bookFile path outPath = do
 
          -- a file == a chapter
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
-           ch@Chapeter{..} <- readChapter (bookDir </> file)
+           ch@Chapter{..} <- readChapter (bookDir </> file)
            -- Sections
            forM_ chapter'sections $ \Section{..} -> do
               -- Paragraphs

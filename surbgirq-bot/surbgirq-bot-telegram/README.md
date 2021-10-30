@@ -51,7 +51,7 @@ https://api.telegram.org/bot<token>/getMe
 https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/logOut
 
 
-check ssl certificate onlien
+check ssl certificate online
 https://www.geocerts.com/ssl-checker
 
 # let's encrypt
@@ -59,14 +59,13 @@ https://www.geocerts.com/ssl-checker
 for creating certificate make sure you disable nginx config for your site to
 pass acme challange, ususaly for bot webhook you use ssl but for acme challange you need
 enable port 80.
-for disable just comment your config include in
-/etc/nginx/nginx.config
+for disable just comment your config included in the config file '/etc/nginx/nginx.config'
 e.g.
 `
   include /etc/nginx/conf.d/*.conf;                                                                                                                                                                                                   
   #include /etc/nginx/sites-enabled/*;
 `
-
+# re-load updated config
 >> sudo systemctl restart nginx
 if get error regarding busy port e.g. nginx: [emerg] bind() to [::]:443 failed (98: Address already in use)
 
@@ -76,9 +75,15 @@ then use command
 list app listening prts
 >> netstat -tulpn 
 
->>  sudo certbot certonly --nginx -d bot.datasfer.comw
+# renew cert
+>> sudo certbot renew
+
+# create cert
+>> sudo certbot certonly --nginx -d bot.datasfer.com
 maybe some more folder will have to delete, e.g. /etc/letsencrypt/archive/*
 after creating enable nginx config for your bot and reload nginx
+
+return the config line, uncomment then re-load config
 >> sudo systemctl restart nginx
 
 To check the status of webhook

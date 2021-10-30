@@ -1,4 +1,4 @@
-{-# LANGUAGE ApplicativeDo     #-}
+{-# LANGUAGE ApplicativeDo       #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE QuasiQuotes         #-}
 {-# LANGUAGE RecordWildCards     #-}
@@ -227,7 +227,7 @@ generateInitCypher bookFile path outPath = do
 
          -- a file == a chapter
          forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
-           ch@Chapeter{..} <- readChapter (bookDir </> file)
+           ch@Chapter{..} <- readChapter (bookDir </> file)
 
            let chName = concat [T.unpack bookName, del, "ch", show chapter'number]
                chNode = [qc| ({chName}:Chapter \{title: 'Գլ. {chapter'number}', book: '{show book'book}', num: {chapter'number} }),|]
@@ -360,11 +360,11 @@ createRef (Ref from  rs) =
 
 -- | cmd line
 data Command = Command
-    { cmd'book    :: BookKind
-    , cmd'outFormat    :: OutFormat
-    , cmd'config  :: FilePath
-    , cmd'inPath  :: FilePath
-    , cmd'outPath :: FilePath
+    { cmd'book      :: BookKind
+    , cmd'outFormat :: OutFormat
+    , cmd'config    :: FilePath
+    , cmd'inPath    :: FilePath
+    , cmd'outPath   :: FilePath
     }
 
 
@@ -433,4 +433,4 @@ parser = do
     <> value ""
     )
   return Command{..}
-      
+

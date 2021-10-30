@@ -74,7 +74,7 @@ data Book = Book
   -- ^ the path to store processed result
   } deriving (Show, Read)
 
-data Chapter = Chapeter
+data Chapter = Chapter
     { chapter'number   :: Int
     , chapter'title    :: Text
     , chapter'ref      :: Text

@@ -1,25 +1,25 @@
 {-# LANGUAGE ApplicativeDo     #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE QuasiQuotes         #-}
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE QuasiQuotes, FlexibleContexts #-}
 
 module Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
     (parseGrabarBibleHtml)
     where
 
-import Debug.Trace
 import Data.IORef
-    
-import Data.Text(Text)
-import Text.Read (readMaybe)
-import Data.Maybe (fromMaybe)
-import Data.Map(Map)
-import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+import Debug.Trace
 
-import Data.Char    
+import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+import Data.Map             (Map)
+import Data.Maybe           (fromMaybe)
+import Data.Text            (Text)
+import Text.Read            (readMaybe)
+
+import Data.Char
 
 import Text.InterpolatedString.Perl6 (qc)
 
@@ -29,24 +29,24 @@ import System.Directory
 import           Control.Applicative
 import           Control.Monad
 import           Control.Monad.IO.Class
+import qualified Data.Aeson             as A
 import           Data.List
 import           Data.List.Split
-import qualified Data.Text           as T
-import qualified Data.Text.Encoding  as TE
-import qualified Data.Text.IO        as TIO
-import qualified Data.Map.Strict as Map
-import qualified Data.Aeson as A
-import qualified Text.Regex.PCRE.Heavy as PCRE
-    
-import           System.IO
-import           Text.HTML.Scalpel
-import System.FilePath
-import           GHC.IO.Encoding
-import           GHC.Generics
+import qualified Data.Map.Strict        as Map
+import qualified Data.Text              as T
+import qualified Data.Text.Encoding     as TE
+import qualified Data.Text.IO           as TIO
+import qualified Text.Regex.PCRE.Heavy  as PCRE
 
-import Text.RawString.QQ    
-import Text.Regex.PCRE
+import GHC.Generics
+import GHC.IO.Encoding
+import System.FilePath
+import System.IO
+import Text.HTML.Scalpel
+
 import Data.Yaml
+import Text.RawString.QQ
+import Text.Regex.PCRE
 
 import Surbgirq.Shell.Types
 
@@ -54,39 +54,14 @@ import Surbgirq.Shell.Types
 --
 -------------------------------------------------------------------------------
 
-data BookData = BookData
- { book'title :: Text
- , book'chapters :: [ChapterData]
- } deriving (Show, Generic)
-data ChapterData = ChapterData
- { chapterNum :: Text
- , chapter'sections :: [SectionData]
- } deriving(Show, Generic)
-
-data SectionData = SectionData
- { title :: Text
- , p_ref :: Text
- , verses :: [VerseData]
- } deriving(Show, Generic)
-
-data VerseData = VerseData
- { verse'num :: Text
- , verse'verse :: Text
- } deriving(Show, Generic)
-
-
 data Book' = Book'
- { b'title :: Text
+ { b'title    :: Text
  , b'chapters :: [Chapter]
  } deriving (Show, Generic)
 
 data FootnoteData = FootnoteData Text Text
                   deriving (Show, Generic)
 
-instance ToJSON VerseData 
-instance ToJSON SectionData
-instance ToJSON ChapterData
-instance ToJSON BookData
 instance ToJSON Book'
 instance ToJSON FootnoteData
 
@@ -122,26 +97,26 @@ parseGrabarBibleHtml dataRootPath  outPutPath = do
     let fullFilename =file
         lastFolderName = (last . splitPath $ takeDirectory fullFilename)
     htmlText <- readFile fullFilename
-    print fullFilename 
+    print fullFilename
 
     let resM = scrapeStringLike htmlText parseFootnotesMap
         refMap = case resM of
-                           Just m -> m
+                           Just m  -> m
                            Nothing -> Map.empty
         ts = scrapeStringLike htmlText (parseBible refMap)
 
-    case ts of 
+    case ts of
       Just xs  -> do
               encodeFile "parseHtml.yaml" xs
               A.encodeFile "parseHtml.json" xs
               print $  length xs
-      
+
               when (length xs > 0) $ do
                 let outDir = outRootDir </> lastFolderName </> (takeBaseName file)
                 createDirectoryIfMissing True outDir
 
                 forM_ xs $ \Book'{..} -> do
-                  forM_ b'chapters $ \ ch@Chapeter{..} -> do
+                  forM_ b'chapters $ \ ch@Chapter{..} -> do
                             let file = outDir </> if chapter'number < 10
                                                   then [qc|0{chapter'number}.yaml|]
                                                   else [qc|{chapter'number}.yaml|]
@@ -175,8 +150,8 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
                   let ps' = zipWith (\n p@(Paragraph{paragraph'number = m}) -> p{paragraph'number = n})
                           [1..] ps
                   in sec{section'paragraphs = ps'}
-                    ) secs                   
-       return $ Chapeter chNum chTitle "" ss
+                    ) secs
+       return $ Chapter chNum chTitle "" ss
     return $ Book' bookTitle chapters
    parse = do
      vv <- T.pack <$> innerHTML "p"
@@ -188,10 +163,10 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
          to = last vNums
 --         vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
          vs = filter ( (>1) . T.length . T.strip) $ PCRE.split rr_1 $ T.pack rawVerseHtml
-         
-         rs :: [(String, [String])]     
+
+         rs :: [(String, [String])]
          rs = PCRE.scan refRegex rawVerseHtml
-      
+
          verseRefs = map toVerseRef rs
 
          xs = map ( \(n, verse) ->
@@ -206,7 +181,7 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
      return $ Section subTitle 999 "" [Paragraph 33 xs] -- vv vNums (T.pack rawVerseHtml) xs
 
    removeLinkTag str = T.intercalate "" $ PCRE.split linkRegex str
-    
+
    toVerseRef :: (String,[String]) -> VerseRef
    toVerseRef (footnote, [key]) = VerseRef 0 (RefFootnote (T.pack key) (removeLinkTag $ T.pack footnote) )
 
@@ -216,40 +191,40 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
         case verseRef'type of
           -- check if footnote belongs to the verse
           RefFootnote key _ -> T.isInfixOf key verse
-          _ -> False
+          _                 -> False
 
    updateRefs :: Map Text Text -> Text -> VerseRef -> VerseRef
    updateRefs refMap verse ref@VerseRef{..} =
        let (rT, keyWord) = case verseRef'type of
                   RefFootnote key f -> (RefFootnote (refMap Map.! key) f, f)
-                  _ -> error "Differ than Footnote type"
+                  _                 -> error "Differ than Footnote type"
            ws = trace (T.unpack keyWord) $
                 zip [1..] (T.words verse)
-           
+
            [w1, w2] = -- trace (show (T.words keyWord)) $
                     trace (show ref) $
                      T.words keyWord
 
            ns1 = filter (\(index, w) -> ( w == w1) || T.init w == w1) ws
            -- remove the last puncuation T.init w
-           ns2 = filter (\(index, w) -> ( w == w2) || T.init w == w2) ws 
+           ns2 = filter (\(index, w) -> ( w == w2) || T.init w == w2) ws
            index = trace (show ns1) $  case (length ns1, length ns2) of
-             (_, 1) -> getIndex $ head ns2
-             (1, _) -> getIndex $ head ns1
+             (_, 1)  -> getIndex $ head ns2
+             (1, _)  -> getIndex $ head ns1
              (0, 0)  -> 0
              (_ , _) -> findFootNoteIndex verse ns1 ns2
-                    
-       in VerseRef index rT 
 
-   getIndex (i, _) = i       
+       in VerseRef index rT
+
+   getIndex (i, _) = i
    findFootNoteIndex :: Text -> [(Int, Text)] -> [(Int, Text)] -> Int
    findFootNoteIndex v firstWs secondWs =
        let is1 = map (\(i,_) -> i) firstWs
            is2 = map (\(i,_) -> i) secondWs
-           zs = [ y  | x <- is1, y <- is2, x == y - 1] 
+           zs = [ y  | x <- is1, y <- is2, x == y - 1]
        in case zs of
             [] -> error $ T.unpack v -- T.unpack v
-            _ -> trace (show zs) $ head zs
+            _  -> trace (show zs) $ head zs
    parseSubTitle :: Scraper String Text
    parseSubTitle = T.pack <$> text "span"
 
@@ -257,7 +232,7 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
 parseFootnotesMap :: Scraper String (Map.Map Text Text)
 parseFootnotesMap = do
     ps <- chroots ( ("div" @:  [hasClass "_idFootnotes"]) // "p") $ parseFootnote
-    return $ Map.fromList (map makePair ps) 
+    return $ Map.fromList (map makePair ps)
   where
     -- removeLinkTag str = T.intercalate "" $ PCRE.split linkRegex str
 
@@ -267,7 +242,7 @@ parseFootnotesMap = do
     removeNumPart refTxt =
         let t = case T.split (=='\t') refTxt of
                   [_,y] -> y
-                  _ -> error [qc|{refTxt} - On footnone remove num|]
+                  _     -> error [qc|{refTxt} - On footnone remove num|]
         in t
     parseFootnote :: Scraper String FootnoteData
     parseFootnote = do
