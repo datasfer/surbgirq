@@ -3,15 +3,17 @@
 {-# LANGUAGE QuasiQuotes       #-}
 
 
-module Surbgirq.Utils.Scripture.Numerals where
+module Surbgirq.Utils.Scripture.ArmenianNumerals where
 
 import Data.Aeson (Value)
+import Data.Char  (toUpper)
+import Data.Maybe (catMaybes)
 import Data.Text  (Text)
 import Text.Read  (readMaybe)
 
 import Common.Aeson
 import Data.List
-import Data.Maybe
+
 import GHC.Generics
 
 import Prelude hiding (lookup)
@@ -31,42 +33,70 @@ import Surbgirq.Types.Girq
 -- (Մարկ. 1.1-8, Ղուկ. 3.1-18, Յովհ. 1.19-28, Մատթ. 1.1-3)
 
 
+-- |
+-- add dumy simbol at beginning to force index start from 1 on forward
+miavors     = '_' : ['Ա'..'Թ']
+tasnavors   = '_' : ['Ժ'..'Ղ']
+haryuravors = '_' : ['Ճ'..'Ջ']
+hazaravors  = '_' : ['Ռ'..'Ք']
 
-miavors = ['Ա'..'Թ']
-tasnavors = ['Ժ'..'Ղ']
-haryuravors = ['Ճ'..'Ջ']
-hazaravors = ['Ռ'..'Ք']
+ranks = [1, 10, 100, 1000]
+
+majuscules  = [miavors, tasnavors, haryuravors, hazaravors]
+
+findWeight c = (\(a,b) -> (a *) <$> b) <$> ( zip ranks  xs)
+       where
+         xs = let uC = toUpper c
+              in findIndex (==uC) <$> majuscules
+
 
 toDigits :: Int -> [Int]
 toDigits n = map read . map (:[]) $ show n
 
-toNumeral :: Int -> Maybe String
-toNumeral n | n > 9999 = Nothing
-            | otherwise = Just $ case toDigits n of
+toArmenianNumeral :: Int -> Maybe String
+toArmenianNumeral n | n > 9999 = Nothing
+                    | otherwise = Just $ case toDigits n of
                             [m] -> [qc|{getMiavor m}|]
                             [t, m] -> [qc|{getTasnavor t}{getMiavor m}|]
                             [h, t, m] -> [qc|{getHaryuravor h}{getTasnavor t}{getMiavor m}|]
                             [hh, h, t, m] -> [qc|{getHazaravor hh}{getHaryuravor h}{getTasnavor t}{getMiavor m}|]
 
    where
-     getMiavor n = miavors !! (n - 1)
-     getTasnavor n = tasnavors !! (n - 1)
-     getHaryuravor n = haryuravors !! (n - 1)
-     getHazaravor n = hazaravors !! (n - 1)
+     getMiavor n = miavors !! n
+     getTasnavor n = tasnavors !! n
+     getHaryuravor n = haryuravors !! n
+     getHazaravor n = hazaravors !! n
 
 
-toNumber :: String -> Maybe Int
-toNumber numeral | length  numeral > 4 = Nothing
-                 | otherwise = readMaybe $ case numeral of
+-- |
+-- > fromArmenianNumber "ՌՋՀԵ"
+-- >>> 1975
+-- > fromArmenianNumber "ՍՄԻԲ"
+-- >>> 2222
+-- > fromArmenianNumber "ՍԴ"
+-- >>> 2004
+-- > fromArmenianNumber "ՃԻ"
+-- >>> 120
+-- > fromArmenianNumber "Ծ"
+-- >>> 50
+fromArmenianNumber :: String -> Int
+fromArmenianNumber  = sum . catMaybes . concatMap findWeight
+
+
+toNumber1 :: String -> String
+toNumber1 numeral | length  numeral > 4 = "121"
+                 | otherwise = case numeral of
                             [m] -> [qc|{getMiavor m}|]
                             [t, m] -> [qc|{getTasnavor t}{getMiavor m}|]
                             [h, t, m] -> [qc|{getHaryuravor h}{getTasnavor t}{getMiavor m}|]
                             [hh, h, t, m] -> [qc|{getHazaravor hh}{getHaryuravor h}{getTasnavor t}{getMiavor m}|]
+
    where
      getMiavor n = findIndex (== n) miavors
      getTasnavor n = findIndex (== n) tasnavors
      getHaryuravor n = findIndex (== n) haryuravors
      getHazaravor n = findIndex (== n) hazaravors
+
 
 
 

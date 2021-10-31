@@ -38,7 +38,7 @@ import qualified Text.Regex.PCRE.Heavy as PCRE
 
 import Common.Aeson
 import Surbgirq.Shell.Types
-
+import Surbgirq.Utils
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
@@ -48,31 +48,6 @@ data BookData = BookData
  , bookData'chapters :: [Chapter]
  } deriving (Show, Generic)
 
-
--- data ChapterData = ChapterData
---  { chapter'number   :: Text
---  , chapter'sections :: [SectionData]
---  } deriving(Show, Generic)
-
--- data SectionData = SectionData
---  { title           :: Text
---  , p_ref           :: Text
---  , sections'verses :: [VerseData]
---  } deriving(Show, Generic)
-
--- data VerseData = VerseData
---  { verse'nums     :: [Text]
---  , verse'refs     :: [Text]
---  , verse'ref_word :: [(String, [String])]
---  , verse'num      :: Text
---  , verse'verse    :: Text
---  } deriving(Show, Generic)
-
-
--- instance ToJSON VerseData
--- instance ToJSON SectionData
--- instance ToJSON ChapterData
--- instance ToJSON BookData
 
 test :: IO ()
 test = do
@@ -146,7 +121,8 @@ parseNarekHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
        title <- seekNext $ T.pack <$> text "h2"
        chapters <- many $ do
 
-         chapter <- seekNext $ T.pack <$> text "h3" -- <|> return "****************"
+         chapter <- seekNext $ text "h3" -- <|> return "****************"
+         let chNum = fromArmenianNumber chapter -- fromMaybe 0 $ ((readMaybe  $ T.unpack chapter) :: Maybe Int)
 
          sections <- untilNext (matches "h3") $
                      many $ do
@@ -156,9 +132,11 @@ parseNarekHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
             ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse1
 
             return $ Section sectionTitle 333 p_ref $ [Paragraph 1 $ concat ps]
-         let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = n}) [1..] sections
-         return $ Chapter 1 "" "" secs
+         let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = chNum}) [1..] sections
+         return $ Chapter chNum "" "" secs
        return $ BookData title chapters
+
+
 
 
 parseVerse1 :: Scraper String [Verse]
