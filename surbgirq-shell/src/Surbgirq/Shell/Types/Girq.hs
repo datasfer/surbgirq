@@ -136,6 +136,7 @@ data Girq =
           | Jude
           | Revelation
 
+          | Narek
             deriving(Show, Read)
 
 -- ^ Պողոս առաքյալի նամակը Հռոմեացիներին

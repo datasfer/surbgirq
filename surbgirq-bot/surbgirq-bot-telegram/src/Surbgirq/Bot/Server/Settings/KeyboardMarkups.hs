@@ -60,7 +60,7 @@ settingsKeyboard lang  =
     let
         toMsg = i18n lang
         bibles = mkInlineBtn (toMsg Bibles) "bibles#"
-        narek  = mkInlineBtn (toMsg Narek) "narek#"
+        narek  = mkInlineBtn (toMsg Narekaci) "narek#"
         parallelNarek = mkInlineBtn (toMsg NarekParallel) "parallelNarek#"
         parallelBible = mkInlineBtn (toMsg BiblesParallel) "parallelBible#"
         subscribe = mkInlineBtn (toMsg Subscription) "subscribe-dailybible#"

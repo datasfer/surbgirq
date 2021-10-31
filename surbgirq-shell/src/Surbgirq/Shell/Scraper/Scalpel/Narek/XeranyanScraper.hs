@@ -127,13 +127,14 @@ parseNarekHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
          sections <- untilNext (matches "h3") $
                      many $ do
             sectionTitle <- (seekNext $ T.pack <$> text "h4")
+            let secNum = fromArmenianNumber $ T.unpack sectionTitle
             p_ref <- (seekNext $ T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return "ref empty"
 
             ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse1
 
-            return $ Section sectionTitle 333 p_ref $ [Paragraph 1 $ concat ps]
-         let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = chNum}) [1..] sections
-         return $ Chapter chNum "" "" secs
+            return $ Section sectionTitle secNum p_ref $ [Paragraph 1 $ concat ps]
+         -- let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = secNum}) [1..] sections
+         return $ Chapter chNum "" "" sections
        return $ BookData title chapters
 
 

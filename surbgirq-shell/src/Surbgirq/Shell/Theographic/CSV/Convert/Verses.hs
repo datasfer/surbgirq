@@ -22,6 +22,7 @@ import Surbgirq.Shell.Theographic.CSV.Types
 --
 ------------------------------------------------------------
 
+-- | KJV text conversation from theographic data
 convertVerses :: String -> FilePath -> FilePath -> IO ()
 convertVerses del dataFolder outFileRoot = do
    -- Verses
@@ -31,7 +32,7 @@ convertVerses del dataFolder outFileRoot = do
    houtVersePersonRel <- openFile (outFileRoot </> "Verse_PersonRel.csv") WriteMode
    houtVersePlaceRel <- openFile (outFileRoot </> "Verse_PlaceRel.csv") WriteMode
    houtVerseEventRel <- openFile (outFileRoot </> "Verse_EventRel.csv") WriteMode
-   TIO.hPutStrLn houtVerses [qc|id:ID(KJV-VERSE-ID){del}verse:int{del}fullRef{del}osisRef{del}shortRef{del}mdText{del}verseText{del}title{del}:LABEL|]
+   TIO.hPutStrLn houtVerses [qc|id:ID(KJV-VERSE-ID){del}verse:long{del}fullRef{del}osisRef{del}shortRef{del}mdText{del}verseText{del}title{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
    TIO.hPutStrLn houtVersePersonRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]
    TIO.hPutStrLn houtVersePlaceRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PLACE-ID){del}:TYPE|]

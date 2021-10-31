@@ -27,7 +27,7 @@ convertBooks del dataFolder outFileRoot = do
    houtBooks <- openFile (outFileRoot </> "books.csv") WriteMode
    houtRelation <- openFile (outFileRoot </> "Testament_BookRel.csv") WriteMode
    houtTransRel <- openFile (outFileRoot </> "Translation_KJVRel.csv") WriteMode
-   TIO.hPutStrLn houtBooks [qc|id:ID(KJV-BOOK-ID){del}book{del}bookOrder:int{del}osisref{del}shortName{del}slug{del}title{del}testament{del}:LABEL|]
+   TIO.hPutStrLn houtBooks [qc|id:ID(KJV-BOOK-ID){del}book{del}bookOrder:long{del}osisref{del}shortName{del}slug{del}title{del}testament{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(TESTAMENT-ID){del}:END_ID(KJV-BOOK-ID){del}:TYPE|]
    TIO.hPutStrLn houtTransRel [qc|:START_ID{del}:END_ID(KJV-BOOK-ID){del}:TYPE|]
    readEntity booksFile >>= \ v ->

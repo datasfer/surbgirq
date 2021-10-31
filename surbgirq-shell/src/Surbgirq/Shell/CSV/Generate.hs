@@ -174,7 +174,7 @@ generateScripturesCSV configFile path outPath = do
 
 
      -- here the entityies which headers included with data in the same file
-     TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
+     TIO.hPutStrLn outBookh [qc|bookID:ID{del}book{del}title{del}bookOrder:long{del}chapters:long{del}testament{del}:LABEL|]
      TIO.hPutStrLn outTranslationh [qc|id:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
      TIO.hPutStrLn outScriptureh [qc|scriptureID:ID{del}title|]
      TIO.hPutStrLn outScriptureBookRelth [qc|:START_ID{del}:END_ID{del}:TYPE|]
@@ -406,7 +406,7 @@ data CSVHeader = CSVHeader
 mkHeader name path template = CSVHeader name path template
 dumpCSVHeaders :: Char -> FilePath -> IO ()
 dumpCSVHeaders del root = do
-                                                  
+                                                   
   let headerRoot = root </> "headers"
       hs = [ mkHeader "Scripture Header" "scripture_header.csv" [qc|scriptureID:ID{del}title|]
            , mkHeader "Scripture to Book relationship Header" "scripture_book_header.csv" [qc|:START_ID{del}:END_ID{del}:TYPE|]
@@ -414,28 +414,37 @@ dumpCSVHeaders del root = do
            -- not used, merge the header and data in the one file for some entity
            -- , mkHeader "Translation Header" "translation_header.csv" [qc|id:ID{del}name{del}version{del}language{del}from{del}year{del}dialect{del}lang{del}translators{del}description{del}:LABEL|]
            -- * Book
-           , mkHeader "Book Header" "book_header.csv" [qc|bookID:ID{del}book{del}title{del}bookOrder:int{del}chapters:int{del}testament{del}:LABEL|]
+           , mkHeader "Book Header" "book_header.csv" [qc|bookID:ID{del}book{del}title{del}bookOrder:long{del}chapters:long{del}testament{del}:LABEL|]
            , mkHeader "Book to Chapter return Header" "book_chapter_header.csv" [qc|:START_ID{del}chapter{del}:END_ID(CHAPTER-ID)|]
            -- * Chapter
-           , mkHeader "Chapter Header" "chapter_header.csv" [qc|chapterID:ID(CHAPTER-ID){del}title{del}num:int{del}book|]
+           , mkHeader "Chapter Header" "chapter_header.csv" [qc|chapterID:ID(CHAPTER-ID){del}title{del}num:long{del}book|]
            , mkHeader "Chapter to Verse Relation Header" "chapter_verse_header.csv" [qc|:START_ID(CHAPTER-ID){del}:END_ID(VERSE-ID)|]
            , mkHeader "Chapter to Section Relation Header" "chapter_section_header.csv" [qc|:START_ID(CHAPTER-ID){del}:END_ID(CHAPTER-ID)|]
+
            -- * Section Headers
-           , mkHeader "Section Header" "section_header.csv"  [qc|sectionID:ID(CHAPTER-ID){del}title{del}num:int{del}chapter:int|]
+           , mkHeader "Section Header" "section_header.csv"  [qc|sectionID:ID(CHAPTER-ID){del}title{del}num:long{del}chapter:long|]
            , mkHeader "Section to Prgh Relation Header" "section_prgh_header.csv"  [qc|:START_ID(CHAPTER-ID){del}:END_ID(CHAPTER-ID)|]
+
            -- * prgh
-           , mkHeader "Paragraph Header" "prgh_header.csv" [qc|prghID:ID(CHAPTER-ID){del}title{del}num:int{del}section:int{del}chapter:int|]
+           , mkHeader "Paragraph Header" "prgh_header.csv" [qc|prghID:ID(CHAPTER-ID){del}title{del}num:long{del}section:long{del}chapter:long|]
+
            -- * Verse
-           , mkHeader "Verse Header" "verse_header.csv" [qc|verseID:ID(VERSE-ID){del}book{del}chapter:int{del}section:int{del}paragraph:int{del}verse:int{del}verseText|]
+              {-- to prevent this normalization routine from int -> long 
+                Property type of 'chapter' normalized from 'int' --> 'long' in /data/csv/./scriptures/headers/verse_header.csv
+                Property type of 'section' normalized from 'int' --> 'long' in /data/csv/./scriptures/headers/verse_header.csv
+                Property type of 'paragraph' normalized from 'int' --> 'long' in /data/csv/./scriptures/headers/verse_header.csv
+                Property type of 'verse' normalized from 'int' --> 'long' in /data/csv/./scriptures/headers/verse_header.csv
+                --}
+           , mkHeader "Verse Header" "verse_header.csv" [qc|verseID:ID(VERSE-ID){del}book{del}chapter:long{del}section:long{del}paragraph:long{del}verse:long{del}verseText|]
            , mkHeader "Verse to Word Relation Header" "verse_word_header.csv" [qc|:START_ID(VERSE-ID){del}:END_ID(WORD-ID)|]
            , mkHeader "Verse to FootNote  Header" "verse_footnote_header.csv" [qc|:START_ID(VERSE-ID){del}:END_ID(FOOTNOTE-ID){del}:TYPE|]
            -- * Word
-           , mkHeader "Word Header" "word_header.csv"  [qc|wordID:ID(WORD-ID){del}word{del}book{del}chapter:int{del}section:int{del}paragraph:int{del}verse:int{del}token{del}versePos:int{del}:LABEL|]
+           , mkHeader "Word Header" "word_header.csv"  [qc|wordID:ID(WORD-ID){del}word{del}book{del}chapter:long{del}section:long{del}paragraph:long{del}verse:long{del}token{del}versePos:long{del}:LABEL|]
            , mkHeader "Word to Footnote  Header" "word_footnote_header.csv" [qc|:START_ID(WORD-ID){del}:END_ID(FOOTNOTE-ID){del}:TYPE|]
            -- * Footnote header
-           , mkHeader "Footnote Header" "footnote_header.csv"  [qc|footnoteID:ID(FOOTNOTE-ID){del}text{del}index:int{del}:LABEL|]
+           , mkHeader "Footnote Header" "footnote_header.csv"  [qc|footnoteID:ID(FOOTNOTE-ID){del}text{del}index:long{del}:LABEL|]
            -- * Ref header
-           , mkHeader "Reference Header" "ref_header.csv"  [qc|refID:ID(FOOTNOTE-ID){del}text{del}index:int{del}:LABEL|]
+           , mkHeader "Reference Header" "ref_header.csv"  [qc|refID:ID(FOOTNOTE-ID){del}text{del}index:long{del}:LABEL|]
             ]
 
   createDirectoryIfMissing True headerRoot

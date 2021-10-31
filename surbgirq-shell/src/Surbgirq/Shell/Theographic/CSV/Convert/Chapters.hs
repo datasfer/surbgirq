@@ -29,7 +29,7 @@ convertChapters del dataFolder outFileRoot = do
    houtChapters <- openFile (outFileRoot </> "chapters.csv") WriteMode
    houtRelation <- openFile (outFileRoot </> "Book_ChapterRel.csv") WriteMode
    houtPersonChapterRel <- openFile (outFileRoot </> "Person_ChapterRel.csv") WriteMode
-   TIO.hPutStrLn houtChapters [qc|id:ID(KJV-CHAPTER-ID){del}book{del}num:int{del}osisref{del}slug{del}title{del}:LABEL|]
+   TIO.hPutStrLn houtChapters [qc|id:ID(KJV-CHAPTER-ID){del}book{del}num:long{del}osisref{del}slug{del}title{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-BOOK-ID){del}:END_ID(KJV-CHAPTER-ID){del}:TYPE|]
    TIO.hPutStrLn houtPersonChapterRel [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]
 

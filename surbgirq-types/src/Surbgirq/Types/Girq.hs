@@ -155,6 +155,7 @@ data Girq =
           | Philemon
           | Revelation
 
+          | Narek
 
             deriving(Show, Eq, Generic, Read, Enum, Ord)
 

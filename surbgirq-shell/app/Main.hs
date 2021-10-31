@@ -85,7 +85,7 @@ main = do
                           wordFormsCSV "./data/txt/wordForms.txt" "./data/csv/words"
                           TIO.putStrLn "CSV generation success!"
 
-               Narek -> do
+               Matyan -> do
                  TIO.putStrLn "Narek scriptures generation not ready yet!"
                  -- wordFormsCypher "./data/txt/wordForms.txt" "./data/cypher/words"
                  -- wordFormsCSV "./data/txt/wordForms.txt" "./data/csv/words"
@@ -369,7 +369,7 @@ data Command = Command
 
 
 data BookKind = Bible
-              | Narek
+              | Matyan
 
 data OutFormat = Cypher
                 | CSV
@@ -382,7 +382,7 @@ bibleInput = flag' Bible
   <> help "Bible Scriptures processing" )
 
 narekInput :: Parser BookKind
-narekInput = flag' Narek
+narekInput = flag' Matyan
   (  long "narek"
   <> short 'n'
   <> help "Narek Scriptures processing" )

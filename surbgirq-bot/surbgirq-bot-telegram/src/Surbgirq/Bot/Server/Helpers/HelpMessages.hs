@@ -55,7 +55,7 @@ helpMessage userId =  sendMessageRequest userId $ T.unlines
 
 
 data SettingMenuMsgs =
-          Narek
+          Narekaci
         | NarekParallel
         | Bibles
         | BiblesParallel
@@ -72,7 +72,7 @@ instance I18n SettingMenuMsgs where
     AM -> case v of
       Bibles         -> "Աստուածաշունչ Մատեան"
       BiblesParallel -> "Աստուածաշունչ Զւոգահեռ Թարգմանություններ"
-      Narek          -> "Նարեկացի"
+      Narekaci       -> "Նարեկացի"
       NarekParallel  -> "Նարեկ Զւոգահեռ Թարգմանություններ"
       Subscription   -> "Բաժանորդագրվել"
       Armenian       -> "Հայերեն"
@@ -81,7 +81,7 @@ instance I18n SettingMenuMsgs where
     RU -> case v of
       Bibles         -> "Библия"
       BiblesParallel -> "Библия параллельные переводы"
-      Narek          -> "Григор Нарекаци"
+      Narekaci       -> "Григор Нарекаци"
       NarekParallel  -> "Нарекаци параллельные переводы"
       Subscription   -> "Подписаться"
       Armenian       -> "Հայերեն"
@@ -90,7 +90,7 @@ instance I18n SettingMenuMsgs where
     EN -> case v of
       Bibles         -> "Bibles"
       BiblesParallel -> "Bibles Parallel Translations"
-      Narek          -> "Narek"
+      Narekaci       -> "Narek"
       NarekParallel  -> "Narek Parallel Translations"
       Subscription   -> "Subscribe"
       Armenian       -> "Հայերեն"
