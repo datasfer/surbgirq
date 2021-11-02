@@ -120,7 +120,7 @@ booksKeyboard books cmdPrefix chName = map (map (toKbd chName)) books ++ [[backT
       toKbd :: Text -> (Text,Text) -> InlineKeyboardButton
       toKbd checkedName (title, cb_data) =
           let name = if checkedName == cb_data
-                     then [qc|{title} ✝|]
+                     then [qc|✝ {title}|] -- this starnge sybol is unicode of code of cross
                      else title
           in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
 
@@ -137,7 +137,7 @@ parallelItemsKeyboard books cmdPrefix xs = map (map toKbd ) books ++ [[backToSet
       toKbd :: (Text,Text) -> InlineKeyboardButton
       toKbd (title, cb_data) =
           let name = if Set.member cb_data xs
-                     then [qc|{title} ✝|]
+                     then [qc|✝ {title}|]
                      else title
           in mkInlineBtn name [qc|{cmdPrefix} {cb_data}|]
 

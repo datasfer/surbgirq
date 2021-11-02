@@ -99,7 +99,7 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
              title = T.unpack $ i18n lang ParallelBibleTitle
 
         editRespuesta chatId msg_id inline_msg_id title $ Just (parallelBiblesKeyboardMarkup lang $ config'parallelBibles cfg)
-        showToolTip cqId $ Just "Parallel Bibles Sub Menu"
+        showToolTip cqId $ Just "Parallel Bibles Sub Menu" -- TODO: localize these tooltip messages in all place
 
       onCommand cfg (T.stripPrefix "subscribe-dailybible#" -> Just _) = do
         BotConfig{..} <- ask
