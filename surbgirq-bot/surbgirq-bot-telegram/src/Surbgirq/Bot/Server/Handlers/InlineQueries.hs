@@ -43,7 +43,7 @@ handleInlineQuery :: InlineQuery -> Bot ()
 handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
   liftIO $ putStrLn $ "Inline query -> " ++ (show iq)
   onCommand query_query
-  cfg <- getUserConfig (UserId user_id)
+  cfg@UserSettings{..} <- getUserConfig (UserId user_id)
   liftIO $ putStrLn $  show cfg
 
   where

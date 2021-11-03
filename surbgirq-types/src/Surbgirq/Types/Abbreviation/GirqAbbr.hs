@@ -153,6 +153,8 @@ abbr = [ -- * New Testament
        -- ^ 47. Դանիելի Մարգարեություն
        , (Ezekiel, ezek)
        -- ^ 48. Եզեկիելի Մարգարեություն
+       ,  (Narek, narek)
+       -- ^ Narek
        ]
 
 
@@ -779,6 +781,19 @@ ezek = [e1994Books ezekAm, v1805Books ezekGr, sinodalBooks ezekRu, kjvBooks ezek
     ezekEn = ["Ezekiel", "Ezek"]
 
 
+narek :: [AbbrBook]
+narek = [ mkAbbrBook Narek_Grabar narek_Grabar
+        , mkAbbrBook Narek_Xer narek_Xer
+        , mkAbbrBook Narek_Gev narek_Gev
+        , mkAbbrBook Narek_Goch narek_Goch
+        ]
+  where
+    narek_Grabar = ["Նարեկացի"]
+    narek_Xer    = ["Նարեկ", "Narek"]
+    narek_Gev    = ["Նարեկ-Գեւ"]
+    narek_Goch   = ["Նարեկ-Գոչ"]
+
+
 
 
 
@@ -808,11 +823,15 @@ getBookName girq translation =
 getTranslationName :: TranslationID -> Text
 getTranslationName transID =
     case transID of
-      E1994T   -> "«Էջմիածին» 1994թ."
-      E2004T   -> "«Էջմիածին»(Նոր) 2004թ."
-      V1805T   -> "«Վէնէտիկ» 1805թ."
-      SinodalT -> "sINODAL"
-      KJVT     -> "KJV 1611թ."
+      E1994T       -> "«Էջմիածին» 1994թ."
+      E2004T       -> "«Էջմիածին»(Նոր) 2004թ."
+      V1805T       -> "«Վէնէտիկ» 1805թ."
+      SinodalT     -> "sINODAL"
+      KJVT         -> "KJV 1611թ."
+      Narek_Grabar -> "Նարեկ"
+      Narek_Xer    -> "Նարեկ"
+      Narek_Gev    -> "Նարեկ"
+      Narek_Goch   -> "Նարեկ"
 
 toRefText :: TranslationID -> VerseReference -> Text
 toRefText defTrans VerseReference{..} =

@@ -84,19 +84,18 @@ settingsKeyboard lang  =
 booksBible :: Language -> [ [(Text,Text)] ]
 booksBible lang =
     let toMsg = i18n lang
-        grabar = toMsg  V1805T
-    in [ [(grabar, "v1805T")]
-       , [("«Էջմիածին» թարգմանություն 1994", "e1994T")]
-       , [("«Էջմիածին» թարգմանություն(Նոր) 2004", "e2004T")]
-       , [("Sinodial", "sinodialT")]
-       , [("KJV", "KJVT"), ("EVN", "EVNT")]
+    in [ [(toMsg  V1805T, toCmd V1805T)]
+       , [("«Էջմիածին» թարգմանություն 1994", toCmd E1994T)]
+       , [("«Էջմիածին» թարգմանություն(Նոր) 2004", toCmd E2004T)]
+       , [("Sinodial", toCmd SinodalT)]
+       , [("KJV", toCmd KJVT), ("EVN", "EVNT")]
        ]
 
 -- narek#
 booksNarek :: Language ->  [ [(Text,Text)] ]
 booksNarek lang =
-    [ [("Նարեկ(Գրաբար)", "grabarNarek#"), ("Նարեկ(Խերանյան)", "xerNarek#")]
-    , [("Նարեկ(Գևորգյան)", "gevNarek#"), ("Նարեկ(Գօչունեան)", "gochNarek#")]
+    [ [("Նարեկ(Գրաբար)", toCmd Narek_Grabar), ("Նարեկ(Խերանյան)", toCmd Narek_Xer)]
+    , [("Նարեկ(Գևորգյան)", toCmd Narek_Gev), ("Նարեկ(Գօչունեան)", toCmd Narek_Goch)]
     , [("Книга скорбных песнопений", "ruNarek#")]
     , [("Book of Lamentations", "enNarek#")]
     ]

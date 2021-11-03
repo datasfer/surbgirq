@@ -24,35 +24,46 @@ class HasId a where
     toId :: a -> Text
 
 class CmdToken a where
-    cmdToken :: a -> Text
+    toCmd :: a -> Text
 
 data TranslationID = E1994T
                    | E2004T
                    | V1805T
                    | SinodalT
                    | KJVT
+                   | Narek_Grabar
+                   | Narek_Xer
+                   | Narek_Gev
+                   | Narek_Goch
                  deriving (Eq, Generic, Read)
 
 instance Show TranslationID where
     show t = case t of
-               E1994T   -> "e1994-T"
-               E2004T   -> "e2004-T"
-               V1805T   -> "v1805-T"
-               SinodalT -> "sinodal-T"
-               KJVT     -> "kjv-T"
-
+               E1994T       -> "e1994-T"
+               E2004T       -> "e2004-T"
+               V1805T       -> "v1805-T"
+               SinodalT     -> "sinodal-T"
+               KJVT         -> "kjv-T"
+               Narek_Grabar -> "narek_grabar-T"
+               Narek_Xer    -> "XER-T"
+               Narek_Gev    -> "narek_gev-T"
+               Narek_Goch   -> "nare_goch-T"
 
 
 instance ToJSON TranslationID
 instance FromJSON TranslationID
 
 instance CmdToken TranslationID where
-    cmdToken t = case t of
-               E1994T   -> "e1994#"
-               E2004T   -> "e2004#"
-               V1805T   -> "v1805#"
-               SinodalT -> "sinodal#"
-               KJVT     -> "kjv#"
+    toCmd t = case t of
+               E1994T       -> "e1994#"
+               E2004T       -> "e2004#"
+               V1805T       -> "v1805#"
+               SinodalT     -> "sinodal#"
+               KJVT         -> "kjv#"
+               Narek_Grabar -> "narek_grabar#"
+               Narek_Xer    -> "narek_xer#"
+               Narek_Gev    -> "narek_gev#"
+               Narek_Goch   -> "nare_goch#"
 
 data Testament = Old
                | New

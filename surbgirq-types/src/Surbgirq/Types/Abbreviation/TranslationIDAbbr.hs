@@ -40,7 +40,7 @@ findTransByAbbr name = findAbbr name abbr
     findAbbr :: Text -> [AbbrTrans] -> Maybe TranslationID
     findAbbr _ [] = Nothing
     findAbbr name ( AbbrTrans t ts:xs ) | any (\b -> T.toLower b == T.toLower name) ts = Just t
-                                      | otherwise = findAbbr name xs
+                                        | otherwise = findAbbr name xs
 
 
 abbr :: [AbbrTrans]
@@ -49,4 +49,9 @@ abbr  = [ AbbrTrans E1994T ["e1994-T", "e1994T", "e1994", "e94", "e94T"]
         , AbbrTrans V1805T ["v1805-T", "v1805T", "v1805", "v05", "v05T"]
         , AbbrTrans SinodalT [""]
         , AbbrTrans KJVT ["kjv-T", "kjvT", "kjv"]
+
+        , AbbrTrans Narek_Grabar ["narek_grabar-T"]
+        , AbbrTrans Narek_Xer    ["narek_xer-T"]
+        , AbbrTrans Narek_Gev    ["narek_gev-T"]
+        , AbbrTrans Narek_Goch   ["narek_goch-T"]
         ]
