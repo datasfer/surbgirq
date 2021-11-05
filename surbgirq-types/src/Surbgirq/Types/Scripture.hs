@@ -44,8 +44,8 @@ instance Show TranslationID where
                V1805T       -> "v1805-T"
                SinodalT     -> "sinodal-T"
                KJVT         -> "kjv-T"
-               Narek_Grabar -> "narek_grabar-T"
-               Narek_Xer    -> "XER-T"
+               Narek_Grabar -> "narekaci-T"
+               Narek_Xer    -> "narek_xer-T"
                Narek_Gev    -> "narek_gev-T"
                Narek_Goch   -> "nare_goch-T"
 

@@ -66,7 +66,12 @@ test = do
 
 
 parseNarekTest :: IO ()
-parseNarekTest = parseNarekByXeranyanHtml "../data/html/narek/xeranyan" "../data/yaml"
+parseNarekTest = parseNarekByXeranyanHtml "../data/html/narek/" "../data/yaml"
+
+-- parseGrabarNarekTest :: IO ()
+-- parseGrabarNarekTest = parseNarekByXeranyanHtml "../data/html/narek/" "../data/yaml"
+
+
 
 -- | stack exec -- html-scraper --narek  --yaml  -i ./data/html/narek/xeranyan -o ./data/yaml
 parseNarekByXeranyanHtml :: FilePath -> FilePath -> IO ()
@@ -74,7 +79,7 @@ parseNarekByXeranyanHtml dataRootPath  outPutPath = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
   let datDir = dataRootPath
-      outRootDir = outPutPath </> "narek/am"
+      outRootDir =  outPutPath </> "narek/am"
 
   createDirectoryIfMissing True outRootDir
 
@@ -98,7 +103,7 @@ parseNarekByXeranyanHtml dataRootPath  outPutPath = do
       --        A.encodeFile "parseHtml.json" xs
               print $  length xs
               when (length xs > 0) $ do
-                let outDir = outRootDir </> lastFolderName </> (takeBaseName file)
+                let outDir = outRootDir </> (takeBaseName file)
                 createDirectoryIfMissing True outDir
 
                 forM_ xs $ \book -> do
