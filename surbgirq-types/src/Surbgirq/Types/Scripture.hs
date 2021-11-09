@@ -21,7 +21,11 @@ import GHC.Generics
 import Surbgirq.Types.Girq
 
 class HasId a where
+
     toId :: a -> Text
+
+class HasOffset a where
+    toOffset :: Int -> a -> (a, Maybe Text)
 
 class CmdToken a where
     toCmd :: a -> Text
@@ -120,6 +124,15 @@ instance HasId VerseReference where
           (Just from, Just to) -> [qc|{verseRef'book}_{verseRef'chapter}_{from}_{to}||]
           (Nothing, Just to)   -> [qc|{verseRef'book}_{verseRef'chapter}_{to}|]
 
+
+instance HasOffset VerseReference where
+    toOffset pageSize verRef@(VerseReference tr girq ch (Just from) (Just to) False) =
+        if (to - from > pageSize)
+        then ( verRef { verseRef'to = Just $ from + pageSize - 1 },
+               Just [qc|{girq} {ch} {from + 50} {to}||])
+        else  (verRef, Nothing)
+    -- TODO: get max verse number for each chapter
+    toOffset _ verRef =  (verRef, Nothing)
 
 $(deriveJSON dropPrefixOptions ''Testament)
 $(deriveJSON dropPrefixOptions ''Dialect)

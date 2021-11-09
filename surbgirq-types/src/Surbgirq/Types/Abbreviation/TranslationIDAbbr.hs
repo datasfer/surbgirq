@@ -44,14 +44,14 @@ findTransByAbbr name = findAbbr name abbr
 
 
 abbr :: [AbbrTrans]
-abbr  = [ AbbrTrans E1994T ["e1994-T", "e1994T", "e1994", "e94", "e94T"]
+abbr  = [ AbbrTrans E1994T ["e1994-T", "e1994T", "e1994", "e94", "e94T", "e1994#"]
         , AbbrTrans E2004T ["e2004-T", "e2004T", "e2004", "e04", "e04T"]
         , AbbrTrans V1805T ["v1805-T", "v1805T", "v1805", "v05", "v05T"]
         , AbbrTrans SinodalT [""]
         , AbbrTrans KJVT ["kjv-T", "kjvT", "kjv"]
 
-        , AbbrTrans Narek_Grabar ["narek_grabar-T"]
-        , AbbrTrans Narek_Xer    ["narek_xer-T"]
-        , AbbrTrans Narek_Gev    ["narek_gev-T"]
-        , AbbrTrans Narek_Goch   ["narek_goch-T"]
+        , AbbrTrans Narek_Grabar ["narek_grabar-T", "narek_grabar#"]
+        , AbbrTrans Narek_Xer    ["narek_xer-T", "narek_xer#"]
+        , AbbrTrans Narek_Gev    ["narek_gev-T", "narek_gev#"]
+        , AbbrTrans Narek_Goch   ["narek_goch-T", "narek_gocj#"]
         ]

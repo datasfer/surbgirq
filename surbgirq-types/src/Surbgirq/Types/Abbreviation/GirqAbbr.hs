@@ -166,6 +166,20 @@ v1805Books = mkAbbrBook V1805T
 e1994Books = mkAbbrBook E1994T
 sinodalBooks = mkAbbrBook E1994T
 
+narek :: [AbbrBook]
+narek = [ mkAbbrBook Narek_Xer narek_Xer
+        , mkAbbrBook Narek_Grabar narek_Grabar
+        , mkAbbrBook Narek_Gev narek_Gev
+        , mkAbbrBook Narek_Goch narek_Goch
+        ]
+  where
+    narek_Grabar = ["Նարեկացի"]
+    narek_Xer    = ["Նարեկ", "Narek"]
+    narek_Gev    = ["Նարեկ-Գեւ"]
+    narek_Goch   = ["Նարեկ-Գոչ"]
+
+
+
 mat :: [AbbrBook]
 mat = [e1994Books matAm, sinodalBooks matRu,  kjvBooks matEn]
   where
@@ -781,18 +795,6 @@ ezek = [e1994Books ezekAm, v1805Books ezekGr, sinodalBooks ezekRu, kjvBooks ezek
     ezekEn = ["Ezekiel", "Ezek"]
 
 
-narek :: [AbbrBook]
-narek = [ mkAbbrBook Narek_Grabar narek_Grabar
-        , mkAbbrBook Narek_Xer narek_Xer
-        , mkAbbrBook Narek_Gev narek_Gev
-        , mkAbbrBook Narek_Goch narek_Goch
-        ]
-  where
-    narek_Grabar = ["Նարեկացի"]
-    narek_Xer    = ["Նարեկ", "Narek"]
-    narek_Gev    = ["Նարեկ-Գեւ"]
-    narek_Goch   = ["Նարեկ-Գոչ"]
-
 
 
 
@@ -806,8 +808,6 @@ narek = [ mkAbbrBook Narek_Grabar narek_Grabar
 
 
 -- (Մատթ. 3.1-12, Ղուկ. 3.1-18, Յովհ. 1.19-28
-
-
 
 
 -- | book name for verse

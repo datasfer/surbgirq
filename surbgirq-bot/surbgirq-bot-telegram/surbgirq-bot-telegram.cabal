@@ -32,8 +32,8 @@ library
                    Surbgirq.Bot.Server.Imports.TelegramAPI
                    Surbgirq.Bot.Server.TelegramAPI
 
-                   Surbgirq.Bot.Server.Helpers.HelpMessages
-
+                   Surbgirq.Bot.Server.Helpers
+                   
                    Surbgirq.Bot.Server
                    Surbgirq.Bot.Server.Handlers
                    Surbgirq.Bot.Server.Handlers.Channels
@@ -44,7 +44,6 @@ library
                    Surbgirq.Bot.Server.Responses
                    Surbgirq.Bot.Server.Webhook
                    Surbgirq.Bot.Server.Settings.KeyboardMarkups
-                   Surbgirq.Bot.Server.Helpers.Pagination
                    Surbgirq.Bot.Monad
                    Surbgirq.Bot.ClientRequests
                    Surbgirq.Bot.App
@@ -54,6 +53,10 @@ library
                    Surbgirq.Bot.FB.Server.Webhook
                   -- Surbgirq.Bot.ShopBotExample
   other-modules: Paths_surbgirq_bot_telegram
+                 Surbgirq.Bot.Server.Helpers.Pagination
+                 Surbgirq.Bot.Server.Helpers.Helpers
+                 Surbgirq.Bot.Server.Helpers.HelpMessages
+
   hs-source-dirs: src
   build-depends: base >=4.7 && <5
                , surbgirq-neo4j-client

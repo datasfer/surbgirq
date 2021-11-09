@@ -22,19 +22,19 @@ import Data.IORef
 import Control.Monad.Reader
 import Lucid
 
-import Surbgirq.Bot.Server.TelegramAPI
 
 import Surbgirq.Bot.ClientRequests
 import Surbgirq.Bot.Lucid.Instances
 import Surbgirq.Bot.Monad
-import Surbgirq.Bot.Server.Helpers.HelpMessages
 import Surbgirq.Bot.State
 import Surbgirq.Bot.Store
 import Surbgirq.Bot.Types
+
+import Surbgirq.Bot.Server.Helpers
+import Surbgirq.Bot.Server.TelegramAPI
+
 import Surbgirq.Types
 import Surbgirq.Utils
-
-import Surbgirq.Bot.Server.Helpers.Pagination
 
 ------------------------------------------------------------
 --
@@ -78,8 +78,11 @@ sendBooks_ chatId = do
 
 
 -- | Sections
-sendChapterSections :: ChatId -> Text -> Bot ()
-sendChapterSections chatId argString = do
+sendChapterSections :: ChatId -> UserId -> Text -> Bot ()
+sendChapterSections chatId userId argString = do
+  BotConfig{..} <- ask
+  cfg <- getUserConfig  userId
+
   let args = parseChatCommandArgs argString
       (book, chapter, section) =
           case args of
@@ -91,11 +94,13 @@ sendChapterSections chatId argString = do
       bookRes = (readMaybe  book) :: Maybe Girq
       chRes = ChapterNum <$> readMaybe chapter :: Maybe ChapterNum
       secRes = SectionNum <$>  readMaybe section :: Maybe SectionNum
-      translation = E1994T
+      -- translation =  fromMaybe E1994T $ readTranslation [config'narek cfg]
+  -- liftIO $ putStrLn [qc|TTTT Translation: {translation}|]
+
   secRes <- liftIO $ case (bookRes, chRes, secRes) of
-    (Just girq, Just chapter, Just section) -> Right <$> getChapterOneSectionHandler translation girq chapter section
-    (Just girq, Just chapter, Nothing) -> Right <$> getChapterSectionsHandler translation girq chapter
-    (Just girq, Nothing, Nothing) -> Right <$> getBookSectionsHandler translation girq
+    (Just girq, Just chapter, Just section) -> Right <$> getChapterOneSectionHandler (getCfgTranslation cfg girq) girq chapter section
+    (Just girq, Just chapter, Nothing) -> Right <$> getChapterSectionsHandler (getCfgTranslation cfg girq) girq chapter
+    (Just girq, Nothing, Nothing) -> Right <$> getBookSectionsHandler (getCfgTranslation cfg girq) girq
     (Nothing, _, _) ->  pure $ Left [qc|Failed parse book: {book}|]
   case secRes of
     Right secs -> do
@@ -103,7 +108,6 @@ sendChapterSections chatId argString = do
         sendHtml chatId  sectionHtml
 --        forM_ secs $ \sec -> let htmlText = TL.toStrict . renderText $ toHtml sec in sendHtml chatId htmlText
     Left e -> sendHtml chatId  e
-
 
 
 -- | verse

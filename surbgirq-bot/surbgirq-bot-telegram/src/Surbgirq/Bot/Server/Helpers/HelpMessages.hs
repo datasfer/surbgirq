@@ -167,3 +167,6 @@ instance I18n SubMenuTitleMsgs where
             ParallelNarekTitle -> "Narek Parallel Translations"
             SubscriptionTitle  -> "Subscribe"
             SettingsMenuTitle  -> "Settings"
+
+
+
