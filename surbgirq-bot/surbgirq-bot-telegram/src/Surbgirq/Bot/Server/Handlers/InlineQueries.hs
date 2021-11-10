@@ -192,7 +192,8 @@ inlineVerse userId iqId verseRef@VerseReference{..} = do
                                                              -- ^ URL of the result
                                                              Nothing
                                                              -- ^ Pass True, if you don't want the URL to be shown in the message
-                                                             (Just $ T.take 50 . T.drop 10 $  html2Text  verse)
+                                                             -- (Just $ T.take 50 . T.drop 10 $  html2Text  verse)
+                                                             (Just $ html2Text  verse)
                                                              -- ^ Short description of the result
                                                              Nothing
                                                              -- ^ Url of the thumbnail for the result
@@ -209,7 +210,6 @@ inlineVerse userId iqId verseRef@VerseReference{..} = do
                                                              -- ^ Title of the result
                                                              -- (Just $ InputTextMessageContent (html2Text' verse vRef) (Just HTML) Nothing)
                                                              (Just $ InputTextMessageContent (html2Text' vs verseRef) (Just HTML) Nothing)
-
                                                              -- ^ Content of the message to be sent
                                                              Nothing
                                                              -- ^ Inline keyboard attached to the message
@@ -217,7 +217,7 @@ inlineVerse userId iqId verseRef@VerseReference{..} = do
                                                              -- ^ URL of the result
                                                              Nothing
                                                              -- ^ Pass True, if you don't want the URL to be shown in the message
-                                                             (Just $ T.take 100 $  html2Text' vs verseRef)
+                                                             (Just $ T.take 500 $  html2Text' vs verseRef)
                                                              -- ^ Short description of the result
                                                              Nothing
                                                              -- ^ Url of the thumbnail for the result

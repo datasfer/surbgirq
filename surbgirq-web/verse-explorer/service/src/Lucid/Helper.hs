@@ -164,10 +164,14 @@ siteMenu = [ -- Counter "" "/#"
              Menu "e1994" $ "/scripture/e1994/books"
            , Menu "v1805" $ "/scripture/v1805/books"
            , Menu "KJV" $ "/scripture/kjv/books"
+           , Menu "Narek" $ "/scripture/narekaci-T/books"
            --                , JsMenu "Filter" "filter_menu"
-           , DropDown "Books" [ DropDownItem "e1994" "/scripture/e1994/books"
-                              , DropDownItem "v1805" "/scripture/v1805/books"
-                              , DropDownItem "KJV"  "/scripture/kjv/books"
+           , DropDown "Bibles" [ DropDownItem "e1994" "/scripture/e1994/books"
+                               , DropDownItem "v1805" "/scripture/v1805/books"
+                               , DropDownItem "KJV"  "/scripture/kjv/books"
+                              ]
+           , DropDown "Nareks" [ DropDownItem "Xeranyan" "/scripture/narek_xer-T/books"
+                               , DropDownItem "Grabar" "/scripture/narekaci-T/books"
                               ]
            , Menu "About" "/about"
            ]

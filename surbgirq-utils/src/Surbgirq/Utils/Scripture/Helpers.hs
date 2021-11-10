@@ -67,3 +67,19 @@ verseRefRange vRef@VerseReference{..} =
     (Nothing, Just to) -> [ vRef{ verseRef'from = (Just v), verseRef'to = Nothing} | v <- [1..to]]
     (Just from, Just to) -> [ vRef{  verseRef'from = (Just v), verseRef'to = Nothing} | v <- [from..to]]
 
+
+toVerseStyle :: Int -> String
+toVerseStyle  = map toSmallDigit . show
+
+toSmallDigit :: Char -> Char
+toSmallDigit '0' = '⁰'
+toSmallDigit '1' = '¹'
+toSmallDigit '2' = '²'
+toSmallDigit '3' = '³'
+toSmallDigit '4' = '⁴'
+toSmallDigit '5' = '⁵'
+toSmallDigit '6' = '⁶'
+toSmallDigit '7' = '⁷'
+toSmallDigit '8' = '⁸'
+toSmallDigit '9' = '⁹'
+

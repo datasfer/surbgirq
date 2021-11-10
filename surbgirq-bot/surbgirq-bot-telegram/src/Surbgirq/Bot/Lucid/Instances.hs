@@ -46,8 +46,9 @@ instance ToHtml [Verse]  where
 
 instance ToHtml Verse  where
     toHtml Verse{..} = do
---        let b = (bold_ . toHtml . pack $ concat ["<sup>", show verse'verse, "</sup>" ]) <> space2 <> (toHtml verse'content)
-        let b = (bold_ . toHtml . pack $ show verse'verse) <> space2 <> (toHtml verse'content)
+--      let b = (bold_ . toHtml . pack $ concat ["<sup>", show verse'verse, "</sup>" ]) <> space2 <> (toHtml verse'content)
+--      let b = (bold_ . toHtml . pack $ toVerseStyle  verse'verse) <> space2 <> (toHtml verse'content)
+        let b = (toHtml . pack $ toVerseStyle  verse'verse) <> (toHtml verse'content)
         withNewLine b
     toHtmlRaw = toHtml
 
