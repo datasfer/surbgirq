@@ -1,15 +1,15 @@
+{-# LANGUAGE ApplicativeDo       #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE QuasiQuotes         #-}
 {-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE ApplicativeDo     #-}
 
 module Main where
 
 
 import Control.Exception    (bracket)
 import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
-import Data.Monoid         ((<>))
+import Data.Monoid          ((<>))
 
 import Options.Applicative
 
@@ -40,10 +40,10 @@ import System.FilePath
 
 import Common.Yaml
 import Surbgirq.Shell.CSV.Generate
+import Surbgirq.Shell.Scraper
 import Surbgirq.Shell.Store.Neo4j
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
-import Surbgirq.Shell.Scraper
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
@@ -56,13 +56,20 @@ main = do
          fullDesc <> progDesc "Scrap html to yamlor json formats."
                   <> header   "Surbgirq text scraper from html."
                   <> footer   ("the generated yaml/json will then converted to csv to feed neo4j."
-                              <> "e.g. html-scraper  --yaml  -i ./data/html/v1805 -o ./data/yaml"
+                              <> "e.g. html-scraper --v1805  --yaml  -i ./data/html/v1805 -o ./data/yaml"
                               )
 
   case cmd of
-    Command{..} -> 
+    Command{..} ->
              case cmd'book of
-               V1805 -> 
+               Z1805 ->
+                 case cmd'outFormat of
+                   YAML -> do
+                          TIO.putStrLn "Start scrapping Grabar scriptures to Yaml..."
+                          parseZohrapHtml cmd'inPath cmd'outPath
+                          TIO.putStrLn "Scrapping success!"
+                   _ -> TIO.putStrLn "format not supported"
+               V1805 ->
                  case cmd'outFormat of
                    YAML -> do
                           TIO.putStrLn "Start scrapping Grabar scriptures to Yaml..."
@@ -76,7 +83,7 @@ main = do
                           TIO.putStrLn "Start scrapping Grabar scriptures to Csv..."
                           parseGrabarBibleHtml cmd'inPath cmd'outPath
                           TIO.putStrLn "Scrapping success!"
-               E1994 -> 
+               E1994 ->
                  case cmd'outFormat of
                    YAML -> do
                           TIO.putStrLn "Start scrapping e 1994 scriptures to Yaml..."
@@ -97,7 +104,7 @@ main = do
 -- Cmd line commands parsing
 data BookTranslation = V1805
                      | E1994
-
+                     | Z1805
 data Command = Command
     { cmd'book      :: BookTranslation
     , cmd'outFormat :: OutFormat
@@ -115,6 +122,14 @@ v1805Input = flag' V1805
   (  long "v1805"
   <> short 'v'
   <> help "grabar 1805 translation" )
+
+-- | Parsing Book translations
+
+z1805Input :: Parser BookTranslation
+z1805Input = flag' V1805
+  (  long "z1805"
+  <> short 'z'
+  <> help "grabar 1805 translation, another parsing" )
 
 e1994Input :: Parser BookTranslation
 e1994Input = flag' E1994
@@ -147,7 +162,7 @@ outFormat :: Parser OutFormat
 outFormat = yamlOut <|> jsonOut <|> csvOut
 
 bookInput :: Parser BookTranslation
-bookInput = v1805Input <|> e1994Input
+bookInput = v1805Input <|> e1994Input <|> z1805Input
 
 parser :: Parser Command
 parser = do
@@ -180,17 +195,17 @@ parser = do
 --     , inPath    :: FilePath <?> "html texts directory"
 --     , outPath   :: FilePath <?> "output directory"
 --     }
---      deriving (Generic)             
+--      deriving (Generic)
 
 -- instance ParseRecord (Command Wrapped) where
 --         parseRecord = parseRecordWithModifiers modifiers
 
 -- deriving instance Show (Command Unwrapped)
-         
+
 -- data OutFormat =  YAML
 --                 | JSON
 --                 | CSV
---      deriving (Generic, Read)             
+--      deriving (Generic, Read)
 
 -- modifiers :: Modifiers
 -- modifiers = defaultModifiers
@@ -203,7 +218,7 @@ parser = do
 -- instance ParseField OutFormat
 -- instance ParseRecord OutFormat
 -- deriving instance Show OutFormat
-         
+
 -- main = do
 --     x <- unwrapRecord "Test program"
 --     print (x :: Command Unwrapped)

@@ -166,10 +166,20 @@ siteMenu = [ -- Counter "" "/#"
            , Menu "KJV" $ "/scripture/kjv/books"
            , Menu "Narek" $ "/scripture/narekaci-T/books"
            --                , JsMenu "Filter" "filter_menu"
-           , DropDown "Bibles" [ DropDownItem "e1994" "/scripture/e1994/books"
-                               , DropDownItem "v1805" "/scripture/v1805/books"
+           , DropDown "Bibles" [ DropDownItem "1805-Zohrap" "/scripture/v1805/books"
                                , DropDownItem "KJV"  "/scripture/kjv/books"
-                              ]
+                               , DropDownItem "e1994" "/scripture/e1994/books"
+                               ]
+           , DropDown "Bibles from cathedral" [
+                   DropDownItem "ar94" "/scripture/ar94/books"
+                 , DropDownItem "1805-Zohrap-cathedral" "/scripture/z1805/books"
+                 , DropDownItem "1896-Western" "/scripture/w1896/books"
+                 ,  DropDownItem "1895-Bagratuni" "/scripture/b1895/books"
+                 , DropDownItem "Ru-Syn"  "/scripture/rsyn/books"
+                 , DropDownItem "Greek"  "/scripture/grk/books"
+                 , DropDownItem "Greek-English" "/scripture/grk-eng/books"
+                 , DropDownItem "Vulgae" "/scripture/vulgate/books"
+                 ]
            , DropDown "Nareks" [ DropDownItem "Xeranyan" "/scripture/narek_xer-T/books"
                                , DropDownItem "Grabar" "/scripture/narekaci-T/books"
                               ]

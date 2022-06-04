@@ -135,6 +135,9 @@ openHs outFileRoot outRefFileRoot Book{..} = do
                         
 -- | Generate all possible csv file for a book
 -- to use with neo4j-import '* scheme'
+-- configuration file - where contains all config for books and etc
+-- the root path of yaml files, in config file there are relative paths
+-- output path of generated csv files
 generateScripturesCSV :: FilePath -> FilePath -> FilePath -> IO ()
 generateScripturesCSV configFile path outPath = do
    let del = ';';

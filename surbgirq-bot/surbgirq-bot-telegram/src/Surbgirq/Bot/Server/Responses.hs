@@ -165,6 +165,13 @@ getVerses defTrans vRef@VerseReference{..} = do
     (Nothing, Just to)   -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just to)
 
 
+getChapterVerses :: TranslationID -> VerseReference -> IO [Verse]
+getChapterVerses defTrans vRef@VerseReference{..} = do
+  maxVerseNum <- getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
+  let translation = fromMaybe defTrans verseRef'translation
+  getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
+
+
 
 -- | Auxiliary functions
 sendAsParts chatId xs = forM_ xs $ \x ->

@@ -32,6 +32,7 @@ library
                    Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
                    Surbgirq.Shell.Scraper.Scalpel.Narek
                    Surbgirq.Shell.Scraper.Scalpel.Narek.XeranyanScraper
+                   Surbgirq.Shell.Scraper.Scalpel.JupyterHtml.ZohrapScraper
                    Surbgirq.Shell.CSV.Generate
                    
                    Surbgirq.Shell.Theographic.JSON.Types

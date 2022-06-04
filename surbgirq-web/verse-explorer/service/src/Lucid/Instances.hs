@@ -57,7 +57,6 @@ girqTable bs =
 bookItemRow :: Monad m => Book -> HtmlT m ()
 bookItemRow b@Book{..} = do
   tr_ [id_ $ T.pack $ show book'book] $ do
-    -- td_ [title_ "base58 of signed tx base58"] (a_ [href_ (tranHashToUrl txItem'transHash)] (toHtml txItem'transHash))
     td_ [] (toHtml $ show book'number)
     td_ [] (a_ [href_ (htoUrl b)] (toHtml $ show book'book))
     td_ [] (toHtml $ book'title)

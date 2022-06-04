@@ -16,7 +16,8 @@ import           Text.Read
 
 -- | parse text to verseRef data
 -- Ղուկ. 6.20-23
-
+-- >> e1994t mat 2
+-- >>> VerseReference {verseRef'translation = Just e1994-T, verseRef'book = Matthew, verseRef'chapter = 2, verseRef'from = Nothing, verseRef'to = Nothing, verseRef'combine = False}
 parseVerseRef :: Text -> Either Text VerseReference
 parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text"
                          | otherwise =

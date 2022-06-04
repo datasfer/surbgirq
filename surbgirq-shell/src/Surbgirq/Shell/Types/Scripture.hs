@@ -143,7 +143,9 @@ data RefTo = YouTube YtUrl YtAuthor YtTitle YtDesc
 data RefType = RefBooks   [Text]
              | RefChapter Int
              | RefSection Int Int
-             | RefVerse   Text
+             | RefVerse Text
+             | RefVerseEnd Text Text
+               -- ^ do not connected to special word, ref number of original and text
              | RefWord    Text
              | RefText    Text
              | RefFootnote Text Text
