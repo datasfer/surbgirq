@@ -214,7 +214,7 @@ data Group = Pentateuch
 -- 	 '--5':'պոեմներ / poetry', 'tJob':'Յոբ / Job (tJob)', 'tPs':'Սաղմոս / Psalms (tPs)', 'tProv':'Առակներ / Proverbs (tProv)', 'tEccles':'Ժողովող / Ecclesiastes (tEccles)', 'tSong':'Երգ Երգոց / Song of Solomon (tSong)',
 -- 	 '--6':'ավագ մերգարեներ / magor prophets','tIs':'Եսայի / Isaiah (tIs)', 'tJer':'Երեմիա / Jeremiah (tJer)', 'tLam':'Ողբ / Lamentations (tLam)', 'tEzek':'Եզեկիէլ / Ezekiel (tEzek)', 'tDan':'Դանիէլ / Daniel (tDan)',
 -- 	 '--7':'մարգարեներ / minor prophets','tHos':'Օսէէ / Hosea (tHos)', 'tJoel':'Յովել / Joel (tJoel)', 'tAmos':'Ամոս / Amos (tAmos)', 'tObad':'Աբդիու / Obadiah (tObad)', 'tJon':'Յովնան / Jonah (tJon)', 'tMic':'Միքիա / Micah (tMic)', 'tNahum':'Նաւում / Nahum (tNahum)', 'tHab':'Ամբակում / Habakkuk (tHab)', 'tZeph':'Սոփոնիա / Zephaniah (tZeph)', 'tHag':'Անգէ / Haggai (tHag)', 'tZech':'Զաքարիա / Zechariah (tZech)', 'tMal':'Մաղաքիա / Malachi (tMal)',
--- 	 '--8':'երկրոդականոն / deuterocanonical', 'tTob':'Տոբիթ / Tobit (tTob)', 'tJudith':'Յուդիթ / Judith (tJudith)', 'tWis':'Իմաստութիւն Սողոմոնի / Wisdoms (tWis)', 'tSir':'Սիրաք / Sirak (tSir)', 'tBar':'Բարուք / Baruk (tBar)', 't1Mac':'Ա Մակաբայեցիներ / 1 Maccabees (t1Mac)', 't2Mac':'Բ Մակաբայեցիներ / 2 Maccabees (t2Mac)', 't3Mac':'Գ Մակաբայեցիներ / 3 Maccabees (t3Mac)', 't1Esdras':'Ա Եզրաս / Esdras (t1Esdras)'};
+-- 	 '--8':'երկրոդականոն / deuterocanonical', 'tTob':'Տոբիթ / Tobit (tTob)', 'tJudith':'Յուդիթ / Judith (tJudith)', 'tWis':'Իմաստութիւն Սողոմոնի / Wisdoms (tWis)', 'tSir':'Սիրաք / Sirak (tSir)', 'tBar':'Բարուք / Baruk (tBar)', 't1Mac':'Ա Մակաբայեցիներ / 1 Maccabees (t1Mac)', 't2Mac':'Բ Մակաբայեցիներ / 2 Maccabees (t2Mac)', 't3Mac':'Գ Մակաբայեցիներ / 3 Maccabees (t3Mac)', 't1Esdras':'Ա Եզրաս / Esdras (t1Esdras)'};
 --     var books_name_am = {'tMt':'Մատթէոս', 'tMk':'Մարկոս', 'tLk':'Ղուկաս', 'tJn':'Յովհաննէս', 'tActs':'Գործք',
 -- 	 '--1':'թղթեր', 't1Cor':'Ա Կորնթացիներ', 't2Cor':'Բ Կորնթացիներ', 'tGal':'Գաղատացիներին', 'tEph':'Եփեսացիներ', 'tPhil':'Փիլիպեցիներ', 'tCol':'Կողոսացիներ', 't1Thess':'Ա Թեսաղոնիկեցիներ', 't2Thess':'Բ Թեսաղոնիկեցիներ', 't1Tim':'Ա Տիմոթէոս', 't2Tim':'Բ Տիմոթէոս', 'tTit':'Տիտոս', 'tPhilem':'Փիլիմոն', 'tHeb':'Թուղթ Եբրայեցիներին', 'tJas':'Յակոբոս', 't1Pet':'Ա Պետրոս', 't2Pet':'Բ Պետրոս', 't1Jn':'Ա Յովհաննէս', 't2Jn':'Բ Յովհաննէս', 't3Jn':'Գ Յովհաննէս', 'tJude':'Յուդա Առաքեալի Թուղթը',
 -- 	 '--2':'-','tRev':'Յայտնութիւն',
@@ -236,3 +236,51 @@ data Group = Pentateuch
 -- 	 '--8':'deuterocanonical', 'tTob':'Tobit', 'tJudith':'Judith', 'tWis':'Wisdoms', 'tSir':'Sirak', 'tBar':'Baruk', 't1Mac':'1 Maccabees', 't2Mac':'2 Maccabees', 't3Mac':'3 Maccabees', 't1Esdras':'Esdras'};
 
 
+-- Աստվածաշնչի և Հին կտակարանի առաջին հինգ գրքերն են, կոչվում են նաև Հնգամատյան: Համաձայն քրիստոնեական վարդապետության`   դրանք գրվել են Մովսես մարգարեի կողմից:
+-- Ծննդոց
+-- Ելք
+-- Ղևտական
+-- Թվեր
+-- Երկրորդ օրենք
+-- Պատմական
+
+-- Պատմական գրքերում ներկայացվում է Իսրայելի պատմությունը Ավետյաց երկիր մտնելուց մինչև Սելևկյան պետության դեմ մղվող ազատագրական պայքարը:
+-- Հեսու
+-- Դատավորներ
+-- Հռութ
+-- Թագավորություններ Ա
+-- Թագավորություններ Բ
+-- Թագավորություններ Գ
+-- Թագավորություններ Դ
+-- Ա Մնացորդաց
+-- Բ Մնացորդաց
+-- Ա Եզրաս
+-- Բ Եզրաս
+-- Նեեմի
+-- Եսթեր
+-- Իմաստության
+-- Սաղմոս
+-- Առակներ
+-- Ժողովող
+-- Երգ երգոց
+-- Հոբ
+-- Մարգարեական
+
+-- Եսայի
+-- Օսեե
+-- Ամոս
+-- Միքիա
+-- Հովել
+-- Աբդիա
+-- Հովնան
+-- Նավում
+-- Ամբակում
+-- Սոփոնիա
+-- Անգե
+-- Զաքարիա
+-- Երեմիա
+-- Ողբ
+-- Դանիել
+-- Եզեկիել
+-- Աղբյուր
+-- Ք.Հ. հանրագիտարան

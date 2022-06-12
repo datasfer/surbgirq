@@ -97,6 +97,13 @@ main = do
                           TIO.putStrLn "Start scrapping e 1994 scriptures to Csv..."
                           parseE1994BibleHtml cmd'inPath cmd'outPath
                           TIO.putStrLn "Scrapping success!"
+               AR94 ->
+                 case cmd'outFormat of
+                   YAML -> do
+                          TIO.putStrLn "Start scrapping Grabar scriptures to Yaml..."
+                          parseAR94Html cmd'inPath cmd'outPath
+                          TIO.putStrLn "Scrapping success!"
+                   _ -> TIO.putStrLn "format not supported"
 
 
 
@@ -104,6 +111,7 @@ main = do
 -- Cmd line commands parsing
 data BookTranslation = V1805
                      | E1994
+                     | AR94
                      | Z1805
 data Command = Command
     { cmd'book      :: BookTranslation
@@ -137,6 +145,12 @@ e1994Input = flag' E1994
   <> short 'e'
   <> help "ashxarhabar 1994 translation" )
 
+ar94Input :: Parser BookTranslation
+ar94Input = flag' AR94
+  (  long "ar94"
+  <> short 'r'
+  <> help "ashxarhabar 1994 translation jupiter processed" )
+
 -- | Parsing formats
 yamlOut :: Parser OutFormat
 yamlOut = flag' YAML
@@ -162,7 +176,7 @@ outFormat :: Parser OutFormat
 outFormat = yamlOut <|> jsonOut <|> csvOut
 
 bookInput :: Parser BookTranslation
-bookInput = v1805Input <|> e1994Input <|> z1805Input
+bookInput = v1805Input <|> e1994Input <|> z1805Input <|> ar94Input
 
 parser :: Parser Command
 parser = do

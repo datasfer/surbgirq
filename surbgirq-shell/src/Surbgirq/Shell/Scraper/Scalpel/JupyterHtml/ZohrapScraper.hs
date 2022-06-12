@@ -6,7 +6,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Surbgirq.Shell.Scraper.Scalpel.JupyterHtml.ZohrapScraper (parseZohrapHtml) where
+module Surbgirq.Shell.Scraper.Scalpel.JupyterHtml.ZohrapScraper (parseZohrapHtml, parseAR94Html) where
 
 
 import Data.Text (Text)
@@ -77,6 +77,7 @@ ar94Test :: IO ()
 ar94Test = parseJupterGeneratedHtml "bible/am/ar94" "../data/html/ar94" "../data/yaml"
 
 parseZohrapHtml  = parseJupterGeneratedHtml "bible/am/z1805"
+parseAR94Html  = parseJupterGeneratedHtml "bible/am/ar94"
 
 -- | stack exec -- html-scraper --z1805  --yaml  -i ./data/html/z1805 -o ./data/yaml
 -- parseZohrapHtml "../data/html/z1805" "../data/yaml"

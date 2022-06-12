@@ -605,7 +605,7 @@ songs = [e1994Books songAm, v1805Books songGr, sinodalBooks songRu, kjvBooks son
     songGr = [""]
     songAm = ["Երգ Երգոց", "Երգոց"]
     songRu = ["Книга Песни Песней Соломона", "Песни Песней"]
-    songEn = ["Song of Solomon", "Song", "Еккл"]
+    songEn = ["Song of Solomon", "Song", "Songs"]
 
 wisdoms :: [AbbrBook]
 wisdoms = [e1994Books wisdomAm, v1805Books wisdomGr, sinodalBooks wisdomRu, kjvBooks wisdomEn]
@@ -613,7 +613,7 @@ wisdoms = [e1994Books wisdomAm, v1805Books wisdomGr, sinodalBooks wisdomRu, kjvB
     wisdomGr = [""]
     wisdomAm = ["Իմաստութիւն Սողոմոնի", "Իմաստութիւն"]
     wisdomRu = ["Книга Песни Песней Соломона", "Песни Песней"]
-    wisdomEn = ["Wisdoms", "Wis"]
+    wisdomEn = ["Wisdoms", "Wisdom", "Wis"]
 
 
 
@@ -676,7 +676,7 @@ joel = [e1994Books joelAm, v1805Books joelGr, sinodalBooks joelRu, kjvBooks joel
     joelGr = [""]
     joelAm = ["Յովել", "Յվլ"]
     joelRu = ["Книга пророка Иоиля", "Иоил"]
-    joelEn = ["Joel"]
+    joelEn = ["Joel", "Hovel"]
 
 
 obad :: [AbbrBook]
@@ -685,7 +685,7 @@ obad = [e1994Books obadAm, v1805Books obadGr, sinodalBooks obadRu, kjvBooks obad
     obadGr = [""]
     obadAm = ["Աբդիու", "Աբդ"]
     obadRu = ["Книга пророка Авдия", "Авд"]
-    obadEn = ["Obadiah", "Obad"]
+    obadEn = ["Obadiah", "Obad", "Abdiu"]
 
 
 jonah :: [AbbrBook]
@@ -694,7 +694,7 @@ jonah = [e1994Books jonahAm, v1805Books jonahGr, sinodalBooks jonahRu, kjvBooks 
     jonahGr = [""]
     jonahAm = ["Յովնան", "Յն"]
     jonahRu = ["Книга пророка Ионы", "Ион"]
-    jonahEn = ["Jonah", "Jon"]
+    jonahEn = ["Jonah", "Jon", "Hovnan"]
 
 
 nahum :: [AbbrBook]
@@ -703,7 +703,7 @@ nahum = [e1994Books nahumAm, v1805Books nahumGr, sinodalBooks nahumRu, kjvBooks 
     nahumGr = [""]
     nahumAm = ["Նաւում", "Նւ"]
     nahumRu = ["Книга пророка Наума", "Наум"]
-    nahumEn = ["Nahum", "Nah"]
+    nahumEn = ["Nahum", "Nah", "Navum"]
 
 
 hab :: [AbbrBook]
@@ -721,7 +721,7 @@ zeph = [e1994Books zephAm, v1805Books zephGr, sinodalBooks zephRu, kjvBooks zeph
     zephGr = [""]
     zephAm = ["Սոփոնիա", "Սփ"]
     zephRu = ["Книга пророка Софонии", "Соф"]
-    zephEn = ["Zephaniah", "Zeph"]
+    zephEn = ["Zephaniah", "Zeph", "Sohonia"]
 
 
 hag :: [AbbrBook]
@@ -730,7 +730,7 @@ hag = [e1994Books hagAm, v1805Books hagGr, sinodalBooks hagRu, kjvBooks hagEn]
     hagGr = [""]
     hagAm = ["Անգէ", "Անգ"]
     hagRu = ["Книга пророка Аггея", "Агг"]
-    hagEn = ["Haggai", "Hag"]
+    hagEn = ["Haggai", "Hag", "Angei"]
 
 
 zech :: [AbbrBook]
@@ -739,7 +739,7 @@ zech = [e1994Books zechAm, v1805Books zechGr, sinodalBooks zechRu, kjvBooks zech
     zechGr = [""]
     zechAm = ["Զաքարիա", "Զք"]
     zechRu = ["Книга пророка Захарии", "Зах"]
-    zechEn = ["Zechariah", "Zech"]
+    zechEn = ["Zechariah", "Zech", "Zaqaria"]
 
 malachi :: [AbbrBook]
 malachi = [e1994Books malachiAm, v1805Books malachiGr, sinodalBooks malachiRu, kjvBooks malachiEn]
@@ -747,7 +747,7 @@ malachi = [e1994Books malachiAm, v1805Books malachiGr, sinodalBooks malachiRu, k
     malachiGr = []
     malachiAm = ["Մաղաքիա", "Մղ"]
     malachiRu = ["Книга пророка Малахии", "Мал"]
-    malachiEn = ["Malachi", "Mal"]
+    malachiEn = ["Malachi", "Mal", "Maxaqia"]
 
 
 jer :: [AbbrBook]
@@ -765,7 +765,7 @@ bar = [e1994Books barAm, v1805Books barGr, sinodalBooks barRu, kjvBooks barEn]
     barGr = [""]
     barAm = ["Բարուք", "Բրք"]
     barRu = ["Книга пророка Варуха", "Вар"]
-    barEn = ["Baruk", "Bar"]
+    barEn = ["Baruk", "Bar", "Baruq"]
 
 
 lam :: [AbbrBook]
@@ -774,7 +774,7 @@ lam = [e1994Books lamAm, v1805Books lamGr, sinodalBooks lamRu, kjvBooks lamEn]
     lamGr = [""]
     lamAm = ["Ողբ"]
     lamRu = ["Книга плач Иеремии", "Плач"]
-    lamEn = ["Lamentations", "Lam"]
+    lamEn = ["Lamentations", "Lam", "Voxb"]
 
 
 dan :: [AbbrBook]
