@@ -137,7 +137,7 @@ parseNarekHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
 
             ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse1
 
-            return $ Section sectionTitle secNum p_ref $ [Paragraph 1 $ concat ps]
+            return $ Section sectionTitle secNum p_ref $ concat ps
          -- let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = secNum}) [1..] sections
          return $ Chapter chNum "" "" sections
        return $ BookData title chapters
@@ -161,7 +161,7 @@ parseVerse1 = do
       rs = PCRE.scan refRegex $ T.unpack verse
 
 --  let xs = map (\(num, v) -> VerseData [] (versRefs) rs (T.pack $ show num) v $ T.pack verse)  (zip [4..] vs)
-  let xs = map (\v -> Verse num v Nothing [])  vs
+  let xs = map (\v -> Verse num v [])  vs
   return xs
   where
     parseVerseNum :: Scraper String Text

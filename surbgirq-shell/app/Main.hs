@@ -254,19 +254,19 @@ generateInitCypher bookFile path outPath = do
                  TIO.hPutStrLn outRefh secRefRel
 
               -- Paragraphs
-             forM_ section'paragraphs $ \Paragraph{..} -> do
-               let prghName = concat [secName, del, "prgh", show paragraph'number]
-                   prghNode = [qc| ({prghName}:Paragraph \{num: {paragraph'number}}),|]
-                   prghRel  = [qc| ({secName})-[:HAS_PRGH \{num: {paragraph'number}} ]->({prghName}),|]
+             -- forM_ section'paragraphs $ \Paragraph{..} -> do
+             --   let prghName = concat [secName, del, "prgh", show paragraph'number]
+             --       prghNode = [qc| ({prghName}:Paragraph \{num: {paragraph'number}}),|]
+             --       prghRel  = [qc| ({secName})-[:HAS_PRGH \{num: {paragraph'number}} ]->({prghName}),|]
 
-               TIO.hPutStrLn outh prghNode
-               TIO.hPutStrLn outh prghRel
+             --   TIO.hPutStrLn outh prghNode
+             --   TIO.hPutStrLn outh prghRel
 
                -- Verses
-               forM_ paragraph'verses $ \v@Verse{..} -> do
-                 let verseName = concat [prghName , del, "verse", show verse'verse]
-                     verseNode = [qc| ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', num: {verse'verse}, section: {section'number}, section_title: '{section'title}', paragraph: {paragraph'number}, chapter: {chapter'number}  }),|]
-                     verseRel  = [qc| ({prghName})-[:HAS_VERSE \{num: {verse'verse}}]->({verseName}),|]
+             forM_ section'verses $ \v@Verse{..} -> do
+                 let verseName = concat [secName , del, "verse", show verse'verse]
+                     verseNode = [qc| ({verseName}:Verse \{book: '{bookLabel}', content: '{verse'content}', num: {verse'verse}, section: {section'number}, section_title: '{section'title}', chapter: {chapter'number}  }),|]
+                     verseRel  = [qc| ({secName})-[:HAS_VERSE \{num: {verse'verse}}]->({verseName}),|]
                  TIO.hPutStrLn outh verseNode
                  TIO.hPutStrLn outh verseRel
 

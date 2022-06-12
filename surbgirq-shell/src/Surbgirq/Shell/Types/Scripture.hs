@@ -8,7 +8,6 @@ module Surbgirq.Shell.Types.Scripture (
  , Book(..)
  , Chapter (..)
  , Section(..)
- , Paragraph(..)
  , Verse(..)
  , Testament (..)
  , BookRef(..)
@@ -33,8 +32,8 @@ import Surbgirq.Types.Scripture
 
 
 data Corpora = Corpora
-     { corpora'scripturesPath   :: FilePath
-     , corpora'translationsPath :: FilePath
+     { corpora'scripturesPath   :: [FilePath]
+     , corpora'translationsPath :: [FilePath]
      -- , corpora'bibleDivisionsPath :: FilePath
      -- , corpora'testamentsPath     :: FilePath
      , corpora'grabar60kPath    :: FilePath
@@ -83,26 +82,17 @@ data Chapter = Chapter
 
 
 data Section = Section
-    { section'title      :: Text
-    , section'number     :: Int
-    , section'ref        :: Text
-    , section'paragraphs :: [Paragraph]
-    } deriving (Show)
-
-
-data Paragraph = Paragraph
-    { paragraph'number :: Int
-    , paragraph'verses :: [Verse]
+    { section'title  :: Text
+    , section'number :: Int
+    , section'ref    :: Text
+    , section'verses :: [Verse]
     } deriving (Show)
 
 
 data Verse = Verse
-  { verse'verse       :: Int
-  , verse'content     :: Text
-  , verse'seperatedBy :: Maybe Int
-  -- ^ next part of this verse should go to next section or prgh
---   , verse'grabar    :: Text
-  , verse'ref         :: [VerseRef]
+  { verse'verse   :: Int
+  , verse'content :: Text
+  , verse'ref     :: [VerseRef]
   } deriving (Show)
 
 
@@ -158,7 +148,6 @@ $(deriveJSON dropPrefixOptions ''Book)
 $(deriveJSON dropPrefixOptions ''Scripture)
 $(deriveJSON dropPrefixOptions ''Chapter)
 $(deriveJSON dropPrefixOptions ''Section)
-$(deriveJSON dropPrefixOptions ''Paragraph)
 $(deriveJSON dropPrefixOptions ''Verse)
 $(deriveJSON dropPrefixOptions ''RefType)
 $(deriveJSON dropPrefixOptions ''VerseRef)

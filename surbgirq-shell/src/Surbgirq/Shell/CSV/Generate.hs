@@ -52,8 +52,8 @@ data FileHandlers =  FileHandlers
     , outSech :: Handle
     , outSecPrghRelh :: Handle
     -- * paragraph
-    , outPrghh :: Handle
-    , outPrghVerseRelh :: Handle
+    -- , outrgPrghh :: Handle
+    -- , outPrghVerseRelh :: Handle
     -- * verse
     , outVerseh :: Handle
     -- * word/tokens
@@ -80,8 +80,8 @@ closeHs FileHandlers {..} = do
   -- sections
   hClose outSech
   hClose outSecPrghRelh
-  hClose outPrghh
-  hClose outPrghVerseRelh
+  -- hClose outPrghh
+  -- hClose outPrghVerseRelh
   -- verses
   hClose outVerseh
   -- words         
@@ -111,8 +111,8 @@ openHs outFileRoot outRefFileRoot Book{..} = do
     outSecPrghRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_SectionPrghRel.csv|]) WriteMode
 
     -- paragraph
-    outPrghh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_prghs.csv|]) WriteMode
-    outPrghVerseRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_PrghVerseRel.csv|]) WriteMode
+    -- outPrghh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_prghs.csv|]) WriteMode
+    -- outPrghVerseRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_PrghVerseRel.csv|]) WriteMode
 
     -- veses
     outVerseh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verses.csv|]) WriteMode
@@ -148,7 +148,7 @@ generateScripturesCSV configFile path outPath = do
    TIO.putStrLn  $ T.pack $ show corpora
 
    TIO.putStrLn "reading list of Scriptures..."
-   scriptures :: [Scripture] <- readYaml (corpora'scripturesPath corpora)
+   scriptures :: [Scripture] <- (fmap concat) $ mapM readYaml (corpora'scripturesPath corpora)
 
    let outRootPath = outPath </> "scriptures" 
 
@@ -204,9 +204,9 @@ generateScripturesCSV configFile path outPath = do
      TIO.hPutStrLn outCommentariesh [qc|eastons;Easton's Bible Dictionary;"The Illustrated Bible Dictionary,[a] better known as Easton's Bible Dictionary, is a reference work on topics related to the Christian Bible compiled by Matthew George Easton";Commentary|]
      hClose outCommentariesh
 
-        
+
      TIO.putStrLn "Reading Translations ..."
-     translations :: [Translation] <- readYaml (corpora'translationsPath corpora)
+     translations :: [Translation] <- (fmap concat) $ mapM readYaml (corpora'translationsPath corpora)
      forM_ translations $ \tr@Translation{..} -> do
        let trTranslators = T.intercalate (T.pack arrayDel) translation'translators
            trLine = [qc|{translation'ID}{del}{translation'name}{del}{translation'version}{del}{translation'language}{del}{translation'from}{del}{translation'year}{del}{translation'dialect}{del}{translation'lang}{del}{trTranslators}{del}{translation'description}{del}Translation|]
@@ -300,30 +300,30 @@ generateScripturesCSV configFile path outPath = do
                    TIO.hPutStrLn outSech secLine
                    TIO.hPutStrLn outChSecRelh  [qc|{chapterID}{del}{sectionID}|]
 
-                    -- Paragraphs
-                   forM_ section'paragraphs $ \Paragraph{..} -> do
-                     let prghID = concat [sectionID, "-", show paragraph'number ]
-                         prghLine = [qc|{prghID}{del}{section'title}{del}{paragraph'number}{del}{section'number}{del}{chapter'number}|]
-                     TIO.hPutStrLn outPrghh prghLine
-                     TIO.hPutStrLn outSecPrghRelh  [qc|{sectionID}{del}{prghID}|]
+                   --  -- Paragraphs
+                   -- forM_ section'verses $ \Paragraph{..} -> do
+                   --   let prghID = concat [sectionID, "-", show paragraph'number ]
+                   --       prghLine = [qc|{prghID}{del}{section'title}{del}{paragraph'number}{del}{section'number}{del}{chapter'number}|]
+                   --   TIO.hPutStrLn outPrghh prghLine
+                   --   TIO.hPutStrLn outSecPrghRelh  [qc|{sectionID}{del}{prghID}|]
 
                      -- Verses
-                     forM_ paragraph'verses $ \v@Verse{..} -> do
+                   forM_ section'verses $ \v@Verse{..} -> do
                        let verseID = concat [chapterID, ".", show verse'verse]
-                           verseLine = [qc|{verseID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verse'verse}{del}{verse'content}|]
+                           verseLine = [qc|{verseID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{verse'verse}{del}{verse'content}|]
                            -- verseWords = T.words verse'content
                            verseWords = filter ((>0) . T.length) $ T.splitOn " " verse'content
 
                        TIO.hPutStrLn outVerseh verseLine
                        TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
-                       TIO.hPutStrLn outChVerseRelh  [qc|{prghID}{del}{verseID}|]
+                       TIO.hPutStrLn outChVerseRelh  [qc|{sectionID}{del}{verseID}|]
 
-                       let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", translationID,  "_", show  chapter'number, ".", show section'number,".", show paragraph'number, ".", show verse'verse]
+                       let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", translationID,  "_", show  chapter'number, ".", show section'number,".", show verse'verse]
                        forM_ (zip [1..] verseWords) $ \(index,word) -> do
                          let wordID = concat [ wordIDPrefix, "-", show index]
                              wordNodeLabels = wordLabels word (show book'language) (show book'dialect) arrayDel
                              token = word
-                             wordLine = [qc|{wordID}{del}{word}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{paragraph'number}{del}{verse'verse}{del}{token}{del}{index}{del}{wordNodeLabels}|]
+                             wordLine = [qc|{wordID}{del}{word}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{verse'verse}{del}{token}{del}{index}{del}{wordNodeLabels}|]
                              vwRel  = [qc|{verseID}{del}{wordID}|]
 
 
@@ -429,7 +429,7 @@ dumpCSVHeaders del root = do
            , mkHeader "Section to Prgh Relation Header" "section_prgh_header.csv"  [qc|:START_ID(CHAPTER-ID){del}:END_ID(CHAPTER-ID)|]
 
            -- * prgh
-           , mkHeader "Paragraph Header" "prgh_header.csv" [qc|prghID:ID(CHAPTER-ID){del}title{del}num:long{del}section:long{del}chapter:long|]
+          -- , mkHeader "Paragraph Header" "prgh_header.csv" [qc|prghID:ID(CHAPTER-ID){del}title{del}num:long{del}section:long{del}chapter:long|]
 
            -- * Verse
               {-- to prevent this normalization routine from int -> long 
@@ -438,11 +438,11 @@ dumpCSVHeaders del root = do
                 Property type of 'paragraph' normalized from 'int' --> 'long' in /data/csv/./scriptures/headers/verse_header.csv
                 Property type of 'verse' normalized from 'int' --> 'long' in /data/csv/./scriptures/headers/verse_header.csv
                 --}
-           , mkHeader "Verse Header" "verse_header.csv" [qc|verseID:ID(VERSE-ID){del}book{del}chapter:long{del}section:long{del}paragraph:long{del}verse:long{del}verseText|]
+           , mkHeader "Verse Header" "verse_header.csv" [qc|verseID:ID(VERSE-ID){del}book{del}chapter:long{del}section:long{del}verse:long{del}verseText|]
            , mkHeader "Verse to Word Relation Header" "verse_word_header.csv" [qc|:START_ID(VERSE-ID){del}:END_ID(WORD-ID)|]
            , mkHeader "Verse to FootNote  Header" "verse_footnote_header.csv" [qc|:START_ID(VERSE-ID){del}:END_ID(FOOTNOTE-ID){del}:TYPE|]
            -- * Word
-           , mkHeader "Word Header" "word_header.csv"  [qc|wordID:ID(WORD-ID){del}word{del}book{del}chapter:long{del}section:long{del}paragraph:long{del}verse:long{del}token{del}versePos:long{del}:LABEL|]
+           , mkHeader "Word Header" "word_header.csv"  [qc|wordID:ID(WORD-ID){del}word{del}book{del}chapter:long{del}section:long{del}verse:long{del}token{del}versePos:long{del}:LABEL|]
            , mkHeader "Word to Footnote  Header" "word_footnote_header.csv" [qc|:START_ID(WORD-ID){del}:END_ID(FOOTNOTE-ID){del}:TYPE|]
            -- * Footnote header
            , mkHeader "Footnote Header" "footnote_header.csv"  [qc|footnoteID:ID(FOOTNOTE-ID){del}text{del}index:long{del}:LABEL|]
@@ -465,12 +465,12 @@ dumpCSVHeaders del root = do
 -- seems not used
 
 generateVerseCsv :: FilePath -> FilePath -> FilePath -> IO ()
-generateVerseCsv bookFile path outPath = do
+generateVerseCsv corporaConfig path outPath = do
    let del = ';';
        arrayDel = "|";
-   corpora :: Corpora <- readYaml bookFile
+   corpora :: Corpora <- readYaml corporaConfig
 
-   scriptures :: [Scripture] <- readYaml (corpora'scripturesPath corpora)
+   scriptures :: [Scripture] <- (fmap concat) $ mapM readYaml (corpora'scripturesPath corpora)
 
    let books = let  (x:_) = scriptures in scripture'books x
 
@@ -526,10 +526,10 @@ generateVerseCsv bookFile path outPath = do
            -- Sections
            forM_ chapter'sections $ \Section{..} -> do
               -- Paragraphs
-             forM_ section'paragraphs $ \Paragraph{..} -> do
+             -- forM_ section'paragraphs $ \Paragraph{..} -> do
                -- Verses
-               forM_ paragraph'verses $ \v@Verse{..} -> do
-                 let verseLine = [qc|{bookLabel}{del} {chapter'number}{del} {section'number}{del} {paragraph'number}{del} {verse'verse}{del} {verse'content} |]
+               forM_ section'verses $ \v@Verse{..} -> do
+                 let verseLine = [qc|{bookLabel}{del} {chapter'number}{del} {section'number}{del} {verse'verse}{del} {verse'content} |]
                  TIO.hPutStrLn outh verseLine
 
 

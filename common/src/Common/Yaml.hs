@@ -10,5 +10,5 @@ import Data.Yaml.Config (loadYamlSettings, useEnv)
 --
 ------------------------------------------------------------
 
-readYaml :: FromJSON settings => FilePath -> IO settings
+readYaml :: FromJSON a => FilePath -> IO a
 readYaml file = loadYamlSettings [file] [] useEnv

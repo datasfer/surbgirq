@@ -66,7 +66,7 @@ instance ToJSON Book'
 instance ToJSON FootnoteData
 
 parseBibleTest :: IO ()
-parseBibleTest = parseGrabarBibleHtml "./data/html/v1805" "./data/yaml"
+parseBibleTest = parseGrabarBibleHtml "../data/html/v1805" "../data/yaml"
 
 data OutFormat =  YAML
                 | JSON
@@ -146,12 +146,12 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
                   (\n s@(Section{section'number = m}) -> s{section'number = n})
                   [1..] sections
 
-           ss = map (\sec@Section{section'paragraphs = ps} ->
-                  let ps' = zipWith (\n p@(Paragraph{paragraph'number = m}) -> p{paragraph'number = n})
-                          [1..] ps
-                  in sec{section'paragraphs = ps'}
-                    ) secs
-       return $ Chapter chNum chTitle "" ss
+           -- ss = map (\sec@Section{section'paragraphs = ps} ->
+           --        let ps' = zipWith (\n p@(Paragraph{paragraph'number = m}) -> p{paragraph'number = n})
+           --                [1..] ps
+           --        in sec{section'paragraphs = ps'}
+           --          ) secs
+       return $ Chapter chNum chTitle "" secs
     return $ Book' bookTitle chapters
    parse = do
      vv <- T.pack <$> innerHTML "p"
@@ -175,10 +175,10 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
                         v = T.strip $ case vR of
                               [] -> verse
                               _  -> removeLinkTag verse
-                    in Verse num v Nothing (map (updateRefs refM v) vR)
+                    in Verse num v (map (updateRefs refM v) vR)
                        )
                (zip [from..to] vs)
-     return $ Section subTitle 999 "" [Paragraph 33 xs] -- vv vNums (T.pack rawVerseHtml) xs
+     return $ Section subTitle 999 "" xs -- vv vNums (T.pack rawVerseHtml) xs
 
    removeLinkTag str = T.intercalate "" $ PCRE.split linkRegex str
 

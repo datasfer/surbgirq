@@ -82,7 +82,7 @@ test = do
 
 
 parseBibleTest :: IO ()
-parseBibleTest = parseE1994BibleHtml "./data/html/e1994" "./data/yaml"
+parseBibleTest = parseE1994BibleHtml "../data/html/e1994" "../data/yaml"
 
 -- | stack exec -- html-scraper --e1994  --yaml  -i ./data/html/e1994 -o ./data/yaml
 parseE1994BibleHtml :: FilePath -> FilePath -> IO ()
@@ -156,7 +156,7 @@ parseVerse fs = do
                         v = case vR of
                               [] -> T.strip verse
                               _  -> removeLinkTag verse
-                    in Verse num (T.strip v) Nothing vR)
+                    in Verse num (T.strip v) vR)
                (zip vNums vs)
   return xs
   where
@@ -211,7 +211,7 @@ parseBibleHtml = do
             sectionTitle <- (seekNext $ T.strip . T.pack <$> text "h4")
             p_ref <- (seekNext $ T.strip . T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
             ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse fs
-            return $ Section sectionTitle 111 p_ref $ [Paragraph 1 $ concat ps]
+            return $ Section sectionTitle 111 p_ref $ concat ps
          let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = n}) [1..] sections
          return $ Chapter chNum "" "" secs
        return $ Book' title   chapters []
