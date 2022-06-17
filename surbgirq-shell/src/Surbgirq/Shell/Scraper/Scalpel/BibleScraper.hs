@@ -45,6 +45,7 @@ import           Text.RawString.QQ
 import           Text.Regex.PCRE
 import qualified Text.Regex.PCRE.Heavy as PCRE
 
+import Surbgirq.Shell.Txt.PlainText
 
 data Book' = Book'
  { b'title     :: Text
@@ -66,7 +67,10 @@ test :: IO ()
 test = do
     setLocaleEncoding utf8
     hSetEncoding stdout utf8
-    htmlText <- readFile "./data/html/e1994/New/01.Matthew.html"
+    let file = "../data/html/e1994/New/01.Matthew.html"
+        outDir = takeBaseName file
+
+    htmlText <- readFile file
 
     let ts = scrapeStringLike htmlText parseBibleHtml
         gs = scrapeStringLike htmlText parseFootnotes
@@ -74,10 +78,16 @@ test = do
     case (ts, gs) of
       (Just xs, Just fs )  -> do
               case xs of
-                [b] -> forM_ (b'chapters b) $ \ ch@Chapter{..} -> do
+                [b] -> do
+                        let chapters = b'chapters b
+                        encodeChaptersToFile [qc|{outDir}.txt|] (b'title b) chapters
+
+                        forM_ chapters $ \ ch@Chapter{..} -> do
+                                encodeFile "matt-parseHtml_chapter.yaml" ch
+                                A.encodeFile "matt-parseHtml_chapter.json" ch
                                 print chapter'number
-              encodeFile "matt-parseHtml.yaml" xs
-              A.encodeFile "matt-parseHtml.json" xs
+              encodeFile "matt-parseHtml_all.yaml" xs
+              A.encodeFile "matt-parseHtml_all.json" xs
       (_, _) -> error $ "failed parse html file "
 
 
@@ -92,9 +102,13 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
   let datDir = dataRootPath </> "New"
       datDirOld = dataRootPath </> "Old"
       outRootDir = outPutPath </> "bible/am/e1994"
+      outTxtRootDir = outRootDir </> "txt"
       format = YAML
 
   createDirectoryIfMissing True outRootDir
+  createDirectoryIfMissing True outTxtRootDir
+  createDirectoryIfMissing True (outTxtRootDir </> "New" )
+  createDirectoryIfMissing True (outTxtRootDir </> "Old" )
 
   txtFiles <- ((datDir </> ) <$>) <$> listDirectory datDir `catchError` \_ -> do
                                           liftIO $ putStrLn (concat [datDir, " does not exist."])
@@ -121,17 +135,23 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
               print $  length fs
               when (length xs > 0) $ do
                 let outDir = outRootDir </> lastFolderName </> (takeBaseName file)
+                let outTxtDir = outTxtRootDir </> lastFolderName </> (takeBaseName file)
+
                 createDirectoryIfMissing True outDir
 
                 forM_ xs $ \book -> do
-                  forM_ (b'chapters book) $ \ ch@Chapter{..} -> do
+                  let chapters = b'chapters book
+
+                  encodeChaptersToFile [qc|{outTxtDir}.txt|] (b'title book) chapters
+                  forM_ chapters $ \ ch@Chapter{..} -> do
                             let file = outDir </> if chapter'number < 10
-                                                  then [qc|0{chapter'number}.yaml|]
-                                                  else [qc|{chapter'number}.yaml|]
+                                                  then [qc|0{chapter'number}|]
+                                                  else [qc|{chapter'number}|]
                             print file
                             case format of
-                              YAML -> encodeFile file ch
-                              JSON -> A.encodeFile file ch
+                              YAML -> do
+                                       encodeFile [qc|{file}.yaml|] ch
+                              JSON -> A.encodeFile  [qc|{file}.JSON|] ch
 
       (_, _) -> error $ "failed parse html file "
   where
@@ -209,7 +229,8 @@ parseBibleHtml = do
          sections <- untilNext (matches "h3") $
                      many $ do
             sectionTitle <- (seekNext $ T.strip . T.pack <$> text "h4")
-            p_ref <- (seekNext $ T.strip . T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
+           --  p_ref <- (seekNext $ T.strip . T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
+            p_ref <- (stepNext $ T.strip . T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return T.empty
             ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse fs
             return $ Section sectionTitle 111 p_ref $ concat ps
          let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = n}) [1..] sections

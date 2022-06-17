@@ -34,6 +34,7 @@ library
                    Surbgirq.Shell.Scraper.Scalpel.Narek.XeranyanScraper
                    Surbgirq.Shell.Scraper.Scalpel.JupyterHtml.ZohrapScraper
                    Surbgirq.Shell.CSV.Generate
+                   Surbgirq.Shell.Txt.PlainText
                    
                    Surbgirq.Shell.Theographic.JSON.Types
                    Surbgirq.Shell.Theographic.JSON.Converter    

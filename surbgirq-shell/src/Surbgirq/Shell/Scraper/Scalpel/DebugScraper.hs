@@ -1,14 +1,14 @@
 {-# LANGUAGE ApplicativeDo     #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE QuasiQuotes         #-}
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE QuasiQuotes, FlexibleContexts #-}
 
 module Surbgirq.Shell.Scraper.Scalpel.DebugScraper where
 
-import Data.Text(Text)
+import Data.Text (Text)
 
 import Text.InterpolatedString.Perl6 (qc)
 
@@ -17,20 +17,20 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.List
 import           Data.List.Split
-import qualified Data.Text           as T
-import qualified Data.Text.Encoding  as TE
-import qualified Data.Text.IO        as TIO
+import qualified Data.Text              as T
+import qualified Data.Text.Encoding     as TE
+import qualified Data.Text.IO           as TIO
+import           GHC.Generics
+import           GHC.IO.Encoding
+import           System.FilePath
 import           System.IO
 import           Text.HTML.Scalpel
-import System.FilePath
-import           GHC.IO.Encoding
-import           GHC.Generics
 
-import Text.RawString.QQ    
-import Text.Regex.PCRE
-import qualified           Text.Regex.PCRE.Heavy as PCRE
-import Data.Yaml
-    
+import           Data.Yaml
+import           Text.RawString.QQ
+import           Text.Regex.PCRE
+import qualified Text.Regex.PCRE.Heavy as PCRE
+
 htmlData :: String
 htmlData = "<section id='examples'>\
            \<h2 id='toc_marker-2-1' class='heading2'>Title1 </h2>\
@@ -113,35 +113,35 @@ verse1 = do
 -- allSections url = scrapeURL url (sections <|> sections1)
 
 data BookData = BookData
- { book'title :: Text
+ { book'title    :: Text
  , book'chapters :: [ChapterData]
  } deriving (Show, Generic)
 data ChapterData = ChapterData
- { chapterNum :: Text
+ { chapterNum       :: Text
  , chapter'sections :: [SectionData]
  } deriving(Show, Generic)
 
 data SectionData = SectionData
- { title :: Text
- , p_ref :: Text
+ { title  :: Text
+ , p_ref  :: Text
  , verses :: [VerseData]
  } deriving(Show, Generic)
 
 data VerseData = VerseData
- { verse'nums :: [Text]
- , verse'refs :: [Text]
+ { verse'nums     :: [Text]
+ , verse'refs     :: [Text]
  , verse'ref_word :: [(String, [String])]
- , verse'num :: Text
- , verse'verse :: Text
- , verse :: Text
+ , verse'num      :: Text
+ , verse'verse    :: Text
+ , verse          :: Text
  } deriving(Show, Generic)
 
 
-instance ToJSON VerseData 
+instance ToJSON VerseData
 instance ToJSON SectionData
 instance ToJSON ChapterData
 instance ToJSON BookData
-    
+
 -- | parse html of from this link
 -- https://www.qahana.am/bible/NewTestament/Matthew.html
 -- parseBibleHtml :: Scraper String [BookData]
@@ -159,20 +159,20 @@ instance ToJSON BookData
 
 --      --             chroot "p" $ VerseData . T.pack <$> text "span")
 --             return $ SectionData "" sectionTitle ps
---          return $ ChapterData chapter  sections  
+--          return $ ChapterData chapter  sections
 --        return $ BookData title chapters
 
 parseBibleTest :: IO ()
 parseBibleTest = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  exampleHtml <- readFile "./data/html/e1994/Old/01.Genesis.html"
+  exampleHtml <- readFile "../data/html/e1994/Old/01.Genesis.html"
   let ts = scrapeStringLike exampleHtml parseBibleHtml_1
   case ts of
     Just xs -> do
             encodeFile "gen-parseHtml.yaml" xs
             hFile <- openFile "scalpel.out" WriteMode
-            forM_ xs (printBook hFile)
+            forM_ (take 4 xs) (printBook hFile)
     Nothing -> error $ "failed parse html file "
 
 
@@ -191,12 +191,12 @@ parseBibleHtml_1 = chroots ("div" @: [hasClass "content"]) $ inSerial innerScrap
 --            ps <- untilNext (matches "h4") (many $ seekNext $ VerseData [] . T.pack <$> parseVerse1)
 
             ps <- untilNext (matches "h4")
-                  (                
+                  (
                    many $ seekNext $ parseVerse1
                   )
 --            let vss = map (\(nums, refs, verse) -> VerseData nums refs $ T.pack verse ) ps
             return $ SectionData sectionTitle p_ref $ concat ps )
-         return $ ChapterData chapter  sections  
+         return $ ChapterData chapter  sections
        return $ BookData title chapters
 
 
@@ -250,7 +250,7 @@ parseVerse1 = do
   let xs = map (\(num, v) -> VerseData vNums (versRefs) rs num v $ T.pack verse)  (zip vNums vs)
   return xs
   -- verse <- text $ "p"  @: [hasClass "Body-Text"]
-  -- return $ map (VerseData . T.pack ) $ splitOn del verse         
+  -- return $ map (VerseData . T.pack ) $ splitOn del verse
   -- return $ (++ "\n") <$> intercalate "{#}" $ splitOn del verse
 --  return $ VerseData vNums versRefs $ T.pack  verse --   (vNums, versRefs, verse)
   where
@@ -272,7 +272,7 @@ parseVerse1 = do
 -- --      rs = filter (not . T.null  ) $ PCRE.scan refRegex  verse
 -- --      rs = PCRE.scan refRegex  verse
 --   mapM (\(link, [z]) -> do
-          
+
 --           let kv = [qc|{T.pack z} -> {T.pack link}|] :: Text
 --           TIO.putStrLn kv -- $ T.pack link
 -- --          TIO.putStrLn $ T.pack z
@@ -293,7 +293,7 @@ parseVerse1 = do
 --   forM_ (zip verse'nums vs) $ \(num, v) -> do
 -- --      TIO.putStrLn "-->"
 --       TIO.putStrLn $ [qc|{num}. {v}|]
-         
+
 parseVerse :: Scraper String [VerseData]
 parseVerse = do
   let del = "\160"
@@ -311,7 +311,7 @@ parseVerse = do
   let xs = map (\(num, v) -> VerseData vNums versRefs [] num v $ T.pack verse)  (zip vNums vs)
   return xs
   -- verse <- text $ "p"  @: [hasClass "Body-Text"]
-  -- return $ map (VerseData . T.pack ) $ splitOn del verse         
+  -- return $ map (VerseData . T.pack ) $ splitOn del verse
   -- return $ (++ "\n") <$> intercalate "{#}" $ splitOn del verse
 --  return $ VerseData vNums versRefs $ T.pack  verse --   (vNums, versRefs, verse)
   where
@@ -344,7 +344,7 @@ printSection hFile SectionData{..} = do
 
 printVerse hFile VerseData{..} = do
   TIO.putStrLn "{#}"
-  TIO.hPutStrLn hFile verse    
+  TIO.hPutStrLn hFile verse
   TIO.putStrLn verse
 
 
@@ -357,12 +357,12 @@ printVerse' VerseData{..} = do
 --      rs = filter (not . T.null  ) $ PCRE.scan refRegex  verse
 --      rs = PCRE.scan refRegex  verse
   mapM (\(link, [z]) -> do
-          
+
           let kv = [qc|{T.pack z} -> {T.pack link}|] :: Text
           TIO.putStrLn kv -- $ T.pack link
 --          TIO.putStrLn $ T.pack z
        ) verse'ref_word
-   
+
   TIO.putStrLn $ [qc|{verse'num}. {verse'verse}|]
 
 --   forM_ (zip verse'nums vs) $ \(num, v) -> do
@@ -372,7 +372,7 @@ printVerse' VerseData{..} = do
 delS :: Text
 delS = [qc|</span>|]
 
-  
+
 -- Regex
 -- rr1 :: String
 -- rr1 = [r|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
@@ -382,12 +382,12 @@ delS = [qc|</span>|]
 
 
 -- matchTexst = matchRegexAll verseSpanRegex txtReg
-             
+
 -- txtReg :: String
--- txtReg = [qc|asdasdasd asd<span class="Numeral" id="6-16">16 </span> text_11 <span class="Numeral" id="6-17">17 </span> asdasd "|]                 
+-- txtReg = [qc|asdasdasd asd<span class="Numeral" id="6-16">16 </span> text_11 <span class="Numeral" id="6-17">17 </span> asdasd "|]
 
 -- tt3 = splitVerseText txtReg
-      
+
 
 
 -- tt1 = getAllTextMatches (txtReg =~ rr1) :: [String]
@@ -397,9 +397,9 @@ delS = [qc|</span>|]
 -- rg1 :: String
 -- rg1 = [r|/<\s*a[^>]*>(.*?)<\s*/\s*a>/g|]
 
-      
+
 -- tt2 = getAllTextMatches (txt1 =~ rg1) :: [String]
-       
+
 rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
 
 

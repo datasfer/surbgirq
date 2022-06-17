@@ -21,7 +21,7 @@ data/debug.log
 data/query*
 data/security.log
 data/transactions/
-
+data/yaml/
 
 .#*
 #*
