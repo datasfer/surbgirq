@@ -1,0 +1,37 @@
+# nuyn verevi girqna uxaki sa urish source-ic e parse arac, cathedralic
+- info: "ԱՍՏՈՒԱԾԱՇՈՒՆՉ ՄԱՏԵԱՆ ՀԻՆ ԵՒ ՆՈՐ ԿՏԱԿԱՐԱՆԱՑ"
+  ID: z1805-Books
+  translationID: z1805-T
+  dataFolder: "./bible/am/z1805"
+  books:
+  # New Testament's books                       
+
+     - { book: Matthew, microName: Մտ, shortName: Մատթ, language: AM, dialect: Grabar, input: "New/01.Matthew",  inputRef: "./matthew/matthew.ref", title: "ԱՒԵՏԱՐԱՆ ԸՍՏ ՄԱՏԹԷՈՍԻ",  orderNum: 1, chapters: 40, testament: New}
+     - { book: Mark, microName: Մր, shortName: Մարկ, language: AM, dialect: Grabar, input: "New/02.Mark",  inputRef: "./matthew/matthew.ref", title: "ԱՒԵՏԱՐԱՆ ԸՍՏ ՄԱՐԿՈՍԻ",  orderNum: 2, chapters: 40, testament: New}
+     - { book: Luke, microName: Ղկ, shortName: Ղուկ, language: AM, dialect: Grabar, input: "New/03.Luke",  inputRef: "./matthew/matthew.ref", title: "ԱՒԵՏԱՐԱՆ ԸՍՏ ՂՈՒԿԱՍՈՒ",  orderNum: 3, chapters: 40, testament: New}
+     - { book: John, microName: Յհ, shortName: Յովհ, language: AM, dialect: Grabar, input: "New/04.John",  inputRef: "./matthew/matthew.ref", title: "ԱՒԵՏԱՐԱՆ ԸՍՏ ՅՈՎՀԱՆՆՈՒ",  orderNum: 4, chapters: 40, testament: New}
+     - { book: Acts, microName: Գրծ, shortName: Գրծ, language: AM, dialect: Grabar, input: "New/05.Acts",  inputRef: "./matthew/matthew.ref", title: "ԳՈՐԾՔ ԱՌԱՔԵԼՈՑ",  orderNum: 5, chapters: 40, testament: New}
+     - { book: James, microName: Յակոբոս, shortName: Յակոբոս, language: AM, dialect: Grabar, input: "New/06.James",  inputRef: "./matthew/matthew.ref", title: "ԹՈՒՂԹ ՍՐԲՈՅ ԱՌԱՔԵԼՈՅՆ ՅԱԿՈՎԲԱՅ ԿԱԹՈՂԻԿԷ",  orderNum: 6, chapters: 40, testament: New}
+     - { book: Peter1, microName: Ա Պտ, shortName: Ա Պետրոս, language: AM, dialect: Grabar, input: "New/07.1_Peter",  inputRef: "./matthew/matthew.ref", title: "ԹՈՒՂԹ ՊԵՏՐՈՍԻ ԱՌԱՋԻՆ",  orderNum: 7, chapters: 40, testament: New}
+     - { book: Peter2, microName: Բ Պտ, shortName: Բ Պետրոս, language: AM, dialect: Grabar, input: "New/08.2_Peter",  inputRef: "./matthew/matthew.ref", title: "ԹՈՒՂԹ ՊԵՏՐՈՍԻ ԵՐԿՐՈՐԴ",  orderNum: 8, chapters: 40, testament: New}
+     - { book: John1, microName: Ա Յհ, shortName: Ա Յովհաննէս, language: AM, dialect: Grabar, input: "New/09.1_John",  inputRef: "./matthew/matthew.ref", title: "ԹՈՒՂԹ ՅՈՎՀԱՆՆՈՒ ԱՌԱՋԻՆ",  orderNum: 9, chapters: 40, testament: New}
+     - { book: John2, microName: Բ Յհ, shortName: Բ Յովհաննէս, language: AM, dialect: Grabar, input: "New/10.2_John",  inputRef: "./matthew/matthew.ref", title: "ԹՈՒՂԹ ՅՈՎՀԱՆՆՈՒ ԵՐԿՐՈՐԴ",  orderNum: 10, chapters: 40, testament: New}
+     - { book: John3, microName: Գ Յհ, shortName: Գ Յովհաննէս, language: AM, dialect: Grabar, input: "New/11.3_John",  inputRef: "./matthew/matthew.ref", title: "ԹՈՒՂԹ ՅՈՎՀԱՆՆՈՒ ԵՐՐՈՐԴ",  orderNum: 11, chapters: 40, testament: New}
+     - { book: Jude, microName: Յդ, shortName: Յուդա, language: AM, dialect: Grabar, input: "New/12.Jude",  inputRef: "./matthew/matthew.ref", title: "ԹՈՒՂԹ ՅՈՒԴԱՅԻ ԱՌԱՔԵԼՈՅ ԿԱԹՈՂԻԿԷ",  orderNum: 12, chapters: 12, testament: New}
+
+     - { book: Romans, microName: Rom, shortName: Romans, language: AM, dialect: Grabar, input: "New/13.Romans",  inputRef: "./matthew/matthew.ref", title: "ՊԱՒՂՈՍԻ ԱՌԱՔԵԼՈՅ ԱՌ ՀՌՈՎՄԱՅԵՑԻՍ ԹՈՒՂԹ",  orderNum: 13, chapters: 12, testament: New}
+     - { book: Corinthians1, microName: 1Cori, shortName: 1Cori, language: AM, dialect: Grabar, input: "New/14.1_Corinthians",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ԿՈՐՆԹԱՑԻՍ ԱՌԱՋԻՆ ԹՈՒՂԹ",  orderNum: 14, chapters: 12, testament: New}
+     - { book: Corinthians2, microName: 1Cori, shortName: 2Cori, language: AM, dialect: Grabar, input: "New/15.2_Corinthians",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ԿՈՐՆԹԱՑԻՍ ԵՐԿՐՈՐԴ ԹՈՒՂԹ",  orderNum: 15, chapters: 12, testament: New}
+     - { book: Galatians, microName: Gala, shortName: Galat, language: AM, dialect: Grabar, input: "New/16.Galatians",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ԳԱՂԱՏԱՑԻՍ ԹՈՒՂԹ",  orderNum: 16, chapters: 15, testament: New}
+     - { book: Ephesians, microName: Ephes, shortName: Ephes, language: AM, dialect: Grabar, input: "New/17.Ephesians",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ԵՓԵՍԱՑԻՍ ԹՈՒՂԹ",  orderNum: 17, chapters: 16, testament: New}
+     - { book: Philippians, microName: Phl, shortName: Phil, language: AM, dialect: Grabar, input: "New/18.Philippians",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ՓԻԼԻՊԵՑԻՍ ԹՈՒՂԹ",  orderNum: 18, chapters: 17, testament: New}
+     - { book: Colossians, microName: Col, shortName: Coloss, language: AM, dialect: Grabar, input: "New/19.Colossians",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ԿՈՂՈՍԱՑԻՍ ԹՈՒՂԹ",  orderNum: 19, chapters: 18, testament: New}
+     - { book: Thessalonians1, microName: Thes1, shortName: Thes1, language: AM, dialect: Grabar, input: "New/20.1_Thessalonians",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ԹԵՍԱՂՈՆԻԿԵՑԻՍ ԱՌԱՋԻՆ ԹՈՒՂԹ",  orderNum: 20, chapters: 19, testament: New}
+     - { book: Thessalonians2, microName: Thes2, shortName: Thes2, language: AM, dialect: Grabar, input: "New/21.2_Thessalonians",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ԹԵՍԱՂՈՆԻԿԵՑԻՍ ԵՐԿՐՈՐԴ ԹՈՒՂԹ",  orderNum: 21, chapters: 20, testament: New}
+     - { book: Hebrews, microName: Hb, shortName: Heb, language: AM, dialect: Grabar, input: "New/22.Hebrews",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ԵԲՐԱՅԵՑԻՍ ԹՈՒՂԹ",  orderNum: 22, chapters: 21, testament: New}
+
+     - { book: Timothy1, microName: Tim1, shortName: Tim1, language: AM, dialect: Grabar, input: "New/23.1_Timothy",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ՏԻՄՈԹԷՈՍ ԱՌԱՋԻՆ ԹՈՒՂԹ",  orderNum: 23, chapters: 21, testament: New}
+     - { book: Timothy2, microName: Tim2, shortName: Tim2, language: AM, dialect: Grabar, input: "New/24.2_Timothy",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ՏԻՄՈԹԷՈՍ ԵՐԿՐՈՐԴ ԹՈՒՂԹ",  orderNum: 24, chapters: 21, testament: New}
+     - { book: Titus,    microName: Tit, shortName: Titus , language: AM, dialect: Grabar, input: "New/25.Titus",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ՏԻՏՈՍ ԹՈՒՂԹ",  orderNum: 25, chapters: 21, testament: New}
+     - { book: Philemon, microName: Phlm, shortName: Philemon , language: AM, dialect: Grabar, input: "New/26.Philemon",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ՓԻԼԻՄՈՆ ԵՒ ԱՌ ԱՐՔԻՊՈՍ ՍԱՐԿԱՒԱԳ ԵՒ ԱՌ ԱՊՓԻԱՍ",  orderNum: 26, chapters: 21, testament: New}
+     - { book: Revelation, microName: Rev, shortName: Revel , language: AM, dialect: Grabar, input: "New/27.Revelation",  inputRef: "./matthew/matthew.ref", title: "ՅԱՅՏՆՈՒԹԻՒՆ ՍՐԲՈՅՆ ՅՈՎՀԱՆՆՈՒ ԱՌԱՔԵԼՈՅ ԵՒ ԱՍՏՈՒԱԾԱԲԱՆ ԱՒԵՏԱՐԱՆՉԻ",  orderNum: 27, chapters: 21, testament: New}

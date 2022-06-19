@@ -1,0 +1,24 @@
+- ID:       narek_xer-T
+  name:     Նարեկ - Խերանյան "ՄԱՏԵԱՆ ՈՂԲԵՐԳՈՒԹԵԱՆ"
+  version:  ԱՐԵՒԵԼԱՀԱՅԵՐԵՆ
+  from:     "grabar"
+  year:     1994
+  language: "Արեւելահայերեն"
+  dialect: Ashxarhabar
+  grammer: Reformed
+  lang:    AM
+  translators:
+         - "Xeranyan"
+  description: ""
+
+- ID:       narekaci-T
+  name:     ԳՐԻԳՈՐ ՆԱՐԵԿԱՑԻ
+  version:  ԱՐԵՒԵԼԱՀԱՅԵՐԵՆ
+  from:     "grabar"
+  year:     1001
+  language: "Գրաբար"
+  dialect: Grabar
+  grammer: Reformed
+  lang:    AM
+  translators: []
+  description: ""

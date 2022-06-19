@@ -1,0 +1,11 @@
+- ID:       kjv-T
+  name:     King James Version
+  version:  KJV
+  from:     "greek1"
+  year:     1622
+  language: en
+  dialect: Ashxarhabar
+  grammer: Reformed
+  lang:    EN
+  translators: []
+  description: ""

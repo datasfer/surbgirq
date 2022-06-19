@@ -1,0 +1,14 @@
+- ID:      z1805-T
+  name:    "Zohrap from cathedral source"
+  version:  "grabar"
+  from:    "greek1"
+  year:    1805
+  language: "Գրաբար։"
+  dialect: Grabar
+  grammer: Classical
+  lang:    AM
+  translators: 
+           - "Mashtoc"
+           - "Koryun"
+  description:
+        "Յաշխատասիրութենէ տեառն Հ. Յովհաննու Զօհրապեան վարդապետի: Տպագրեալ հրամանաւ Տ.Տ. Ստեփաննոսի Ագոնց աստուածապատիւ արհիեպիսկոպոսի եւ առաջնորդի ուխտին սրբոյն Ղազարու։"

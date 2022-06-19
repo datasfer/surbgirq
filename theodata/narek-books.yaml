@@ -1,0 +1,14 @@
+- info: "ԳՐԻԳՈՐ ՆԱՐԵԿԱՑԻ"
+  ID: Narek-Xer
+  translationID: narek_xer-T
+  dataFolder: "./narek/am/xeranyan"
+  books: 
+     - { book: Narek, microName: Narek, shortName: Narek, language: AM, dialect: Ashxarhabar, input: ".",  inputRef: "", title: Նարեկ - Խերանյան "ՄԱՏԵԱՆ ՈՂԲԵՐԳՈՒԹԵԱՆ",  orderNum: 1, chapters: 95, testament: New}
+      # ԳՐԻԳՈՐ ՆԱՐԵԿԱՑԻ - ՄԱՏԵԱՆ ՈՂԲԵՐԳՈՒԹԵԱՆ
+
+- info: "ԳՐԻԳՈՐ ՆԱՐԵԿԱՑԻ"
+  ID: Narekaci
+  translationID: narekaci-T
+  dataFolder: "./narek/am/grabar"
+  books: 
+     - { book: Narek, microName: Narek, shortName: Narek, language: AM, dialect: Grabar, input: ".",  inputRef: "", title: Նարեկացի "ՄԱՏԵԱՆ ՈՂԲԵՐԳՈՒԹԵԱՆ",  orderNum: 1, chapters: 95, testament: New}
