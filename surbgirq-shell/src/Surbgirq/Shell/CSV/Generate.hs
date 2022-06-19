@@ -288,9 +288,9 @@ generateScripturesCSV configFile path outPath = do
 
                -- a file == a chapter
                -- Chapter
-               liftIO . atomically $ writeTVar verseCounter 1    
                forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
                  ch@Chapter{..} <- readChapter (bookDir </> file)
+                 liftIO . atomically $ writeTVar verseCounter 1    
                  let chapterID = concat [bookID, "-", show chapter'number ]
                      chNode = [qc|{chapterID}{del}Գլ. {chapter'number}{del}{chapter'number}{del}{show book'book}|]
                      bookRel  = [qc|{bookID}{del}{chapter'number}{del}{chapterID}|]
@@ -316,11 +316,11 @@ generateScripturesCSV configFile path outPath = do
                      -- Verses
                    -- add counter for uniquy verses in chapter    
                    forM_ section'verses $ \v@Verse{..} -> do
-                       st <- readTVarIO verseCounter
-                       liftIO . atomically $ writeTVar verseCounter (st + 1)          
+                       verseOrder <- readTVarIO verseCounter -- verseOrder within a chapter
+                       liftIO . atomically $ writeTVar verseCounter (verseOrder + 1)          
                        let 
-                           verseID = concat [chapterID, ".", show verse'verse, "_", show st]
-                           verseLine = [qc|{verseID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{verse'verse}{del}{verse'content}|]
+                           verseID = concat [chapterID, ".", show verse'verse, "_", show verseOrder]
+                           verseLine = [qc|{verseID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{verse'verse}{del}{verseOrder}{del}{verse'content}|]
                            -- verseWords = T.words verse'content
                            verseWords = filter ((>0) . T.length) $ T.splitOn " " verse'content
 
@@ -328,7 +328,7 @@ generateScripturesCSV configFile path outPath = do
                        TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
                        TIO.hPutStrLn outChVerseRelh  [qc|{sectionID}{del}{verseID}|]
 
-                       let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", translationID,  "_", show  chapter'number, ".", show section'number,".", show verse'verse, ".", show . hash $ verse'content]
+                       let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", translationID,  "_", show  chapter'number, ".", show section'number,".", show verse'verse, ".", take 6 $ show . hash $ verse'content]
                        forM_ (zip [1..] verseWords) $ \(index,word) -> do
                          let wordID = concat [ wordIDPrefix, "-", show index]
                              wordNodeLabels = wordLabels word (show book'language) (show book'dialect) arrayDel
@@ -448,7 +448,7 @@ dumpCSVHeaders del root = do
                 Property type of 'paragraph' normalized from 'int' --> 'long' in /data/csv/./scriptures/headers/verse_header.csv
                 Property type of 'verse' normalized from 'int' --> 'long' in /data/csv/./scriptures/headers/verse_header.csv
                 --}
-           , mkHeader "Verse Header" "verse_header.csv" [qc|verseID:ID(VERSE-ID){del}book{del}chapter:long{del}section:long{del}verse:long{del}verseText|]
+           , mkHeader "Verse Header" "verse_header.csv" [qc|verseID:ID(VERSE-ID){del}book{del}chapter:long{del}section:long{del}verse:long{del}verseOrder:long{del}verseText|]
            , mkHeader "Verse to Word Relation Header" "verse_word_header.csv" [qc|:START_ID(VERSE-ID){del}:END_ID(WORD-ID)|]
            , mkHeader "Verse to FootNote  Header" "verse_footnote_header.csv" [qc|:START_ID(VERSE-ID){del}:END_ID(FOOTNOTE-ID){del}:TYPE|]
            -- * Word

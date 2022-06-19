@@ -62,7 +62,8 @@ instance ToJSON FootnoteData
 
 data OutFormat =  YAML
                 | JSON
-
+                | TEXT
+                  deriving(Eq)
 test :: IO ()
 test = do
     setLocaleEncoding utf8
@@ -94,16 +95,22 @@ test = do
 parseBibleTest :: IO ()
 parseBibleTest = parseE1994BibleHtml "../data/html/e1994" "../data/yaml"
 
+texte1994 = parseE1994BibleHtml' TEXT "./data/raw_html/e1994" "./data/yaml"
+
 -- | stack exec -- html-scraper --e1994  --yaml  -i ./data/html/e1994 -o ./data/yaml
 parseE1994BibleHtml :: FilePath -> FilePath -> IO ()
-parseE1994BibleHtml dataRootPath  outPutPath = do
+parseE1994BibleHtml  = parseE1994BibleHtml' YAML
+
+
+
+parseE1994BibleHtml' :: OutFormat -> FilePath -> FilePath -> IO ()
+parseE1994BibleHtml' format dataRootPath  outPutPath = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
   let datDir = dataRootPath </> "New"
       datDirOld = dataRootPath </> "Old"
       outRootDir = outPutPath </> "bible/am/e1994"
       outTxtRootDir = outRootDir </> "txt"
-      format = YAML
 
   createDirectoryIfMissing True outRootDir
   createDirectoryIfMissing True outTxtRootDir
@@ -141,16 +148,17 @@ parseE1994BibleHtml dataRootPath  outPutPath = do
 
                 forM_ xs $ \book -> do
                   let chapters = b'chapters book
-
-                  encodeChaptersToFile [qc|{outTxtDir}.txt|] (b'title book) chapters
-                  forM_ chapters $ \ ch@Chapter{..} -> do
+                  if format == TEXT
+                  then do
+                    encodeChaptersToFile [qc|{outTxtDir}.txt|] (b'title book) chapters
+                  else  do
+                    forM_ chapters $ \ ch@Chapter{..} -> do
                             let file = outDir </> if chapter'number < 10
                                                   then [qc|0{chapter'number}|]
                                                   else [qc|{chapter'number}|]
                             print file
                             case format of
-                              YAML -> do
-                                       encodeFile [qc|{file}.yaml|] ch
+                              YAML -> encodeFile [qc|{file}.yaml|] ch
                               JSON -> A.encodeFile  [qc|{file}.JSON|] ch
 
       (_, _) -> error $ "failed parse html file "
