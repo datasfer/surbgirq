@@ -24,6 +24,7 @@ services:
       - neo4j_data:/import
       - neo4j_data:/plugin
       - neo4j_data:/logs
+      - scripts:/scripts
 volumes:
   neo4j_data:
     driver: local
@@ -37,3 +38,9 @@ volumes:
       o: bind
       type: none
       device: $HOME/surbgirq/data/conf
+  scripts:     
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: $HOME/surbgirq/scripts      

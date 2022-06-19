@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
 
-# be carefull not to leave space after line ends with simbol \
-export E1994=./scriptures/bible/am/e1994
+ROOT_PATH=/var/lib/neo4j/data/csv
 
-export SCRIPTURES=./scriptures
-export HEADERS=./scriptures/headers
-export ARMATS=./words
+# be carefull not to leave space after line ends with simbol \
+export E1994=$ROOT_PATH/scriptures/bible/am/e1994-J
+
+export SCRIPTURES=$ROOT_PATH/scriptures
+export HEADERS=$ROOT_PATH/scriptures/headers
+export ARMATS=$ROOT_PATH/words
 
 neo4j-admin import \
     --database=bibleam \

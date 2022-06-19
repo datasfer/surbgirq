@@ -83,6 +83,8 @@ library
                , selda-sqlite
                , filepath
                , mtl
+               , stm
+               , hashable
                , containers
                , unordered-containers
                , scalpel >= 0.6.0

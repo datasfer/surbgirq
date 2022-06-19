@@ -12,6 +12,7 @@ module Surbgirq.Shell.Scraper.Scalpel.JupyterHtml.ZohrapScraper (parseZohrapHtml
 import Data.Text (Text)
 
 import Control.Monad.Except          (MonadError, MonadIO, catchError, liftIO)
+import Control.Monad.IO.Class        (liftIO)
 import Data.Maybe                    (fromMaybe)
 import Text.InterpolatedString.Perl6 (qc)
 import Text.Read                     (readMaybe)
@@ -53,19 +54,19 @@ data OutFormat =  YAML
                 | JSON
 
 
-test :: IO ()
-test = do
-  setLocaleEncoding utf8
-  hSetEncoding stdout utf8
-  exampleHtml <- readFile "../data/test/zohrap.html"
-  let ts = scrapeStringLike exampleHtml parseNarekHtml
-  case ts of
-    Just xs -> do
-            encodeFile "../data/test/zohrap-gen-parseHtml.yaml" xs
-            -- XShFile <- openFile "../data/test/zohrap-scalpel.out" WriteMode
-            return ()
---            forM_ xs (printBook hFile)
-    Nothing -> error $ "failed parse html file "
+-- test :: IO ()
+-- test = do
+--   setLocaleEncoding utf8
+--   hSetEncoding stdout utf8
+--   exampleHtml <- readFile "../data/test/zohrap.html"
+--   let ts = scrapeStringLike exampleHtml parseNarekHtml
+--   case ts of
+--     Just xs -> do
+--             encodeFile "../data/test/zohrap-gen-parseHtml.yaml" xs
+--             -- XShFile <- openFile "../data/test/zohrap-scalpel.out" WriteMode
+--             return ()
+-- --            forM_ xs (printBook hFile)
+--     Nothing -> error $ "failed parse html file "
 
 
 
@@ -76,8 +77,13 @@ zohrapTest = parseZohrapHtml "../data/html/z1805" "../data/yaml"
 ar94Test :: IO ()
 ar94Test = parseJupterGeneratedHtml "bible/am/ar94" "../data/html/ar94" "../data/yaml"
 
+eTest :: IO ()
+eTest = parsee1994Html "./data/html/e1994" "./data/yaml"
+
+
 parseZohrapHtml  = parseJupterGeneratedHtml "bible/am/z1805"
 parseAR94Html  = parseJupterGeneratedHtml "bible/am/ar94"
+parsee1994Html  = parseJupterGeneratedHtml "bible/am/e1994-J"
 
 -- | stack exec -- html-scraper --z1805  --yaml  -i ./data/html/z1805 -o ./data/yaml
 -- parseZohrapHtml "../data/html/z1805" "../data/yaml"
@@ -136,47 +142,6 @@ parseJupterGeneratedHtml outSubPath dataRootPath   outPutPath = do
     doesFilenameMatch path = takeExtension path `elem` [ ".txt", ".html", ".HTML"]
 
 
-  -- let datDir = dataRootPath
-  --     outRootDir =  outPutPath </> "bible/am/z1805"
-
-  -- createDirectoryIfMissing True outRootDir
-
-  -- txtFiles <- ((datDir </> ) <$>) <$> listDirectory datDir `catchError` \_ -> do
-  --                                         liftIO $ putStrLn (concat [datDir, " does not exist."])
-  --                                         return []
-
-
-  -- forM_  (sort txtFiles)
-  --         $ \file -> when (doesFilenameMatch file) $ do
-
-  --   let lastFolderName = (last . splitPath $ takeDirectory file)
-  --   htmlText <- readFile file
-  --   print file
-  --   -- print htmlText
-  --   let ts = scrapeStringLike htmlText parseNarekHtml
-
-  --   case ts of
-  --     Just xs  -> do
-  --             encodeFile "parseHtml.yaml" xs
-  --     --        A.encodeFile "parseHtml.json" xs
-  --             print $  length xs
-  --             when (length xs > 0) $ do
-  --               let outDir = outRootDir </> (takeBaseName file)
-  --               createDirectoryIfMissing True outDir
-
-  --               forM_ xs $ \book -> do
-  --                 forM_ (bookData'chapters book) $ \ ch@Chapter{..} -> do
-  --                           let file = outDir </> [qc|{chapter'number}.yaml|]
-  --                           print file
-  --                           encodeFile file ch
-  --                           -- A.encodeFile file ch
-
-  --     Nothing -> error $ "failed parse html file "
-  -- where
-  --   doesFilenameMatch :: FilePath -> Bool
-  --   doesFilenameMatch path = takeExtension path `elem` [ ".html", ".HTML"]
-
-
 parseNarekHtml :: Scraper String [BookData]
 parseNarekHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
   where
@@ -188,18 +153,27 @@ parseNarekHtml = chroots ("div" @: [hasClass "content"]) $ inSerial innerScraper
 
          sections <- untilNext (matches "h3") $
                      many $ do
-            sectionTitle <- (seekNext $ T.pack <$> text "h4")
+            (s_num, sectionTitle) <- (seekNext parseSection) -- $ T.pack <$> text "h4")
             let secNum = fromArmenianNumber $ T.unpack sectionTitle
+
             p_ref <- (seekNext $ T.pack <$> text ("p" @: [hasClass "Parallel-References"]))  <|> return "ref empty"
 
             ps <- untilNext (matches "h4") $ many $ seekNext $ parseVerse1
 
-            return $ Section sectionTitle secNum p_ref $  concat ps
+            return $ Section sectionTitle s_num p_ref $  concat ps
          -- let secs = zipWith (\n s@(Section{section'number = m}) -> s{section'number = secNum}) [1..] sections
          return $ Chapter chNum "" "" sections
        return $ BookData "" chapters
 
 
+parseSection :: Scraper String (Int, Text)
+parseSection = do
+  let tag  = "h4"
+  title <- T.pack <$> innerHTML tag
+  numTxt <- (attr "sec-num" tag)
+  let secNum = fromMaybe 0 $ ((readMaybe   numTxt) :: Maybe Int)
+ -- h4 <- text "p4"
+  return  (secNum, title)
 
 
 parseVerse1 :: Scraper String [Verse]

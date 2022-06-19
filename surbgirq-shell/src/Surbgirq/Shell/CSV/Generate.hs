@@ -12,9 +12,11 @@ import System.FilePath.Posix         (takeBaseName, takeDirectory)
 import Data.Maybe (fromMaybe)
 import Data.Text  (Text, pack)
 import Text.InterpolatedString.Perl6 (qc)
-
+import Data.Hashable(hash)
+    
 import System.IO.Error hiding (catch)
 import Prelude hiding (catch)
+
     
 import qualified Data.Text               as T
 import qualified Data.Text.Encoding      as TE
@@ -23,6 +25,7 @@ import qualified Data.Text.Lazy          as TL
 import qualified Data.Text.Lazy.Builder  as TB
 import           Data.Text.Lazy.Encoding as TLE
 
+import Control.Concurrent.STM
 import Data.Aeson
 import Data.Char
 import Control.Exception
@@ -218,7 +221,8 @@ generateScripturesCSV configFile path outPath = do
         
      -- TODO: read words/WordForms.csv
      -- find verse  tokens in wordForms list and make referecen 
-        
+
+     verseCounter <- liftIO $ newTVarIO 1     
      -- scriptures
      forM_ scriptures $ \scripture@Scripture{..} -> do
 
@@ -284,6 +288,7 @@ generateScripturesCSV configFile path outPath = do
 
                -- a file == a chapter
                -- Chapter
+               liftIO . atomically $ writeTVar verseCounter 1    
                forM_ (sort txtFiles) $ \file -> when (doesFilenameMatch file) $ do
                  ch@Chapter{..} <- readChapter (bookDir </> file)
                  let chapterID = concat [bookID, "-", show chapter'number ]
@@ -294,6 +299,7 @@ generateScripturesCSV configFile path outPath = do
                  TIO.hPutStrLn outBookChapterRelh bookRel
 
                  -- Sections
+                    
                  forM_ chapter'sections $ \Section{..} -> do
                    let sectionID = concat [chapterID, "-", show section'number ]
                        secLine = [qc|{sectionID}{del}{section'title}{del}{section'number}{del}{chapter'number}|]
@@ -308,8 +314,12 @@ generateScripturesCSV configFile path outPath = do
                    --   TIO.hPutStrLn outSecPrghRelh  [qc|{sectionID}{del}{prghID}|]
 
                      -- Verses
+                   -- add counter for uniquy verses in chapter    
                    forM_ section'verses $ \v@Verse{..} -> do
-                       let verseID = concat [chapterID, ".", show verse'verse]
+                       st <- readTVarIO verseCounter
+                       liftIO . atomically $ writeTVar verseCounter (st + 1)          
+                       let 
+                           verseID = concat [chapterID, ".", show verse'verse, "_", show st]
                            verseLine = [qc|{verseID}{del}{bookLabel}{del}{chapter'number}{del}{section'number}{del}{verse'verse}{del}{verse'content}|]
                            -- verseWords = T.words verse'content
                            verseWords = filter ((>0) . T.length) $ T.splitOn " " verse'content
@@ -318,7 +328,7 @@ generateScripturesCSV configFile path outPath = do
                        TIO.hPutStrLn outChVerseRelh  [qc|{chapterID}{del}{verseID}|]
                        TIO.hPutStrLn outChVerseRelh  [qc|{sectionID}{del}{verseID}|]
 
-                       let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", translationID,  "_", show  chapter'number, ".", show section'number,".", show verse'verse]
+                       let wordIDPrefix = concat ["word_", T.unpack book'shortName, "_", translationID,  "_", show  chapter'number, ".", show section'number,".", show verse'verse, ".", show . hash $ verse'content]
                        forM_ (zip [1..] verseWords) $ \(index,word) -> do
                          let wordID = concat [ wordIDPrefix, "-", show index]
                              wordNodeLabels = wordLabels word (show book'language) (show book'dialect) arrayDel

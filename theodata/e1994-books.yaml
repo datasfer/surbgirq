@@ -1,7 +1,7 @@
 - info: "ԱՍՏՈՒԱԾԱՇՈՒՆՉ ՄԱՏԵԱՆ ՀԻՆ ԵՒ ՆՈՐ ԿՏԱԿԱՐԱՆՆԵՐԻ"
   ID: e1994-Books
   translationID: e1994-T
-  dataFolder: "./bible/am/e1994"
+  dataFolder: "./bible/am/e1994-J"
   books: 
      - { book: Matthew, microName: Մտ, shortName: Մատթ., language: AM, dialect: Ashxarhabar, input: "New/01.Matthew", inputRef: "./matthew/matthew.ref", title: "Աւետարան ըստ Մատթէոսի",  orderNum: 1, chapters: 26, testament: New}
      - { book: Mark, microName: Մր, shortName: Մարկ., language: AM, dialect: Ashxarhabar, input: "New/02.Mark", inputRef: "./mark/mark.ref", title: "ԱՒԵՏԱՐԱՆ ԸՍՏ ՄԱՐԿՈՍԻ",  orderNum: 2, chapters: 40, testament: New}
