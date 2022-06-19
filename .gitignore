@@ -9,19 +9,8 @@ TAGS
 .ghc.environment*
 dist-newstyle/
 front/girq-front/result*
-data/databases/
-data/dbms/*
-data/databases/*
-data/dbms/*
-data/cypher/#*#
-data/cypher/#*
-data/cypher/~*
-data/cypher/*~
-data/debug.log
-data/query*
-data/security.log
-data/transactions/
-data/yaml/
+data/*
+data/**
 
 .#*
 #*
