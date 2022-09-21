@@ -78,12 +78,14 @@ ar94Test :: IO ()
 ar94Test = parseJupterGeneratedHtml "bible/am/ar94" "../data/html/ar94" "../data/yaml"
 
 eTest :: IO ()
-eTest = parsee1994Html "./data/html/e1994" "./data/yaml"
+eTest = parsee1994Html "./data/e1994/html" "./data/yaml"
+eTest1 = parseJupterGeneratedHtml "" "./data/e1994/html" "./data/e1994/yaml"
 
 
 parseZohrapHtml  = parseJupterGeneratedHtml "bible/am/z1805"
 parseAR94Html  = parseJupterGeneratedHtml "bible/am/ar94"
 parsee1994Html  = parseJupterGeneratedHtml "bible/am/e1994-J"
+
 
 -- | stack exec -- html-scraper --z1805  --yaml  -i ./data/html/z1805 -o ./data/yaml
 -- parseZohrapHtml "../data/html/z1805" "../data/yaml"

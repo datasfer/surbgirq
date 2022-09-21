@@ -68,7 +68,7 @@ test :: IO ()
 test = do
     setLocaleEncoding utf8
     hSetEncoding stdout utf8
-    let file = "../data/html/e1994/New/01.Matthew.html"
+    let file = "./data/e1994/html/New/01.Matthew.html"
         outDir = takeBaseName file
 
     htmlText <- readFile file
@@ -93,24 +93,27 @@ test = do
 
 
 parseBibleTest :: IO ()
-parseBibleTest = parseE1994BibleHtml "../data/html/e1994" "../data/yaml"
+parseBibleTest = parseE1994BibleHtml' YAML "bible/am/e1994" "./data/e1994/html" "./data/yaml"
 
-texte1994 = parseE1994BibleHtml' TEXT "./data/raw_html/e1994" "./data/yaml"
+texte1994 :: IO ()
+texte1994 =      parseE1994BibleHtml' TEXT "e1994" "./data/raw_html/e1994" "./data"
 
 -- | stack exec -- html-scraper --e1994  --yaml  -i ./data/html/e1994 -o ./data/yaml
-parseE1994BibleHtml :: FilePath -> FilePath -> IO ()
+parseE1994BibleHtml :: FilePath -> FilePath -> FilePath -> IO ()
 parseE1994BibleHtml  = parseE1994BibleHtml' YAML
 
 
 
-parseE1994BibleHtml' :: OutFormat -> FilePath -> FilePath -> IO ()
-parseE1994BibleHtml' format dataRootPath  outPutPath = do
+parseE1994BibleHtml' :: OutFormat -> FilePath -> FilePath -> FilePath -> IO ()
+parseE1994BibleHtml' format outputSubPath dataRootPath  outPutPath  = do
   setLocaleEncoding utf8
   hSetEncoding stdout utf8
-  let datDir = dataRootPath </> "New"
+
+  let -- outputSubPath = "bible/am/e1994"
+      datDir = dataRootPath </> "New"
       datDirOld = dataRootPath </> "Old"
-      outRootDir = outPutPath </> "bible/am/e1994"
-      outTxtRootDir = outRootDir </> "txt"
+      outRootDir = outPutPath </> outputSubPath
+      outTxtRootDir = outRootDir </> "text"
 
   createDirectoryIfMissing True outRootDir
   createDirectoryIfMissing True outTxtRootDir
@@ -144,7 +147,8 @@ parseE1994BibleHtml' format dataRootPath  outPutPath = do
                 let outDir = outRootDir </> lastFolderName </> (takeBaseName file)
                 let outTxtDir = outTxtRootDir </> lastFolderName </> (takeBaseName file)
 
-                createDirectoryIfMissing True outDir
+                when (format /= TEXT) $ do
+                    createDirectoryIfMissing True outDir
 
                 forM_ xs $ \book -> do
                   let chapters = b'chapters book

@@ -87,15 +87,15 @@ main = do
                  case cmd'outFormat of
                    YAML -> do
                           TIO.putStrLn "Start scrapping e 1994 scriptures to Yaml..."
-                          parseE1994BibleHtml cmd'inPath cmd'outPath
+                          parseE1994BibleHtml "bible/am/e1994" cmd'inPath cmd'outPath
                           TIO.putStrLn "Scrapping success!"
                    JSON -> do
                           TIO.putStrLn "Start scrapping e 1994 scriptures to Json..."
-                          parseE1994BibleHtml cmd'inPath cmd'outPath
+                          parseE1994BibleHtml "bible/am/e1994" cmd'inPath cmd'outPath
                           TIO.putStrLn "Scrapping success!"
                    CSV -> do
                           TIO.putStrLn "Start scrapping e 1994 scriptures to Csv..."
-                          parseE1994BibleHtml cmd'inPath cmd'outPath
+                          parseE1994BibleHtml "bible/am/e1994" cmd'inPath cmd'outPath
                           TIO.putStrLn "Scrapping success!"
                AR94 ->
                  case cmd'outFormat of

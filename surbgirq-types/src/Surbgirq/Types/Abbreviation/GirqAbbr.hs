@@ -275,14 +275,14 @@ romans = [mkAbbrBook E1994T romansAm, mkAbbrBook E1994T romansRu, kjvBooks roman
 cor1 :: [AbbrBook]
 cor1 = [mkAbbrBook E1994T cor1Am, mkAbbrBook E1994T cor1Ru, kjvBooks cor1En]
   where
-    cor1Am = ["ԱԿորնթացիներ", "ԱԿորնթացիներին", "ԿորնթացիներԱ", "ԱԿր", "Ա.Կր", "ԿրԱ"]
+    cor1Am = ["ԱԿորնթացիներ", "ԱԿորնթացիներին", "ԿորնթացիներինԱ", "ԿորնթացիներԱ", "ԱԿր", "Ա.Կր", "ԿրԱ"]
     cor1Ru = ["1Коринфянам", "1Коринфян", "Коринфянам1", "Коринфян1", "1Кор", "Кор1"]
     cor1En = ["1Corinthians", "1 Corinthians", "1Cor", "Corinthians1", "Cor1"]
 
 cor2 :: [AbbrBook]
 cor2 = [mkAbbrBook E1994T cor2Am, mkAbbrBook E1994T cor2Ru, kjvBooks cor2En]
   where
-    cor2Am = ["ԲԿորնթացիներ", "ԲԿորնթացիներին", "ԿորնթացիներԲ", "ԲԿր", "Բ.Կր", "ԿրԲ"]
+    cor2Am = ["ԲԿորնթացիներ", "ԲԿորնթացիներին","ԿորնթացիներինԲ", "ԿորնթացիներԲ", "ԲԿր", "Բ.Կր", "ԿրԲ"]
     cor2Ru = ["2Коринфянам", "2Коринфян", "Коринфянам2", "Коринфян2", "2Кор", "Кор2"]
     cor2En = ["2Corinthians", "2 Corinthians", "2Cor", "Corinthians2", "Cor2"]
 
