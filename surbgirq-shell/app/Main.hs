@@ -55,7 +55,7 @@ main1 = do
   TIO.putStrLn res
   TIO.putStrLn "Գիրք ծննդեան"
 
--- |  stack exec -- surbgirq-shell --bible --csv -c ./data/corpora.conf -i ./data/yaml -o ./data/csv
+-- |  stack exec -- surbgirq-shell --bible --csv -c ./theodata/corpora.conf -i ./data/yaml -o ./data/csv
 main :: IO ()
 main = do
   cmd <- customExecParser (prefs showHelpOnError) $
@@ -82,7 +82,7 @@ main = do
                           TIO.putStrLn "CSV genererating starting ..."
                           -- wordFormsCSV "./data/txt/wordForms.txt" "./data/csv/words"
                           generateScripturesCSV cmd'config cmd'inPath cmd'outPath
-                          wordFormsCSV "./data/txt/wordForms.txt" "./data/csv/words"
+                          wordFormsCSV "./data/words/wordForms.txt" "./data/csv/words"
                           TIO.putStrLn "CSV generation success!"
 
                Matyan -> do

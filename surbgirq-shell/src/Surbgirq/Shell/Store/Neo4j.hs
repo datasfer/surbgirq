@@ -6,6 +6,7 @@
 
 module Surbgirq.Shell.Store.Neo4j where
 
+import Control.Monad
 import Data.IORef
 import Database.Selda
 import Database.Selda.SQLite
@@ -13,8 +14,7 @@ import System.Directory
 import System.FilePath
 import System.IO
 import Text.Printf
-import Control.Monad
-    
+
 import Control.Exception             (bracket)
 import Control.Monad                 (forM_, when)
 import Data.List                     (sortBy, splitAt)
@@ -29,14 +29,14 @@ import qualified Data.Text           as T
 import qualified Data.Text.IO        as TIO
 
 import Surbgirq.Shell.Store.ParseFile
-import Surbgirq.Shell.Types
 import Surbgirq.Shell.Store.SQLite.Selda
+import Surbgirq.Shell.Types
 
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
 
-    
+
 chunk :: Int -> [a] -> [[a]]
 chunk n xs = case splitAt n xs of
   (c,[]) -> [c]
@@ -139,13 +139,16 @@ wordFormsCSV wordFormFile outPath = do
       TIO.hPutStrLn outFormh  [qc|armatID:ID(ARMAT-ID){del}token{del}armat{del}tags|]
       TIO.hPutStrLn outArmath [qc|formID:ID(WORDFORM-ID){del}armat|]
       TIO.hPutStrLn outRelh   [qc|:START_ID(WORDFORM-ID){del}:END_ID(ARMAT-ID)|]
-      
-      liftIO $ withSQLite "words.sqlite" $ do
+
+      let dbFile = "words.sqlite"
+      fileExists <- doesFileExist dbFile
+      when fileExists (removeFile dbFile)
+      liftIO $ withSQLite dbFile $ do
         createTable armatformTable
         createTable armatTable
         createTable wordFormTable
-        createTable engLemmaTable            
-                         
+        createTable engLemmaTable
+
         liftIO $ forM_ (sortBy (comparing armat) wordForms) $ \WordForm{..} -> do
             hashMap <- readIORef hashMapRef
             modifyIORef formRef (+1)
@@ -154,8 +157,8 @@ wordFormsCSV wordFormFile outPath = do
 
             let formLine = [qc|{form_ID}{del}{form}{del}{armat}{del}{tags}|]
             TIO.hPutStrLn outFormh formLine
-            -- _ <- insert wordFormTable $ [WordForm form_ID form armat tags] 
-                  
+            -- _ <- insert wordFormTable $ [WordForm form_ID form armat tags]
+
             let armatExists = HMap.lookup armat hashMap
             when (isNothing armatExists) $ do
                 modifyIORef armatRef (+1)
@@ -177,4 +180,4 @@ wordFormsCSV wordFormFile outPath = do
 
 
 
--- csvReadWordForms :: FilePath -> 
+-- csvReadWordForms :: FilePath ->

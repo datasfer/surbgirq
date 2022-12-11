@@ -64,13 +64,9 @@ test = do
     Nothing -> error $ "failed parse html file "
 
 
-
+-- | parse all books inside narek
 parseNarekTest :: IO ()
-parseNarekTest = parseNarekByXeranyanHtml "../data/html/narek/" "../data/yaml"
-
--- parseGrabarNarekTest :: IO ()
--- parseGrabarNarekTest = parseNarekByXeranyanHtml "../data/html/narek/" "../data/yaml"
-
+parseNarekTest = parseNarekByXeranyanHtml "./data/raw_html/narek/" "./data/yaml"
 
 
 -- | stack exec -- html-scraper --narek  --yaml  -i ./data/html/narek/xeranyan -o ./data/yaml

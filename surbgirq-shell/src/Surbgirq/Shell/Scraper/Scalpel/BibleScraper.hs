@@ -133,16 +133,14 @@ parseE1994BibleHtml' format outputSubPath dataRootPath  outPutPath  = do
 
     let lastFolderName = (last . splitPath $ takeDirectory file)
     htmlText <- readFile file
-    print file
+    putStrLn [qc| process: {file}|]
     let ts = scrapeStringLike htmlText parseBibleHtml
         gs = scrapeStringLike htmlText parseFootnotes
 
     case (ts, gs) of
       (Just xs, Just fs )  -> do
-              encodeFile "parseHtml.yaml" xs
-              A.encodeFile "parseHtml.json" xs
-              print $  length xs
-              print $  length fs
+              -- encodeFile "parseHtml.yaml" xs
+              -- A.encodeFile "parseHtml.json" xs
               when (length xs > 0) $ do
                 let outDir = outRootDir </> lastFolderName </> (takeBaseName file)
                 let outTxtDir = outTxtRootDir </> lastFolderName </> (takeBaseName file)
@@ -154,16 +152,20 @@ parseE1994BibleHtml' format outputSubPath dataRootPath  outPutPath  = do
                   let chapters = b'chapters book
                   if format == TEXT
                   then do
-                    encodeChaptersToFile [qc|{outTxtDir}.txt|] (b'title book) chapters
+                    let outFileName = [qc|{outTxtDir}.txt|]
+                    encodeChaptersToFile outFileName (b'title book) chapters
+                    putStrLn [qc| output: {outFileName} |]
                   else  do
                     forM_ chapters $ \ ch@Chapter{..} -> do
                             let file = outDir </> if chapter'number < 10
                                                   then [qc|0{chapter'number}|]
                                                   else [qc|{chapter'number}|]
-                            print file
+                            putStrLn [qc| output: {file} |]
                             case format of
                               YAML -> encodeFile [qc|{file}.yaml|] ch
                               JSON -> A.encodeFile  [qc|{file}.JSON|] ch
+              print $  length xs
+              print $  length fs
 
       (_, _) -> error $ "failed parse html file "
   where
