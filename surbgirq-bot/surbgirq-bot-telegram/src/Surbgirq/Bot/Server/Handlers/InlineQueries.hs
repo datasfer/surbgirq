@@ -173,12 +173,14 @@ inlineVerse userId iqId verseRef@VerseReference{..} = do
   let def1 = getCfgTranslation cfg verseRef'book
       defaultTrans = fromMaybe def1 verseRef'translation
       offset@(queryRef, queryOffsetTxt) = toOffset 50 verseRef
+  _ <- liftIO $ putStrLn $ ">InlineVerse getTranslation: " ++ (show def1)
+  _ <- liftIO $ putStrLn $ ">InlineVerse defaultTrans: " ++ (show defaultTrans)
+  _ <- liftIO $ putStrLn $ ">InlineVerse VerseRef: " ++ (show verseRef)
+  _ <- liftIO $ putStrLn $ ">InlineVerse offset: " ++ (show offset)
   vs <- liftIO $ getVerses defaultTrans queryRef
          -- liftIO $ case verseRef'to of
          --     Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum <$> verseRef'from)
          --     Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
-  _ <- liftIO $ putStrLn $ ">====== Inline Ref: " ++ (show verseRef)
-  _ <- liftIO $ putStrLn $ ">====== Offset Ref: " ++ (show offset)
 
   let inlineQueryResults = map (\(verse, vRef) ->
                                     InlineQueryResultArticle (toId vRef)

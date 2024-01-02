@@ -68,6 +68,9 @@ instance ToJSON FootnoteData
 parseBibleTest :: IO ()
 parseBibleTest = parseGrabarBibleHtml "../data/html/v1805" "../data/yaml"
 
+parseOldBibleTest :: IO ()
+parseOldBibleTest = parseGrabarBibleHtml "./data/raw_html/v1805" "../data/yaml-v1805-Old"
+
 data OutFormat =  YAML
                 | JSON
 

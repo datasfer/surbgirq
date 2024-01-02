@@ -55,7 +55,7 @@ instance Show TranslationID where
                Narek_Grabar -> "narekaci-T"
                Narek_Xer    -> "narek_xer-T"
                Narek_Gev    -> "narek_gev-T"
-               Narek_Goch   -> "nare_goch-T"
+               Narek_Goch   -> "narek_goch-T"
 
 
 instance ToJSON TranslationID
@@ -73,7 +73,7 @@ instance CmdToken TranslationID where
                Narek_Grabar -> "narek_grabar#"
                Narek_Xer    -> "narek_xer#"
                Narek_Gev    -> "narek_gev#"
-               Narek_Goch   -> "nare_goch#"
+               Narek_Goch   -> "narek_goch#"
 
 data Testament = Old
                | New
