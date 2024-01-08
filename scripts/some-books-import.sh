@@ -15,7 +15,7 @@ export HEADERS=./scriptures/headers
 export ARMATS=./words
 
 neo4j-admin import \
-    --database=bibleam \
+    --database=somebibleam \
     --id-type STRING \
     --delimiter ";" \
     --array-delimiter "|" \

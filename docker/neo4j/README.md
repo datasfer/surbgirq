@@ -84,3 +84,8 @@ docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
 
 
 use docker-compose yaml
+
+### How access Docker bash and generate neo4j db from csv data.
+docker exec  -i -t neo /bin/bash
+cd ./data/csv
+/var/lib/neo4j/data/csv$ bash ~/scripts/some-books-import.sh
