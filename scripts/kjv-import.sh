@@ -6,7 +6,6 @@ export SCRIPTURES=./scriptures
 neo4j-admin database import full \
     --verbose \
     --id-type STRING \
-    --skip-bad-relationships=true \
     --delimiter ";" \
     --array-delimiter "|" \
     --multiline-fields=true \
