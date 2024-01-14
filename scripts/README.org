@@ -7,7 +7,17 @@ https://neo4j.com/docs/operations-manual/current/tools/neo4j-admin/neo4j-admin-i
 * DB imports 
 
 ** 13.01.2024
-Work combination in neo4j 5.15.0
+
+*** conlclusion
+seperate book translation and etc for each book in a files.
+
+*** 'all-import.sh'
+
+all-imports at this moment imports following books: 
+[E1994, V1805, KJV, NAREK_XER, NAREK_GRABAR]
+[./scriptures/bible/am/e1994-J, ./scriptures/bible/am/v1805, ./scriptures/bible/en/kjv, ./scriptures/narek/am/xeranyan, ./scriptures/narek/am/grabar]
+
+Work combination in neo4j 5.15.0 with parameter ' --skip-bad-relationships=true"
 $ bash ~/scripts/all-import.sh
 - docker-compose.yaml@76c6423d8d412c166a9f5d8894995a9a01bb079c
 - the script all-import.sh@76c6423d8d412c166a9f5d8894995a9a01bb079c
@@ -19,3 +29,50 @@ Imported:
   996178 relationships
   6912174 properties
 Peak memory usage: 1.041GiB
+
+*** kjv-import.sh,  works without  '--skip-bad-relationships=true' parameter
+IMPORT DONE in 7s 40ms.
+Imported:
+  43878 nodes
+  75970 relationships
+  306474 properties
+Peak memory usage: 1.033GiB
+
+*** e1994-J-import.sh
+$ bash ~/scripts/e1994-J-import.sh 
+Caused by: org.neo4j.importer.CsvImporter$CsvImportException: org.neo4j.internal.batchimport.input.InputException: 
+????v1805-T1 (global id space)-[CONTAINS]->????v1805-T1-1 (CHAPTER-ID) referring to missing node ????v1805-T1-1
+... 13 more
+
+if we add the parameter '--skip-bad-relationships=true' to the import script then we success importing the book. 
+
+IMPORT DONE in 53s 426ms.
+Imported:
+  570278 nodes
+  584443 relationships
+  4251055 properties
+Peak memory usage: 1.038GiB
+
+*** e1994-import.sh - csv generated in different format than csv header expected, missing verseOrder filed in generated csv.
+$ bash ~/scripts/e1994-import.sh
+data source: BufferedCharSeeker[source:/data/csv/./scriptures/bible/am/e1994/abdiu_verses.csv, position:187, line:1]
+for header: [verseID:ID(VERSE-ID), book, chapter:long, section:long, verse:long, verseOrder:long, verseText]
+  raw field value: ?? ? ??????? ???????? ?????? ? ????? ???? ????? ?????. ???? ?????? ???????, ?? ???????? ??????? ???????? ????????????. ??????, ????????? ????? ???? ??? ?????
+  original error: Not an integer: "?? ? ??????? ???????? ?????? ? ????? ???? ????? ?????. ???? ?????? ???????, ?? ???????? ??????? ???????? ????????????. ??????, ????????? ????? ???? ??? ?????"
+
+*** z1805-import.sh
+$ bash ~/scripts/z1805-import.sh  
+data source: BufferedCharSeeker[source:/data/csv/./scriptures/bible/am/z1805/acts_words.csv, position:52, line:0]
+in field: versePos:long:8
+for header: [wordID:ID(WORD-ID), word, book, chapter:long, section:long, verse:long, token, versePos:long, :LABEL]
+raw field value: ?????
+original error: Not an integer: "?????"
+
+
+*** v1805-import.sh
+$ bash ~/scripts/v1805-import.sh
+Caused by: org.neo4j.importer.CsvImporter$CsvImportException: org.neo4j.internal.batchimport.input.InputException: 
+????.e1994-T1 (global id space)-[CONTAINS]->????.e1994-T1-1 (CHAPTER-ID) referring to missing node ????.e1994-T1-1
+... 13 more
+Suppressed: org.neo4j.internal.batchimport.input.InputException: sire1994-T29 (global id space)-[CONTAINS]->sire1994-T29-30 (CHAPTER-ID) referring to missing node sire1994-T29-30
+... 14 more

@@ -8,6 +8,7 @@ export ARMATS=./words
 
 neo4j-admin database import full \
     --verbose \
+    --skip-bad-relationships=true \
     --id-type STRING \
     --delimiter ";" \
     --array-delimiter "|" \

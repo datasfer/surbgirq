@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-
 export E1994=./scriptures/bible/am/e1994-J
-export AR94=./scriptures/bible/am/ar94
 export V1805=./scriptures/bible/am/v1805
-export Z1805=./scriptures/bible/am/z1805
 export KJV=./scriptures/bible/en/kjv
+
+# not used 
+export Z1805=./scriptures/bible/am/z1805
+export AR94=./scriptures/bible/am/ar94
 
 # Narek
 export NAREK_XER=./scriptures/narek/am/xeranyan
@@ -17,7 +18,6 @@ export ARMATS=./words
 neo4j-admin database import full \
     --verbose \
     --id-type STRING \
-    --skip-bad-relationships=true \
     --delimiter ";" \
     --array-delimiter "|" \
     --multiline-fields=true \
@@ -91,6 +91,6 @@ neo4j-admin database import full \
     --relationships="$KJV/Event_YearRel.csv" \
     --relationships="$KJV/Commentary_EastonRel.csv" \
     --relationships="$KJV/Translation_KJVRel.csv" \
-    bibleam
+    bibles
 # --nodes=Movie=movies.csv --nodes=Actor=actors.csv --relationships=roles.csv \
     
