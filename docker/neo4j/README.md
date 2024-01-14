@@ -1,3 +1,5 @@
+obsolate, see /notes.org
+
 # Dockerfile with Neo4j
 
 This directory contains `Dockerfile` with Neo4j set up  password is set.
@@ -65,12 +67,6 @@ cat sample.cypher | cypher-shell -u neo4j -p CHANGE_ME
 ### Share folder with docker container    
     -v ~/haskell/surbgirq/data:/data
 
-
-
-
-
-
-
 docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
              --env NEO4J_AUTH=neo4j/CHANGE_ME \
              --publish=7474:7474  --publish=7687:7687 \
@@ -83,9 +79,3 @@ docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
 
 
 
-use docker-compose yaml
-
-### How access Docker bash and generate neo4j db from csv data.
-docker exec  -i -t neo /bin/bash
-cd ./data/csv
-/var/lib/neo4j/data/csv$ bash ~/scripts/some-books-import.sh

@@ -1,0 +1,21 @@
+* Scripts
+in neo4j 5.15 the import syntax and commands have been changed since neo4j 4.* version, the difference can be light out compare the scripts with neo4j_4/* folder. the detailed manual can be find at this  
+https://neo4j.com/docs/operations-manual/current/tools/neo4j-admin/neo4j-admin-import/?_ga=2.241408002.1297546137.1705046821-2047302713.1705046821
+
+ 
+
+* DB imports 
+
+** 13.01.2024
+Work combination in neo4j 5.15.0
+$ bash ~/scripts/all-import.sh
+- docker-compose.yaml@76c6423d8d412c166a9f5d8894995a9a01bb079c
+- the script all-import.sh@76c6423d8d412c166a9f5d8894995a9a01bb079c
+- with the scripture @163ec60c80b4b6873df0e0c2cf3f5128916ed278
+
+IMPORT DONE in 1m 29s 588ms.
+Imported:
+  916443 nodes
+  996178 relationships
+  6912174 properties
+Peak memory usage: 1.041GiB

@@ -13,6 +13,8 @@
    - https://medium.com/@akshaykadidal/bulk-upload-csv-to-neo4j-on-windows-54321e9f0198
    - https://neo4j.com/docs/operations-manual/current/tutorial/import-tool/#import-tool-types-labels
 
+** neo4j-admin command
+https://neo4j.com/docs/operations-manual/current/tools/neo4j-admin/neo4j-admin-import/?_ga=2.241408002.1297546137.1705046821-2047302713.1705046821
 
 *** open new created db in enterprise
 - version >= 4.*
@@ -24,8 +26,25 @@ create database <your_db_name>
 from config
 activate db bla bla
 
-** Tips for running docker
+** Tips for running docker and db neo4j-admim database import
 
+> cd ./surbgirq/docker/
+> docker compose up
+
+# How access Docker bash and generate neo4j db from csv data.
+# to enter docker terminal, container name is neo, 
+> dokcer exec -i -t neo /bin/bash
+
+# to import csv in docker terminal
+docker > cs ./data/csv
+/var/lib/neo4j/data/csv$ bash ~/scripts/all-import.sh
+
+# if import success go to localhost:7474 and create dtabase with the name you set in import script
+# <your_db_name> the name of db set in import script
+:use system
+create database <your_db_name>
+
+*** etc
 https://neo4j.com/docs/operations-manual/current/docker/introduction/#docker-user
 
 for enterprise editin nad auth for fixing auth problem
@@ -41,5 +60,3 @@ docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
 
 
 
-** narek sources
-- (Quoted descriptions of the Narek translations removed before publishing.)
