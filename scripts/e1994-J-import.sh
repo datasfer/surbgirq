@@ -18,7 +18,7 @@ neo4j-admin database import full \
     --nodes="$SCRIPTURES/testaments.csv" \
     --nodes="$SCRIPTURES/divisions.csv" \
     --nodes="$SCRIPTURES/commentaries.csv" \
-    --nodes=Book="$SCRIPTURES/books.csv" \
+    --nodes=Book="$SCRIPTURES/books/e1994_books.csv" \
     --nodes=Chapter="$HEADERS/chapter_header.csv,$E1994/.*_chapters.csv" \
     --nodes=Section="$HEADERS/section_header.csv,$E1994/.*_sections.csv" \
     --nodes=Verse="$HEADERS/verse_header.csv,$E1994/.*_verses.csv" \
@@ -34,5 +34,5 @@ neo4j-admin database import full \
     --nodes=Token="$ARMATS/wordForms.csv" \
     --nodes=Armat="$ARMATS/armats.csv" \
     --relationships=ARMAT="$ARMATS/WordArmatRel.csv" \
-    e1994.jupyter.graph
+    e1994.jupyter.graph.new
     

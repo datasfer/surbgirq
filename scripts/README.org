@@ -53,6 +53,17 @@ Imported:
   4251055 properties
 Peak memory usage: 1.038GiB
 
+!!!!!FIXED!!!!!!
+the reason that faile to import is we add all availables book data from another books for this specific scripture as well, 
+because we add ./books.csv which contains all bools, i am going to devide each books scripture to individual csv files, and 
+it will work.
+IMPORT DONE in 54s 317ms.
+Imported:
+  570251 nodes
+  584389 relationships
+  4250893 properties
+Peak memory usage: 1.038GiB
+
 *** e1994-import.sh - csv generated in different format than csv header expected, missing verseOrder filed in generated csv.
 $ bash ~/scripts/e1994-import.sh
 data source: BufferedCharSeeker[source:/data/csv/./scriptures/bible/am/e1994/abdiu_verses.csv, position:187, line:1]
