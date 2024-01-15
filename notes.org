@@ -59,4 +59,18 @@ docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
 
 
 
-
+* Build project
+1. install stack
+2. stack build
+	# usefull command
+	> sudo apt-cache search prce 
+	problems:
+	a) While building package pcre-light-0.4.1.0 (scroll up to its section to see the error) using:
+	 	fixed by installing missing package:
+	 	> sudo apt install libghc-pcre-light-dev
+	 	# sually the missing package ends with "dev" prefix in a Debian based system.
+	b) [S-7011]
+       While building package regex-pcre-0.95.0.0 (scroll up to its section to see the error) using:
+	   fixed by installing missing package:
+	   > sudo apt install pkg-config	
+		
