@@ -1,4 +1,4 @@
-cabal-version: 1.12
+cabal-version:      3.0
 
 -- This file has been generated from package.yaml by hpack version 0.31.2.
 --
@@ -14,7 +14,7 @@ bug-reports:    https://github.com/arthurvard/surbgirq-bot/issues
 author:         Arthur Vardanyan
 maintainer:     arthur@datasfer.com
 copyright:      2019
-license:        BSD3
+license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
@@ -58,7 +58,7 @@ library
                  Surbgirq.Bot.Server.Helpers.HelpMessages
 
   hs-source-dirs: src
-  build-depends: base >=4.7 && <5
+  build-depends: base ^>=4.17.2.1
                , surbgirq-neo4j-client
                , surbgirq-types
                , surbgirq-bot-state
@@ -98,7 +98,7 @@ library
 --   other-modules: Paths_surbgirq_bot_telegram
 --   hs-source-dirs: app
 --   ghc-options: -threaded -rtsopts -with-rtsopts=-N
---   build-depends: base >=4.7 && <5
+--   build-depends: base ^>=4.17.2.1
 --                , surbgirq-bot-telegram
 --                , text
 --   default-language: Haskell2010
@@ -109,6 +109,6 @@ test-suite surbgirq-telebot-test
   other-modules: Paths_surbgirq_bot
   hs-source-dirs: test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends: base >=4.7 && <5
+  build-depends: base ^>=4.17.2.1
                , surbgirq-bot
   default-language: Haskell2010

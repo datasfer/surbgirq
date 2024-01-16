@@ -1,4 +1,5 @@
-cabal-version: 1.12
+cabal-version:      3.0
+
 name:           surbgirq-service
 version:        0.1.0.0
 description:    Surbgirq REST API Service
@@ -7,7 +8,7 @@ bug-reports:    https://github.com/arthurvard/surbgirq/issues
 author:         Arthur Vardanyan
 maintainer:     arthur@datasfer.com
 copyright:      2019
-license:        BSD3
+license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
@@ -37,7 +38,7 @@ library
                        Surbgirq.Back.Swagger.Doc
                        Surbgirq.Back.Swagger.Instances
   hs-source-dirs: src
-  build-depends: base >=4.7 && <5
+  build-depends: base ^>=4.17.2.1
                , surbgirq-api
                , surbgirq-types
                , surbgirq-utils
@@ -90,7 +91,7 @@ executable surbgirq-service
   other-modules: Paths_surbgirq_service
   hs-source-dirs: app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends: base >=4.7 && <5
+  build-depends: base ^>=4.17.2.1
                , surbgirq-service
   default-language: Haskell2010
 
@@ -100,6 +101,6 @@ test-suite surbgirq-service-test
   other-modules: Paths_surbgirq_service
   hs-source-dirs: test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends: base >=4.7 && <5
+  build-depends: base ^>=4.17.2.1
                , surbgirq-service
   default-language: Haskell2010

@@ -74,3 +74,13 @@ docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
 	   fixed by installing missing package:
 	   > sudo apt install pkg-config	
 		
+
+
+* install Haskell toolchain
+- https://wasp-lang.dev/blog/2022/09/02/how-to-get-started-with-haskell-in-2022
+- https://www.reddit.com/r/haskell/comments/vxk72l/whats_the_recommended_setup/
+- https://www.youtube.com/watch?v=bB4fmQiUYPw
+- https://www.haskell.org/documentation/
+- https://marcosampellegrini.com/
+- https://www.parsonsmatt.org/programming/
+- https://gilmi.me/

@@ -5,6 +5,12 @@
 resolver: lts-21.25 # ghc: 9.4.8
 #resolver: nightly-2021-10-29 # ghc-9.0.1
 
+# added this params to ~/.stack/config.yaml
+# https://docs.haskellstack.org/en/stable/yaml_configuration/#install-ghc
+#install-ghc: false
+# Turn on system GHC, https://docs.haskellstack.org/en/stable/yaml_configuration/#system-ghc
+#system-ghc: true
+
 packages:
 - surbgirq-types
 - surbgirq-utils
