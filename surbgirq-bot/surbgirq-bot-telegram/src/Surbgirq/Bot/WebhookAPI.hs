@@ -7,8 +7,8 @@ module Surbgirq.Bot.WebhookAPI where
 import Data.Text            (Text)
 import Web.Telegram.API.Bot (Update)
 
-import Web.FBMessenger.API.Bot
-import Web.FBMessenger.API.Bot.WebhookAPI
+-- import Web.FBMessenger.API.Bot
+-- import Web.FBMessenger.API.Bot.WebhookAPI
 
 import Data.Aeson
 import Servant
@@ -23,10 +23,10 @@ type WebHookAPI = "version" :> Get '[JSON] Version
                        -- :> Capture "secret" Text
                   :> ReqBody '[JSON] Update
                   :> Post '[JSON] ()
-              :<|> "fb-webhook" :>
-                   QueryParam "hub.verify_token" Text :>
-                   QueryParam "hub.challenge" Text :>
-                   Get '[PlainText] Text
-              :<|> "fb-webhook" :>
-                   ReqBody '[JSON] RemoteEventList :>
-                   Post '[PlainText,JSON] Text
+          --     :<|> "fb-webhook" :>
+          --          QueryParam "hub.verify_token" Text :>
+          --          QueryParam "hub.challenge" Text :>
+          --          Get '[PlainText] Text
+          --     :<|> "fb-webhook" :>
+          --          ReqBody '[JSON] RemoteEventList :>
+          --          Post '[PlainText,JSON] Text

@@ -107,6 +107,15 @@ data Verse = Verse
 --    v .: "verse" <*>
 --    v .: "verseText"
 
+instance ToJSON Girq where
+    toJSON a  = object ["book" .= T.pack (show a)]
+
+instance FromJSON Girq where
+    parseJSON (String g) = do
+        case (findByAbbr g) of
+            Just (girq, _) -> return girq
+            Nothing        ->  error $ "Girq parsed to nothing: " ++ T.unpack  g
+    parseJSON v = error $ "Girq typemismatch: " ++ show  v
 
 instance FromJSON Verse where
   parseJSON = withObject "verse" $ \o -> do
@@ -134,6 +143,11 @@ $(deriveJSON dropPrefixOptions ''Paragraph)
 $(deriveToJSON dropPrefixOptions ''Verse)
 
 $(deriveToJSON dropPrefixOptions ''Book)
+
+
+-- | Girtq type instances
+
+
 
 -- $(deriveJSON dropPrefixOptions ''Book)
 -- instance ToJSON Book
@@ -190,14 +204,4 @@ capitalized (head:tail) = toUpper head : tail
 
 
 
--- | Girtq type instances
-instance ToJSON Girq where
-    toJSON a  = object ["book" .= T.pack (show a)]
-
-instance FromJSON Girq where
-    parseJSON (String g) = do
-        case (findByAbbr g) of
-            Just (girq, _) -> return girq
-            Nothing        ->  error $ "Girq parsed to nothing: " ++ T.unpack  g
-    parseJSON v = error $ "Girq typemismatch: " ++ show  v
 

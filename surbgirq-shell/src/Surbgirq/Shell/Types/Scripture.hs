@@ -145,16 +145,16 @@ data RefType = RefBooks   [Text]
 $(deriveJSON dropPrefixOptions ''Corpora)
 $(deriveJSON dropPrefixOptions ''Girq)
 $(deriveJSON dropPrefixOptions ''Book)
-$(deriveJSON dropPrefixOptions ''Scripture)
-$(deriveJSON dropPrefixOptions ''Chapter)
-$(deriveJSON dropPrefixOptions ''Section)
-$(deriveJSON dropPrefixOptions ''Verse)
+$(deriveJSON dropPrefixOptions ''RefTo)
 $(deriveJSON dropPrefixOptions ''RefType)
+$(deriveJSON dropPrefixOptions ''Ref)
 $(deriveJSON dropPrefixOptions ''VerseRef)
+$(deriveJSON dropPrefixOptions ''Verse)
+$(deriveJSON dropPrefixOptions ''Scripture)
+$(deriveJSON dropPrefixOptions ''Section)
+$(deriveJSON dropPrefixOptions ''Chapter)
 $(deriveJSON dropPrefixOptions ''BookRef)
 $(deriveJSON dropPrefixOptions ''Ban)
-$(deriveJSON dropPrefixOptions ''Ref)
-$(deriveJSON dropPrefixOptions ''RefTo)
 
 
 

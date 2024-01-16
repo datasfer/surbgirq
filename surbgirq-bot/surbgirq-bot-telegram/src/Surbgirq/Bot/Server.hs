@@ -34,6 +34,6 @@ import Surbgirq.Bot.WebhookAPI
 ------------------------------------------------------------
 
 botServer :: Text -> Text -> ServerT WebHookAPI Bot
-botServer verifyTokenStored pageTokenStored  = returnVersion :<|> handleWebhook :<|> webhook_verify verifyTokenStored :<|> webhook_message pageTokenStored
+botServer verifyTokenStored pageTokenStored  = returnVersion :<|> handleWebhook -- :<|> webhook_verify verifyTokenStored  -- :<|> webhook_message pageTokenStored
 
 

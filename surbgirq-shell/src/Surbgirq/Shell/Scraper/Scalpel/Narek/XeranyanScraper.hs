@@ -48,6 +48,7 @@ data BookData = BookData
  , bookData'chapters :: [Chapter]
  } deriving (Show, Generic)
 
+instance ToJSON BookData
 
 test :: IO ()
 test = do
@@ -67,6 +68,8 @@ test = do
 -- | parse all books inside narek
 parseNarekTest :: IO ()
 parseNarekTest = parseNarekByXeranyanHtml "./data/raw_html/narek/" "./data/yaml"
+
+
 
 
 -- | stack exec -- html-scraper --narek  --yaml  -i ./data/html/narek/xeranyan -o ./data/yaml
@@ -228,4 +231,9 @@ rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
 -- $(deriveJSON dropPrefixOptions ''VerseData)
 -- $(deriveJSON dropPrefixOptions ''ChapterData)
 -- $(deriveJSON dropPrefixOptions ''SectionData)
-$(deriveJSON dropPrefixOptions ''BookData)
+
+
+
+-- this commented becuase of bump to ghc: 9.4.8, seems the order of instancing is matter, added 
+-- tojson instance declaration above
+-- $(deriveJSON dropPrefixOptions ''BookData)

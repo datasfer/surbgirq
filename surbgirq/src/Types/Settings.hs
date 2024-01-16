@@ -93,12 +93,12 @@ data SurbgirqSettings = SurbgirqSettings
   -- ^ the storage settings
   } deriving (Show)
 
-$(deriveFromJSON dropPrefixOptions ''SurbgirqSettings)
-$(deriveFromJSON dropPrefixOptions     ''ExplorerSettings)
-
 $(deriveJSON dropPrefixOptions     ''LogSpec)
 $(deriveFromJSON dropPrefixOptions ''ServerSettings)
+$(deriveFromJSON dropPrefixOptions     ''ExplorerSettings)
+
 $(deriveJSON dropPrefixOptions     ''SqliteConfig)
 $(deriveJSON dropPrefixOptions     ''Neo4jConfig)
 $(deriveJSON dropPrefixOptions     ''LocalNeo4jApiConfig)
 $(deriveJSON dropPrefixOptions     ''StoreSpec)
+$(deriveFromJSON dropPrefixOptions ''SurbgirqSettings)

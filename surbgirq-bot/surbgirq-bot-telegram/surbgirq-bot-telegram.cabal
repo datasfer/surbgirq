@@ -49,8 +49,8 @@ library
                    Surbgirq.Bot.App
                    Surbgirq.Bot.WebhookAPI
                    Surbgirq.Bot.Lucid.Instances
-                   Surbgirq.Bot.FB.Facebook
-                   Surbgirq.Bot.FB.Server.Webhook
+                  -- Surbgirq.Bot.FB.Facebook
+                  -- Surbgirq.Bot.FB.Server.Webhook
                   -- Surbgirq.Bot.ShopBotExample
   other-modules: Paths_surbgirq_bot_telegram
                  Surbgirq.Bot.Server.Helpers.Pagination
@@ -69,7 +69,7 @@ library
                , postgresql-simple
                  --
                , telegram-api
-               , fbmessenger-api
+              -- , fbmessenger-api
                , fb
                , aeson
                , servant >= 0.16                                                                                                                                                                                                         

@@ -41,6 +41,6 @@ data TelegramBotConfig = TelegramBotConfig
     } deriving (Show)
 
 
-$(deriveJSON dropPrefixOptions     ''BotSettings)
 $(deriveJSON dropPrefixOptions     ''TelegramBotConfig)
 $(deriveJSON dropPrefixOptions     ''BotSpec)
+$(deriveJSON dropPrefixOptions     ''BotSettings)

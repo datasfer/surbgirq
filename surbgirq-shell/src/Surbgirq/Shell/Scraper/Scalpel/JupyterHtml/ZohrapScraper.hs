@@ -53,7 +53,7 @@ data BookData = BookData
 data OutFormat =  YAML
                 | JSON
 
-
+instance ToJSON BookData
 -- test :: IO ()
 -- test = do
 --   setLocaleEncoding utf8
@@ -228,4 +228,6 @@ divRegex = [PCRE.re|<\s*div[^>]*>(.*?)<\s*/\s*div>|]
 removeLinkTag str = T.intercalate "" $ PCRE.split linkRegex str
 removeDivTag str = T.intercalate "" $ PCRE.split divRegex str
 
-$(deriveJSON dropPrefixOptions ''BookData)
+-- this commented becuase of bump to ghc: 9.4.8, seems the order of instancing is matter, added 
+-- tojson instance declaration above
+-- $(deriveJSON dropPrefixOptions ''BookData)
