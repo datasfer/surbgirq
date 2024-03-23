@@ -28,6 +28,14 @@ activate db bla bla
 
 ** Tips for running docker and db neo4j-admim database import
 
+# some dokcer commands
+> dokcer volume list
+> docker ps -a
+
+# create folder conf in folder scriptures
+> cd ./scriptures
+> mkdir conf
+
 > cd ./surbgirq/docker/
 > docker compose up
 
