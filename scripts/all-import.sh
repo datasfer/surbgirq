@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
-export E1994=./scriptures/bible/am/e1994-J
-export V1805=./scriptures/bible/am/v1805
-export KJV=./scriptures/bible/en/kjv
+ROOT=~/csv_data # this folder name coming from docker volume mapping
+SCRIPTURES=$ROOT/scriptures
+
+E1994=$SCRIPTURES/bible/am/e1994-J
+V1805=$SCRIPTURES/bible/am/v1805
+KJV=$SCRIPTURES/bible/en/kjv
 
 # not used 
-export Z1805=./scriptures/bible/am/z1805
-export AR94=./scriptures/bible/am/ar94
+Z1805=$SCRIPTURES/bible/am/z1805
+AR94=$SCRIPTURES/bible/am/ar94
 
 # Narek
-export NAREK_XER=./scriptures/narek/am/xeranyan
-export NAREK_GRABAR=./scriptures/narek/am/grabar
+NAREK_XER=$SCRIPTURES/narek/am/xeranyan
+NAREK_GRABAR=$SCRIPTURES/narek/am/grabar
 
-export SCRIPTURES=./scriptures
-export HEADERS=./scriptures/headers
-export ARMATS=./words
+HEADERS=$SCRIPTURES/headers
+ARMATS=$ROOT/words
 
+#    --overwrite-destination \
 neo4j-admin database import full \
     --verbose \
     --id-type STRING \

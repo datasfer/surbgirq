@@ -1,11 +1,103 @@
-* Neo4j
+* Build and Eun
+** ghcup
+# install essentials libs
+> sudo apt-get install git-core zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev
+
+# install ghcup
+# https://www.haskell.org/ghcup/install/
+> curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+
+** build haskell project
+> cd surbgirq
+> stack build
+*** Missing libs on stack build
+ # usefull command
+ > sudo apt-cache search prce 
+	problems:
+	a) While building package pcre-light-0.4.1.0 (scroll up to its section to see the error) using:
+	 	fixed by installing missing package:
+	 	> sudo apt install libghc-pcre-light-dev
+	 	# usually the missing package ends with "dev" prefix in a Debian based system.
+	b) [S-7011]
+       While building package regex-pcre-0.95.0.0 (scroll up to its section to see the error) using:
+	   fixed by installing missing package:
+	   > sudo apt install pkg-config	
+		
+
+# can install all required packages
+> sudo apt install libghc-pcre-light-dev
+libghc-regex-pcre-dev
+libghc-regex-base-dev
+pcregrep
+libpcre2-posix3
+libgmp-dev
+libgbm-dev
+# sudo apt-cache search regex | grep tdfa
+libghc-regex-compat-tdfa-dev
+libghc-regex-tdfa-dev
+pkg-config
+
+** install Docker
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04
+
+# update your existing list of packages:
+> sudo apt update
+# install a few prerequisite packages which let apt use packages over HTTPS:
+> sudo apt install apt-transport-https ca-certificates curl software-properties-common
+# Then add the GPG key for the official Docker repository to your system:
+> curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+# Add the Docker repository to APT sources:
+> echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+# Update your existing list of packages again for the addition to be recognized:
+> sudo apt update
+> apt-cache policy docker-ce
+> sudo apt install docker-ce
+> sudo systemctl status docker
+
+# run docker commands without sudo
+# add your username to the docker group:
+> sudo usermod -aG docker ${USER}
+# To apply the new group membership, log out of the server and back in, or type the following:
+> su - ${USER}
+# list groups of users
+> groups
+
+** run neo4j docker
+# create 'conf' directory in ~/scriptures, this need for docker volume mapping
+> cd ~/scriptures
+> mkdir conf
+> cd ~/surbgirq/docker
+> docker compose up
+
+# check if neo4j reachable from outside go to
+http://localhost:7474/  or http://<server_ip>:7474/ 
+
+** neo4j import
+# enter into container of neo4j server
+> docker exec  -i -t neo /bin/bash
+# change directory to
+> cd data/csv
+# run import command
+> bash ~/scripts/all-import.sh
+# db will created in ~/scriptures/database 
+
+** start telegram bot
+> cd surbgirq/srubgirq
+> stack exec -- telegram-bot
+** start verse explorer
+> cd surbgirq/srubgirq
+> stack exec -- verse-explorer
+** start neo4j to REST server API
+> cd ~/Surbgirq.Neo4j/Surbgirq.Neo4j
+> dotnet run
+* Commands
+> docker volume ls
 
 ** Bulk Insert
 *** CSV import
     https://medium.com/neo4j/5-tips-tricks-for-fast-batched-updates-of-graph-structures-with-neo4j-and-cypher-73c7f693c8cc
     https://gist.github.com/jexp/d788e117129c3730a042
     https://www.youtube.com/watch?v=aWqQNDi7p9I
-
 
 ** Example of inport
    - https://learnmeabitcoin.com/neo4j/how/
@@ -44,7 +136,7 @@ activate db bla bla
 > dokcer exec -i -t neo /bin/bash
 
 # to import csv in docker terminal
-docker > cs ./data/csv
+docker > cd ./data/csv
 /var/lib/neo4j/data/csv$ bash ~/scripts/all-import.sh
 
 # if import success go to localhost:7474 and create dtabase with the name you set in import script
@@ -65,23 +157,6 @@ docker run  --env=NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
             neo4j-4-enterprise:latest 
 ```
 
-
-
-* Build project
-1. install stack
-2. stack build
-	# usefull command
-	> sudo apt-cache search prce 
-	problems:
-	a) While building package pcre-light-0.4.1.0 (scroll up to its section to see the error) using:
-	 	fixed by installing missing package:
-	 	> sudo apt install libghc-pcre-light-dev
-	 	# sually the missing package ends with "dev" prefix in a Debian based system.
-	b) [S-7011]
-       While building package regex-pcre-0.95.0.0 (scroll up to its section to see the error) using:
-	   fixed by installing missing package:
-	   > sudo apt install pkg-config	
-		
 
 
 * install Haskell toolchain
