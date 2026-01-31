@@ -1,10 +1,6 @@
 # surbgirq-bot
 
-# Facebook
-
-
-
-
+sensitive info: telegram token
 
 # Telegram
 
