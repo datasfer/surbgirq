@@ -5,7 +5,7 @@ description:    REST API types and endpoint definitions
 homepage:       https://github.com/arthurvard/surbgirq-api#readme
 bug-reports:    https://github.com/arthurvard/surbgirq-api/issues
 author:         Arthur Vardanyan
-maintainer:     arthur@datasfer.com
+maintainer:     artie.vard@gmail.com
 copyright:      2019
 license:        MIT
 license-file:   LICENSE

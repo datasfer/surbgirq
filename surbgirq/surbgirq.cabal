@@ -4,9 +4,9 @@ version:        0.1.0.0
 description:    Surbgirq REST API executables
 homepage:       https://github.com/githubuser/surbgirq#readme
 bug-reports:    https://github.com/githubuser/surbgirq/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2019 Author name here
+author:         Arthur Vardanyan
+maintainer:     artie.vard@gmail.com
+copyright:      2019 Arthur Vardanyan
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
