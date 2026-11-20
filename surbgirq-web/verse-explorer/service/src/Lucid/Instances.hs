@@ -109,7 +109,7 @@ instance ToHtml [Section] where
 
 
 htoUrl :: Book -> Text
-htoUrl Book{..} = T.pack $ concat [ "/scripture/"
+htoUrl Book{..} = T.pack $ concat [ "/api/verses/"
                                   , T.unpack book'translation
                                   , "/books/"
                                   , show book'book
@@ -119,7 +119,7 @@ htoUrl Book{..} = T.pack $ concat [ "/scripture/"
 
 chNumtoUrl :: Verse -> Int -> Text
 chNumtoUrl Verse{..} i =
-    T.pack $ concat [ "/scripture/"
+    T.pack $ concat [ "/api/verses/"
                     , T.unpack verse'translation
                     , "/books/"
                     , show verse'book

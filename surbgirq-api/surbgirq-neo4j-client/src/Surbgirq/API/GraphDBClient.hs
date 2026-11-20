@@ -45,41 +45,42 @@ import Surbgirq.Types
 -- | Api schema of .net core web api, that expose neo4j data
 -- haskell neo4j driver doesnot support neo4j 4.* this is the reason
 -- we develope net core web api to get neo4j data
-type GraphDBLocalAPI =
-            "scripture" :> Capture "translation" TranslationID :> Summary "Get Books of translation"
-                        :> "books" :> Get '[JSON, HTML] [Book]
-       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get verse range"
+type GraphDBLocalAPI = "api" :> (
+            "scriptures" :> Capture "translation" TranslationID :> Summary "Get Books of translation"
+                         :> "books" :> Get '[JSON, HTML] [Book]
+       :<|> "verses" :> Capture "translation" TranslationID :> Summary "Get verse range"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "verses" :> Capture "verseFrom" VerseNum
 --                 :> "to" :> Capture "verseTo" VerseNum
                  :> QueryParam "v2" VerseNum
                  :> Get '[JSON, HTML] [Verse]
-       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get a verse"
+       :<|> "scriptures" :> Capture "translation" TranslationID :> Summary "Get a verse"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "oneverse" :> Capture "verseNum" VerseNum
                  :> Get '[JSON, HTML] [Verse]
-       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get chapter's sections"
+       :<|> "scriptures" :> Capture "translation" TranslationID :> Summary "Get chapter's sections"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "sections"
                  :> Get '[JSON, HTML] [Section]
-       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get chapter's sections by sec num"
+       :<|> "scriptures" :> Capture "translation" TranslationID :> Summary "Get chapter's sections by sec num"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "sections" :> Capture "secNum" SectionNum
                  :> Get '[JSON, HTML] [Section]
-       :<|> "scripture" :> Capture "translation" TranslationID :> Summary "Get Book's section"
+       :<|> "scriptures" :> Capture "translation" TranslationID :> Summary "Get Book's section"
                  :> "books" :> Capture "girq" Girq
                  :> "sections"
                  :> Get '[JSON] [Section]
-       :<|> "scripture" :> "book" :> Summary "Get book's chapter's verse count"
+       :<|> "scriptures" :> Capture "translation" TranslationID
+                 :> "books" :> Summary "Get book's chapter's verse count"
                  :> Capture "girq" Girq
-                 :> "chapter" :> Capture "ch" ChapterNum
+                 :> "chapters" :> Capture "ch" ChapterNum
                  :> "verses" :> "count"
                  :> Get '[JSON] Int
-
+            )
 
 --    :<|> "chapters" :> Get '[JSON] [Chapter]
  --   :<|> "chapter" :> Capture "num" ChapterNum :> Get '[JSON] Chapter
@@ -99,7 +100,8 @@ getOneVerse' :: TranslationID -> Girq -> ChapterNum -> VerseNum -> ClientM [Vers
 getChapterSections' :: TranslationID -> Girq -> ChapterNum -> ClientM [Section]
 getChapterOneSection' :: TranslationID -> Girq -> ChapterNum -> SectionNum -> ClientM [Section]
 getBookSections' :: TranslationID -> Girq ->  ClientM [Section]
-getChapterVerseNumber' :: Girq -> ChapterNum -> ClientM Int
+-- TODO: change return type of Int to compound data type, which store book metadatas
+getChapterVerseNumber' :: TranslationID -> Girq -> ChapterNum -> ClientM Int
 
 ( getAllBooks'
  :<|> getVerseRange'

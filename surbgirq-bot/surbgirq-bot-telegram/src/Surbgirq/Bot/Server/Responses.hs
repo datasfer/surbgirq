@@ -129,7 +129,7 @@ sendVerse' sendAtOnce chatId userId vRef@VerseReference{..} = do
       let defaultTrans = fromMaybe E1994T $ readTranslation [config'bible cfg]
 
       vs <- liftIO $ getVerses defaultTrans vRef
-      maxVerseNum <- liftIO $ getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
+      maxVerseNum <- liftIO $ getChapterVerseNumberHandler defaultTrans verseRef'book $ ChapterNum verseRef'chapter
 
       if sendAtOnce
       then do
@@ -156,8 +156,8 @@ getVerse' defaTrans chatId vRef@VerseReference{..} = getVerses defaTrans vRef
 
 getVerses :: TranslationID -> VerseReference -> IO [Verse]
 getVerses defTrans vRef@VerseReference{..} = do
-  maxVerseNum <- getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
   let translation = fromMaybe defTrans verseRef'translation
+  maxVerseNum <- getChapterVerseNumberHandler translation verseRef'book $ ChapterNum verseRef'chapter
   case (verseRef'from, verseRef'to) of
     (Nothing, Nothing)   -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
     (Just from, Nothing) -> getOneVerseHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)
@@ -167,8 +167,8 @@ getVerses defTrans vRef@VerseReference{..} = do
 
 getChapterVerses :: TranslationID -> VerseReference -> IO [Verse]
 getChapterVerses defTrans vRef@VerseReference{..} = do
-  maxVerseNum <- getChapterVerseNumberHandler verseRef'book $ ChapterNum verseRef'chapter
   let translation = fromMaybe defTrans verseRef'translation
+  maxVerseNum <- getChapterVerseNumberHandler translation verseRef'book $ ChapterNum verseRef'chapter
   getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
 
 
