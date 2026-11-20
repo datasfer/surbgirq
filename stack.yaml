@@ -55,7 +55,7 @@ extra-deps:
     commit: 4bfb0354cb610ff7731c72cb8f480042dacc5ec7 # ghc: 9.4.8
     # commit: 8c156dc9a5208b1963072cdfde8e497611671507 # ghc: 8.10.4
     # commit: cc2c545cd9d92eaf2221f98a976023893dcd1b96 # ghc: 9.2.5
-  - git: git@github.com:ArthurVard/fbmessenger-api-hs.git
+  - git: https://github.com/ArthurVard/fbmessenger-api-hs.git
     commit: 409b9369d3989077c09f693c33629a3abe4bac44
   - Cabal-3.4.0.0@sha256:74ca2bc93297dc20b291c8dc721055278aa4a7942b0b5aca86766d407e3cbe5f,30533
   - parsec-3.1.14.0@sha256:72d5c57e6e126adaa781ab97b19dc76f68490c0a3d88f14038219994cabe94e1,4356
