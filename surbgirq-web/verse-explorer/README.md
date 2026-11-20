@@ -11,7 +11,7 @@ gets as HTML, or passes it on as JSON.
 ## Run it
 
 ```bash
-cd surbgirq
+cd surbgirq                           # the package folder inside the repository
 stack exec -- verse-explorer          # http://localhost:8009
 ```
 
@@ -23,7 +23,7 @@ page's CSS, JavaScript and images (`EXPLORER_STATIC_PATH`; by default `../surbgi
 | Route | What it shows |
 |---|---|
 | `/` | the books of the 1994 translation (`e1994-T`), Old and New Testament |
-| the graph API's routes: `/scripture/…` on `master`, `/api/…` on `fix-api` | the same data as the API: the books of a translation, a verse range, one verse, a chapter's sections, a book's sections |
+| the graph API's `/api/…` routes, forwarded to `surbgirq-graph-api` (four of them don't match it yet; see the root README's Known issues) | the same data as the API: the books of a translation, a verse range, one verse, a chapter's sections, a book's sections |
 | `/about` | a placeholder |
 | `POST /search` | always "Not found" |
 
@@ -43,4 +43,4 @@ How Bible references are written in the project: [docs/bot.md](../../docs/bot.md
   `front/static/js/app.js` has a live counter over a WebSocket and a filter dialog that nothing feeds; `custom.css` styles
   lists that the pages don't have; a few names (`txhash`, `tx-list`) remain.
 - **The home page lists the 1994 translation,** which public data won't include ([data sources](../../docs/data-sources.md)).
-- **No build was run for the 2026 publication.** Its rework belongs to the project's revival.
+- **It builds with the rest of `master`** (GHC 9.6.7, November 2026). Its rework belongs to the project's revival.

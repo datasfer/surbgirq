@@ -3,6 +3,9 @@
 How Bible texts become the Surbgirq graph. The inputs and outputs aren't in this repository (see the README's
 [Data](../README.md#data) section); the commands show how the author ran each stage, with the `data/` layout of the time.
 
+The `surbgirq-shell` package, which holds these executables, is out of the build at the moment (see the README's Known
+issues), so it has to come back before these commands run again.
+
 ```text
 HTML (saved pages, e-book XHTML, pages made by the conversion notebooks)
   └─ html-scraper ............ YAML, one file per chapter

@@ -7,20 +7,21 @@ The graph is always rebuilt from scratch: generate the CSVs ([data-pipeline.md](
 
 `docker/docker-compose.yaml` starts one container, `neo`:
 
-| | `master` | `fix-api` | `bump-9.6.7` |
-|---|---|---|---|
-| Image | `neo4j:5.15.0-enterprise` | `neo4j:5.18.1-enterprise` | `neo4j:5.26.6-enterprise` |
-| Ports | 7474 (Browser), 7687 (Bolt) | the same | the same |
-| Memory | heap up to 4 GB, page cache 2 GB | the same | the same |
-| Volumes | `~/scriptures` (the CSVs) bound as the data, import and log folders; a `conf` folder (create it first); the scripts | the database in `~/neo4jDB`, the CSVs mounted separately (`/csv_data`); the scripts | separate folders for data, import, plugins and logs; `~/scriptures` at `/scriptures`; the scripts at `/import-scripts` |
+| | |
+|---|---|
+| Image | `neo4j:5.26.6-enterprise` (5.15 in 2024; 5.18.1 on the former `fix-api` branch) |
+| Ports | 7474 (Browser) and 7687 (Bolt), published on every interface (see the README's Known issues); Bolt is advertised as `neo4j.datasfer.com:7687`, so change that to your host |
+| Memory | heap up to 4 GB, page cache 2 GB |
+| Volumes | `~/neo4j_data/` with `data`, `conf`, `import`, `plugins` and `logs` (create them first); `~/scriptures`, the pipeline's output with the CSVs under `csv/`, at `/scriptures`; this repository's `scripts/` at `/import-scripts` |
 
-Set your own password in `NEO4J_AUTH` (the files say `neo4j/CHANGE_ME`). The older files (`docker-compose_4.0.4.yml`,
+Set your own password in `NEO4J_AUTH` (the file says `neo4j/CHANGE_ME`). The older files (`docker-compose_4.0.4.yml`,
 `old_docker.yaml`, `neo4j/Dockerfile`, `neo4j/runNeo4jDocker.sh`) are for Neo4j 4.x and are kept for reference.
 
 ```bash
 cd docker
+mkdir -p ~/neo4j_data/{data,conf,import,plugins,logs}
 docker compose up -d
-docker exec -it neo bash          # then, inside the container: bash ~/scripts/all-import.sh
+docker exec -it neo bash          # then, inside the container: cd /scriptures/csv && bash /import-scripts/all-import.sh
 ```
 
 ## The import
@@ -29,14 +30,14 @@ The scripts are in [`scripts/`](../scripts/README.md). The main one, `all-import
 1805, the KJV with the Theographic layer, and both Narek texts into a database named `bibles`:
 
 ```bash
-neo4j-admin database import full \
+neo4j-admin database import full bibles \
+    --verbose \
     --id-type STRING \
     --delimiter ";" \
     --array-delimiter "|" \
     --multiline-fields=true \
     --nodes=Scripture="$SCRIPTURES/scriptures.csv" \
-    --nodes=…  --relationships=…   \
-    bibles
+    --nodes=…  --relationships=…
 ```
 
 Its last recorded run (Neo4j 5.15, 2024-01-13, with `--skip-bad-relationships=true` added): 916,443 nodes, 996,178
@@ -44,8 +45,8 @@ relationships and 6,912,174 properties in 1 min 29 s, with a peak of 1 GB of mem
 
 **After the import** on Enterprise, create the database once in the Browser: `:use system`, then `CREATE DATABASE bibles`.
 
-**On 5.26** (the notes of `bump-9.6.7`): the database name goes first, `neo4j-admin database import full bibles …`, and the
-running `neo4j` database must be stopped first (`STOP DATABASE neo4j`). To wait for the server after `docker compose up -d`:
+**On 5.26** (the author's notes): the database name goes first, as above, and the running `neo4j` database must be stopped
+first (`STOP DATABASE neo4j`). To wait for the server after `docker compose up -d`:
 
 ```bash
 until curl -s localhost:7474 > /dev/null; do echo "Waiting for Neo4j..."; sleep 2; done

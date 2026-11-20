@@ -1,32 +1,32 @@
 # Building
 
-Nothing was built for the 2026 publication. These notes come from the code and from the author's notes of 2024–2026.
+`master` builds with Stack and GHC 9.6.7 (checked on Linux in November 2026). The rest of these notes come from the code and
+from the author's notes of 2024–2026.
 
-## Toolchain per branch
+## Toolchain
 
-| Branch | GHC | Stackage resolver | Cabal | Notes |
-|---|---|---|---|---|
-| `master`, `fix-api` | 9.4.8 | `lts-21.25` | `cabal.project` lists the packages but not the forked dependencies, so use Stack | `stack.yaml` sets `allow-newer: true`, and points `extra-include-dirs`/`extra-lib-dirs` at a machine-specific `/nix/store/…-postgresql-11.7`; remove or adapt those two lines |
-| `bump-9.6.7` | 9.6.7 | `lts-22.44` | `cabal.project` with `with-compiler: ghc-9.6.7`, plus a local clone of the Telegram fork next to the repository: `../haskell-telegram-api` | `surbgirq-shell` is left out of the build (a `selda` conflict); the Facebook Messenger packages are commented out; `shell.nix` is a plain `mkShell` (zlib, sqlite, libpq, openssl, HLS) |
+| GHC | Stackage resolver | Notes |
+|---|---|---|
+| 9.6.7 | `lts-22.44` | `stack.yaml` sets `allow-newer: true`, and asks for `-j4` with large GHC heaps for every package (so does `cabal.project.local`): lower `-j` on a small machine. `surbgirq-shell` is left out of the build (a `selda` conflict; see the README's Known issues). The Facebook Messenger packages are commented out. `shell.nix` is a plain `mkShell` (zlib, sqlite, libpq, openssl, HLS). |
 
 ```bash
-# master, fix-api
-stack build
+stack build        # Stack installs GHC 9.6.7 and fetches the Telegram fork at its pinned commit
 
-# bump-9.6.7, with Cabal: clone the Telegram fork next to this repository first
+# or with Cabal: clone the Telegram fork next to this repository, at the commit that stack.yaml pins
 git clone https://github.com/ArthurVard/haskell-telegram-api.git ../haskell-telegram-api
+git -C ../haskell-telegram-api checkout 94c40a15515920a4919fb4dc1a7ee008d598765d
 cabal build all
 ```
 
-The `cabal.project` on `bump-9.6.7` takes the fork's working tree as it is, so check out the commit that `stack.yaml` pins
-(below) in the clone.
+Until November 2026 `master` was on GHC 9.4.8 (`lts-21.25`); the GHC 9.6.7 work came from the `bump-9.6.7` branch (see the
+README's Branches).
 
 ## Forked dependencies
 
 | Fork | Why | Pinned commit |
 |---|---|---|
-| [`ArthurVard/haskell-telegram-api`](https://github.com/ArthurVard/haskell-telegram-api) | The Telegram Bot API client: upstream `klappvisor/haskell-telegram-api` (Bot API 3.5) plus build fixes for newer GHCs | `4bfb0354` on `master`/`fix-api`, `94c40a15` on `bump-9.6.7` |
-| [`ArthurVard/fbmessenger-api-hs`](https://github.com/ArthurVard/fbmessenger-api-hs) | The Facebook Messenger client (dead code) | `409b9369` on `master`/`fix-api` |
+| [`ArthurVard/haskell-telegram-api`](https://github.com/ArthurVard/haskell-telegram-api) | The Telegram Bot API client: upstream `klappvisor/haskell-telegram-api` (Bot API 3.5) plus build fixes for newer GHCs | `94c40a15` |
+| [`ArthurVard/fbmessenger-api-hs`](https://github.com/ArthurVard/fbmessenger-api-hs) | The Facebook Messenger client (dead code; commented out in `stack.yaml`) | `409b9369` |
 
 ## System packages
 
@@ -42,7 +42,7 @@ Two build failures and their fixes, from the same notes:
 - `regex-pcre` failed (`[S-7011]`) until `pkg-config` was installed.
 
 The notes also list `libghc-regex-pcre-dev`, `libghc-regex-base-dev`, `libghc-regex-tdfa-dev`, `libpcre2-posix3`, `libgmp-dev`
-and `libgbm-dev`. The PostgreSQL client library (`libpq`) is in the Nix shell of `bump-9.6.7` as well.
+and `libgbm-dev`. The PostgreSQL client library (`libpq`) is in `shell.nix` as well.
 
 ## Executables
 
@@ -56,7 +56,10 @@ and `libgbm-dev`. The PostgreSQL client library (`libpq`) is in the Nix shell of
 | `surbgirq-sqlite` | `surbgirq-shell` | The lexicon into SQLite |
 | `surbgirq-db`, `surbgirq-service` | dead packages | Not in `stack.yaml`, so not built |
 
-Run them from the `surbgirq/` folder (`cd surbgirq && stack exec -- telegram-bot`): the default config paths are relative to it.
+The four `surbgirq-shell` executables aren't built at the moment (see the README's Known issues).
+
+Run them from the `surbgirq/` package folder inside the repository (`cd surbgirq && stack exec -- telegram-bot`; in a clone
+named `surbgirq`, that's `surbgirq/surbgirq/`): the default config paths are relative to it.
 
 ## Tests
 

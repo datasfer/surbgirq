@@ -9,16 +9,16 @@ word forms.
 REST API that serves the graph lives in [`datasfer/surbgirq-graph-api`](https://github.com/datasfer/surbgirq-graph-api)
 (ASP.NET Core); the bot reads the graph through it.
 
-**Status:** nothing here runs at the moment. The code is published as it was last changed (February 2026), without a new
-build. Bringing the bot back on a current stack is the next phase. Read
-[Known issues / security](#known-issues--security) before running any of it.
+**Status:** nothing here runs in public at the moment. `master` builds with Stack and GHC 9.6.7 (checked in November 2026);
+bringing the bot back on a current stack is the current phase. Read [Known issues / security](#known-issues--security) before
+running any of it.
 
 ## What's here
 
 | Part | What it does | Where |
 |---|---|---|
 | **Telegram bot** (`@SurbgirqBot`) | Looks up verses by reference, in chat and in inline mode, in several translations, with per-user settings ([docs/bot.md](docs/bot.md)) | `surbgirq-bot/*`; the `telegram-bot` executable in `surbgirq/` |
-| **Data pipeline** | Scrapes Bible texts from HTML into YAML, turns YAML into CSV for `neo4j-admin`, converts Theographic's KJV metadata, builds the lexicon ([docs/data-pipeline.md](docs/data-pipeline.md)) | `surbgirq-shell`: `html-scraper`, `surbgirq-shell`, `theographic`, `surbgirq-sqlite` |
+| **Data pipeline** | Scrapes Bible texts from HTML into YAML, turns YAML into CSV for `neo4j-admin`, converts Theographic's KJV metadata, builds the lexicon ([docs/data-pipeline.md](docs/data-pipeline.md)) | `surbgirq-shell`: `html-scraper`, `surbgirq-shell`, `theographic`, `surbgirq-sqlite` (not built at the moment; see [Known issues](#known-issues--security)) |
 | **Import scripts** | Bulk-load the CSVs into Neo4j ([docs/neo4j-import.md](docs/neo4j-import.md), [scripts/README.md](scripts/README.md)) | `scripts/`, `docker/` |
 | **Verse explorer** | A small server-rendered web page (Lucid): books and verses ([its README](surbgirq-web/verse-explorer/README.md)) | `surbgirq-web/verse-explorer/`; the `verse-explorer` executable |
 | Shared code | Domain types (books, chapters, verses, translations, Armenian and English book abbreviations), helpers, the API client | `surbgirq-types`, `surbgirq-utils`, `common`, `surbgirq-api/surbgirq-api-instances`, `surbgirq-api/surbgirq-neo4j-client` |
@@ -36,22 +36,22 @@ them. Released hasbolt versions still speak only Bolt 3, so they can't reach Neo
 
 ## Branches
 
-| Branch | Last change | What it is |
-|---|---|---|
-| `master` (default) | 2024-03 | The 2024 state: GHC 9.4.8 (Stackage `lts-21.25`), Neo4j 5.15 in Docker |
-| `bump-9.6.7` | 2026-02 | GHC 9.6.7 (`lts-22.44`) and Cabal build fixes with local clones of two forks; `surbgirq-shell` left out of the build (a `selda` conflict); the Facebook Messenger code commented out; Neo4j 5.26.6; a Nix shell |
-| `fix-api` | 2026-01 | The bot's API client switched to `surbgirq-graph-api`'s `/api/…` routes; Neo4j 5.18.1 |
+`master` is the only branch. Two side branches were brought into it on 2026-11-21, as four topic commits, and then deleted:
 
-Both newer branches start from `master` and haven't been merged; merging them is part of the revival. All three carry the same
-documentation, licence files and log clean-up from 2026.
+| Branch | Work | What it brought |
+|---|---|---|
+| `fix-api` | 2024-03 → 2026-01 | The bot's API client and the verse explorer's links on `surbgirq-graph-api`'s `/api/…` routes |
+| `bump-9.6.7` | 2025-05 → 2026-02 | GHC 9.6.7 (`lts-22.44`) and Cabal build fixes; `surbgirq-shell` and the Facebook Messenger packages left out of the build; Neo4j 5.26.6 in Docker; `hie.yaml` and a Nix shell |
+
+`fix-api`'s own commits are still on its pull request, [#1](https://github.com/datasfer/surbgirq/pull/1).
 
 ## Build and run
 
-The short version; system packages, the forks and the per-branch differences are in [docs/build.md](docs/build.md).
+The short version; system packages, the Cabal build and the fork are in [docs/build.md](docs/build.md).
 
 ```bash
-stack build                          # master and fix-api; bump-9.6.7: see docs/build.md
-cd surbgirq
+stack build                          # GHC 9.6.7 (lts-22.44); Stack installs the compiler and fetches the Telegram fork
+cd surbgirq                          # the package folder inside the repository: the config paths are relative to it
 stack exec -- telegram-bot           # the bot: config/bot-settings.yaml, webhook server on port 5000
 stack exec -- verse-explorer         # the web page: config/verse-explorer.yaml, port 8009
 ```
@@ -86,7 +86,10 @@ The bot also needs its own token ([docs/bot.md](docs/bot.md)), the graph in Neo4
 - **2021:** the verse explorer; Narek.
 - **2022:** the text data moved out of this repository.
 - **2024:** the Neo4j 5 bulk import: 916,443 nodes and 996,178 relationships in one run.
-- **2025–2026:** the GHC 9.6.7 upgrade (`bump-9.6.7`) and the switch to `surbgirq-graph-api`'s routes (`fix-api`).
+- **2025–2026:** the GHC 9.6.7 upgrade (`bump-9.6.7`) and the switch to `surbgirq-graph-api`'s routes (`fix-api`), on two
+  side branches.
+- **2026-11:** published; the two side branches brought into `master`; the dead `surbgirq` executable removed, and with it
+  hasbolt and the `hs-connection` fork.
 - **The history was rewritten before publishing (2026).**
   - Secrets and server addresses were replaced by `CHANGE_ME`, `REMOVED-TELEGRAM-TOKEN`, `REMOVED-FACEBOOK-TOKEN`,
     `REMOVED-SENDGRID-KEY` and `192.0.2.x` documentation addresses.
@@ -109,17 +112,19 @@ Nothing runs this code in public at the moment. Fix these before it does:
 | **The webhook is open:** no secret path, and no `X-Telegram-Bot-Api-Secret-Token` check (the check is a stub, `let b = True`). | Set `secret_token` in `setWebhook` and check the header |
 | **A failing handler answers 500,** so Telegram retries and holds back that chat's later updates. Some handlers call `error` when an API call fails. | Catch errors, always answer 200 |
 | The bot's logs were cut down before publishing (no token, no user data), so they say little about failures. | Structured logging that never prints the token or user data |
-| `fix-api`: the bot asks `surbgirq-graph-api` for one verse and for sections under `api/scriptures/…`, but the API serves them under `api/verses/…`; `…/verses/count` always returns 100. | Align the two when the bot runs again |
+| The bot asks `surbgirq-graph-api` for one verse and for sections under `api/scriptures/…`, but the API serves them under `api/verses/…`; `…/verses/count` always returns 100. The verse explorer forwards the same routes. | Align the two when the bot runs again |
 | The API address is hard-coded (`http://localhost:33010` in `ClientRequests.hs`). | Configuration |
 | A reference without a translation word uses the translation of its book abbreviation: Armenian abbreviations mean the 1994 translation (which public data won't include), English ones the KJV. The user's translation setting is ignored for references. | Use the setting as the default, and default to a public text |
 | User settings live in memory (an STM `TVar`) and are lost on restart. | A small persistent store |
 | The Docker Compose files run **Neo4j Enterprise** and accept its commercial licence (`NEO4J_ACCEPT_LICENSE_AGREEMENT=yes`). | Neo4j Community ([docs/neo4j-import.md](docs/neo4j-import.md)) |
+| **The Compose file publishes Neo4j's ports 7474 and 7687 on every interface,** which Docker opens past a host firewall such as `ufw`, and it lowers the minimum password length to 1 (`NEO4J_dbms_security_auth__minimum__password__length`). | Publish the ports on `127.0.0.1` only (or not at all); drop that setting |
 | On Neo4j 2026.x the import needs `--vector-delimiter` (its default, `;`, is our column delimiter), and `--multiline-fields=true` slows the whole import although only Easton's dictionary needs it. | [docs/neo4j-import.md](docs/neo4j-import.md) |
 | The verse explorer was adapted from an earlier block-explorer prototype by the same author: `app.js` still has a live counter and a filter dialog that nothing feeds, and some names (`txhash`, `tx-list`) remain. Its search always answers "Not found"; `/about` is a placeholder. | Rework the page during the revival |
+| **The data pipeline (`surbgirq-shell`) is out of the build** since the GHC 9.6.7 upgrade: the author's note in `stack.yaml` names a `selda` conflict. So the CSV converters can't be rebuilt from `master` at the moment. | Update or replace `selda`, and bring the package back |
 | `html-scraper --z1805` runs the v1805 parser; `--json` and `--csv` still write YAML. `theodata/ar94-books.yaml` points at `e1994-T`. | Fix with the next pipeline run |
 | Tests are stubs ("not yet implemented"); `surbgirq-db`'s test needs a live Neo4j; several test suites name modules that don't exist. | Real tests where the code is touched |
-| `master`'s `cabal.project` doesn't list the forked dependencies, so a plain Cabal build can't resolve them; use Stack there. | One build setup after merging the branches |
-| The Facebook Messenger integration (2020) is dead code, and commented out on `bump-9.6.7`. | Remove it |
+| `cabal.project` needs a local clone of the Telegram fork next to the repository (`../haskell-telegram-api`), and lists the dead `surbgirq-api`, which `stack.yaml` doesn't build. Stack fetches the fork itself. | A `source-repository-package` entry for the fork; one package list for both tools |
+| The Facebook Messenger integration (2020) is dead code; its packages are commented out of the build. | Remove it |
 
 ## License
 

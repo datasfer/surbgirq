@@ -13,7 +13,7 @@ are in [docs/neo4j-import.md](../docs/neo4j-import.md).
 | `narek-xer.sh` | Narek in Kheranyan's translation | `narek.xeranyan` |
 | `narek-grabar.sh` | nothing yet (an empty file) | — |
 | `neo4j_4/` | the same imports for Neo4j 4.x (`neo4j-admin import --database=…`: `bibleam`, `somebibleam`, `vizbible`); `load_scv.sh` loads CSVs with Cypher instead | — |
-| `refactoring-idea-all-import.sh` (`bump-9.6.7` only) | a draft of a parameterized `all-import.sh` | — |
+| `refactoring-idea-all-import.sh` | a draft of a parameterized `all-import.sh` | — |
 
 Neo4j 5 changed the command: `neo4j-admin import --database=<name>` (4.x) became `neo4j-admin database import full <name>`
 (5.x). On 5.26 the database name goes first: `neo4j-admin database import full <name> --other-options…`

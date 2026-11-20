@@ -73,7 +73,7 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
 
    `_env:NAME:default` reads an environment variable, with a default. Set `BOT_API_URL` and `BOT_API_PORT` only for a
    self-hosted Bot API server (below).
-4. **Start it:** `cd surbgirq && stack exec -- telegram-bot`. It serves `GET /version` and `POST /tg-webhook` on port 5000.
+4. **Start it** from the `surbgirq/` package folder inside the repository: `cd surbgirq && stack exec -- telegram-bot`. It serves `GET /version` and `POST /tg-webhook` on port 5000.
 5. **HTTPS and the webhook.** Telegram delivers webhooks over HTTPS only, on port 443, 80, 88 or 8443. The author ran nginx
    with a Let's Encrypt certificate in front of the bot:
 
@@ -113,12 +113,11 @@ log the bot out of the cloud server once (`https://api.telegram.org/bot<token>/l
 
 ## The API the bot calls
 
-`Surbgirq.Bot.ClientRequests` calls the graph API at `http://localhost:33010`:
-
-- on `master`, the 2020 .NET API's routes, e.g. `/scripture/{translation}/books/{book}/chapters/{chapter}/verses/{from}?v2={to}`;
-- on `fix-api`, `surbgirq-graph-api`'s `/api/…` routes. Four of them don't match the API yet (README, Known issues).
+`Surbgirq.Bot.ClientRequests` calls the graph API at `http://localhost:33010`, on `surbgirq-graph-api`'s `/api/…` routes. Four
+of them don't match the API yet (README, Known issues). Until 2026 the bot called the 2020 .NET API's routes, e.g.
+`/scripture/{translation}/books/{book}/chapters/{chapter}/verses/{from}?v2={to}`.
 
 ## Facebook Messenger
 
-A Messenger integration from 2020 (`Surbgirq.Bot.FB.*` and the `fbmessenger-api-hs` fork) is dead code; `bump-9.6.7`
-comments it out.
+A Messenger integration from 2020 (`Surbgirq.Bot.FB.*` and the `fbmessenger-api-hs` fork) is dead code; its packages are
+commented out of the build.
