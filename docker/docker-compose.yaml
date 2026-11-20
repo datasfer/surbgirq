@@ -1,57 +1,92 @@
 version: '3.8'
-networks:
-  neo4j_network:
+
 services:
   neo4j-docker:
     container_name: neo
     hostname: neo4j
-    image: neo4j:5.15.0-enterprise
+    image: neo4j:5.26.6-enterprise  # <- latest 5.x LTS version
+    user: "1000:999"
+    restart: always
     networks:
       - neo4j_network
-    user: "1000:999" # Allow write access for neo4j
     environment:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_dbms_connector_bolt_listen__address=0.0.0.0:7687
+      # Advertise your real hostname (or A-record domain)
+      - NEO4J_dbms_connector_bolt_advertised__address=neo4j.datasfer.com:7687
       - NEO4J_AUTH=neo4j/CHANGE_ME
       - NEO4J_dbms_security_auth__minimum__password__length=1
       - NEO4J_server_memory_heap_initial__size=512M
       - NEO4J_server_memory_heap_max__size=4G
       - NEO4J_server_memory_pagecache_size=2G
-      - NEO4J_dbms_connector_bolt_advertised__address=127.0.0.1:7687
+      #- NEO4J_server_bolt_advertised__address=0.0.0.0:7687
     ports:
-      - 7474:7474
-      - 7687:7687
+      - 7474:7474  # HTTP
+      - 7687:7687  # Bolt
     volumes:
-      # <host_source>:<container_destination>:<options>
       - neo4j_data:/data
       - neo4j_conf:/conf
-      - neo4j_data:/import
-      - neo4j_data:/plugin
-      - neo4j_data:/logs
-      - scripts:/scripts
-    restart: always
+      - neo4j_import:/import
+      - neo4j_plugins:/plugins
+      - neo4j_logs:/logs
+      - scriptures:/scriptures
+      - scripts:/import-scripts
     healthcheck:
-      test: wget http://localhost:7474 || exit 1
-      interval: 1s
+      test: ["CMD", "curl", "-f", "http://localhost:7474"]
+      interval: 10s
       timeout: 10s
-      retries: 20
-      start_period: 3s
+      retries: 5
+      start_period: 15s
+
+networks:
+  neo4j_network:
+
 volumes:
   neo4j_data:
     driver: local
     driver_opts:
-      o: bind
       type: none
-      device: $HOME/scriptures
+      o: bind
+      device: ${HOME}/neo4j_data/data
+
   neo4j_conf:
     driver: local
     driver_opts:
-      o: bind
       type: none
-      device: $HOME/scriptures/conf
+      o: bind
+      device: ${HOME}/neo4j_data/conf
+
+  neo4j_import:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/neo4j_data/import
+
+  neo4j_plugins:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/neo4j_data/plugins
+
+  neo4j_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/neo4j_data/logs
+
+  scriptures:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/scriptures
+
   scripts:
     driver: local
     driver_opts:
-      o: bind
       type: none
-      device: $HOME/surbgirq/scripts
-
+      o: bind
+      device: ../scripts

@@ -15,7 +15,7 @@ export SCRIPTURES=./scriptures
 export HEADERS=./scriptures/headers
 export ARMATS=./words
 
-neo4j-admin database import full \
+neo4j-admin database import full  bibles \
     --verbose \
     --id-type STRING \
     --delimiter ";" \
@@ -90,7 +90,7 @@ neo4j-admin database import full \
     --relationships="$KJV/Verse_EventRel.csv" \
     --relationships="$KJV/Event_YearRel.csv" \
     --relationships="$KJV/Commentary_EastonRel.csv" \
-    --relationships="$KJV/Translation_KJVRel.csv" \
-    bibles
+    --relationships="$KJV/Translation_KJVRel.csv" 
+    
 # --nodes=Movie=movies.csv --nodes=Actor=actors.csv --relationships=roles.csv \
     
