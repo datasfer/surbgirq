@@ -32,11 +32,7 @@ handleWebhook :: Update -> Bot ()
 handleWebhook update = do
               liftIO $ print "Hook comes"
 
-              Token token <- asks telegramToken
               let b = True -- (EQ == compare secret token)
-              liftIO $ print $ show b
---              liftIO $ print $ show secret
-              liftIO $ print $ show token
 
               if b
                  then handleUpdate update

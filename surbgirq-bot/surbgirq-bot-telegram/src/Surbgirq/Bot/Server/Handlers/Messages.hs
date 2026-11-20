@@ -44,15 +44,13 @@ handleMessage msg@Message{..} = do
   --   Nothing   -> do
   --               liftIO $ putStrLn $ "Erro: message has not from: to get user_id " ++ (show msg)
   --               return ()
-  liftIO $ putStrLn [qc|=========== Message Handler {msg} Message =================|]
-  liftIO $ putStrLn [qc|=========== u_id {userId}|]
 
   BotConfig{..} <- ask
   cfg <- getUserConfig userId
 
   case text of
     Nothing -> do
-              liftIO $ putStrLn $ ">>>>>> Message text is null: \n" ++ (show msg)
+              liftIO $ putStrLn ">>>>>> Message without text"
     Just messageText -> onCommand userId messageText
 
   -- liftIO $ atomically $ do
@@ -93,7 +91,6 @@ handleMessage msg@Message{..} = do
 showSettings :: ChatId -> UserId -> Bot ()
 showSettings chatId userId = do
     lang <- getLanguage ( unUserId userId)
-    liftIO $ putStrLn [qc|=========== UserId {userId} | lang: {lang}|]
     sendTextReplyKb (settingsKeyboardReplyMarkup lang) chatId "Settings"
 
 testMd :: ChatId -> Bot ()

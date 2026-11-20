@@ -198,10 +198,9 @@ sendTextReplyKb keyborad chatId msg = do
     BotConfig{..} <- ask
     let request = SendMessageRequest chatId msg (Just HTML) Nothing Nothing Nothing (Just keyborad)
     res <- ($) sendMessage telegramToken request manager
-    liftIO $ putStrLn $ show res
     let id_ = case res of
                 Right rm -> message_id $ result rm
-                Left e   -> error $ show e
+                Left _   -> error "sendTextReplyKb: sendMessage failed"
     liftIO $ writeIORef ref id_
 
     return ()
@@ -235,7 +234,6 @@ sendTextInlineReplyKb keyboard chatId msg = do
             -- SendMessageRequest chatId msg Nothing Nothing Nothing Nothing (Just keyborad)
         request = AnswerInlineQueryRequest msg [inlineQuery] apiCachTime Nothing Nothing Nothing Nothing
     res <- ($) answerInlineQuery telegramToken request manager
-    liftIO $ putStrLn $ show res
     return ()
 
 parseChatCommandArgs :: Text -> [String]
