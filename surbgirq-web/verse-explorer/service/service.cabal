@@ -66,7 +66,7 @@ test-suite service-spec
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
   main-is:          Spec.hs
-  other-modules:    BE.Server
+  other-modules:    VE.Server
                     Paths_service
   build-depends:    base ^>=4.17.2.1
                   , bytestring

@@ -29,7 +29,7 @@ $( document ).ready(function() {
      });
 
     $('#btnFilter').on('click', function () {
-        window.location.href = '/blocks';
+        window.location.href = '/verses';
         MicroModal.close("modal-1");
 
     })
@@ -68,20 +68,20 @@ MicroModal.init({
    *
    * @type {Number | null}
    */
-  var originalBlockCount = null;
-  var blockCount = 0;
+  var originalVerseCount = null;
+  var verseCount = 0;
   var wssProtocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(wssProtocol + '://' + window.location.host + '/block/channels/notify-new');
+  var ws = new WebSocket(wssProtocol + '://' + window.location.host + '/verse/channels/notify-new');
   ws.onmessage = function (msg) {
     var newCount = parseInt(msg.data);
     if (!isNaN(newCount)) {
-      blockCount = newCount;
+      verseCount = newCount;
     }
-    // Initialize originalBlockCount with first count from server
-    if (originalBlockCount === null) {
-      originalBlockCount = newCount;
+    // Initialize originalVerseCount with first count from server
+    if (originalVerseCount === null) {
+      originalVerseCount = newCount;
     }
-    $('#block_count').text(msg.data)
+    $('#verse_count').text(msg.data)
     console.debug(msg);
   }
   var originalTitle = document.title;
@@ -90,43 +90,43 @@ MicroModal.init({
     document.title = prefix + ' ' + originalTitle;
   }
 
-  var $blocks = $('.blocks-list');
-  var $refreshBtn = $('.blocks-update');
-  function handleBlockUpdates () {
+  var $verses = $('.verses-list');
+  var $refreshBtn = $('.verses-update');
+  function handleVerseUpdates () {
     var updatesPending = false;
     var updatesCount = 0;
-    if (isNaN(originalBlockCount)){
+    if (isNaN(originalVerseCount)){
       updatesPending = true
     } else {
-      updatesCount = blockCount - originalBlockCount
+      updatesCount = verseCount - originalVerseCount
       updatesPending = updatesCount > 0
     }
 
     if (updatesPending) {
-      $('.blocks-update', $blocks).text(renderUpdatedBlocksMsg(updatesCount));
+      $('.verses-update', $verses).text(renderUpdatedVersesMsg(updatesCount));
 
-      if (!$blocks.hasClass('updated')) {
-        $($blocks).addClass('updated');
+      if (!$verses.hasClass('updated')) {
+        $($verses).addClass('updated');
         $refreshBtn.slideDown();
       }
       prependTitle('(*)')
     }
   }
 
-  function renderUpdatedBlocksMsg(count) {
+  function renderUpdatedVersesMsg(count) {
     if (count === 1) {
-      return "One block"
+      return "One verse"
     } else {
-      return count + " blocks"
+      return count + " verses"
     }
   }
 
-  // do not bother with new blocks custom handler if there's no blocks list on page
-  if ($blocks.length && $blocks.length > 0) {
-    var blocksUrl = $('#menu-blocks').attr('href'); // see Lucid.Helper.mkMenu_ for ID generation
-    $($refreshBtn).on('click', function () {window.location.href = blocksUrl;});
+  // do not bother with new verses custom handler if there's no verses list on page
+  if ($verses.length && $verses.length > 0) {
+    var versesUrl = $('#menu-verses').attr('href'); // see Lucid.Helper.mkMenu_ for ID generation
+    $($refreshBtn).on('click', function () {window.location.href = versesUrl;});
     var timeout = 10 * 1000 // milliseconds
-    setInterval(handleBlockUpdates.bind(this), timeout)
+    setInterval(handleVerseUpdates.bind(this), timeout)
   }
 
   // tx filtering
@@ -146,7 +146,7 @@ var modalHTML  =
       <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
          <header class="modal__header">
             <h2 class="modal__title" id="modal-1-title">
-               Hide blocks with:
+               Hide verses with:
             </h2>
             <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
          </header>

@@ -116,7 +116,7 @@ mkMenu_ (Logo txt url) =
     toHtml txt
 mkMenu_ (Counter _txt url) =
   with li_ [class_ "nav-item"] $
-  a_ [class_ "nav-link", href_ url] $ do span_ [id_ "block_count", class_ "block-counter"] "*"
+  a_ [class_ "nav-link", href_ url] $ do span_ [id_ "verse_count", class_ "verse-counter"] "*"
 mkMenu_ (Menu txt url) =
   with li_ [class_ "nav-item"] $ a_ [class_ "nav-link", href_ url, id_ (mkId txt)] (toHtml txt)
   where
@@ -135,10 +135,10 @@ navBar :: Monad m => HtmlT m ()
 navBar = do
   a_ [class_ "navbar-brand", href_ "/#"] $ do
            img_ [src_ "/static/img/cross-transparent.png", style_ "width: 35px;"]
-  button_ [class_ "navbar-toggler",  type_ "button", data_toggle_ "collapse", data_target_ "#bexNav",
-               aria_controls_ "bexNav", aria_expanded_ "false", aria_label_ "Toggle navigation"] $
+  button_ [class_ "navbar-toggler",  type_ "button", data_toggle_ "collapse", data_target_ "#vexNav",
+               aria_controls_ "vexNav", aria_expanded_ "false", aria_label_ "Toggle navigation"] $
           span_ [class_ "navbar-toggler-icon"] ""
-  div_ [id_ "bexNav", class_ "navbar-collapse collapse" ] $ do
+  div_ [id_ "vexNav", class_ "navbar-collapse collapse" ] $ do
            ul_ [class_ "navbar-nav mr-auto"] (mapM_ mkMenu_ siteMenu )
            form_ [action_ "/search", method_ "post", class_ "form-inline", style_ "margin-bottom: auto;"] $
                div_ [class_ "md-form", style_ "display: inline;"] $ do
