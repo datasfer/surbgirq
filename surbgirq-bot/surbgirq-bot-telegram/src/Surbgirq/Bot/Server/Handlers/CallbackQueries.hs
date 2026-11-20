@@ -48,10 +48,8 @@ import Surbgirq.Utils
 handleCallbackQuery :: CallbackQuery -> Bot ()
 handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
   BotConfig{..} <- ask
-  liftIO $ putStrLn [qc|=========== callback Query {cbq}|]
   cfg <- getUserConfig (UserId user_id)
   let  lang = config'menuLanguage cfg
-  liftIO $ putStrLn [qc|=========== User settings {cfg}|]
 
   maybe (return ()) (onCommand cfg) cq_data
 
@@ -162,7 +160,6 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
           us <- modifyUserConfig userId cfg'
           let  lang = config'menuLanguage cfg
 
-          liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'} - returned {us}|]
           liftIO $ putStrLn [qc|=========== modifed settings user: {bibleName} |]
           editRespuesta chatId msg_id inline_msg_id [qc|Bibles - choosed {bibleName}|] $ Just (biblesKeyboardMarkup lang bibleName)
           showToolTip cqId $ Just bibleName
@@ -179,7 +176,6 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
           us <- modifyUserConfig userId cfg'
           let  lang = config'menuLanguage cfg
 
-          liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'} - returned {us}|]
           liftIO $ putStrLn [qc|=========== modifed settings user: {bibleName} |]
           editRespuesta chatId msg_id  inline_msg_id [qc|Parallel Bibles - choosed {pSet}|] $
                         Just (parallelBiblesKeyboardMarkup lang pSet)
@@ -194,7 +190,6 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
           us <- modifyUserConfig userId cfg'
           let  lang = config'menuLanguage cfg
 
-          liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'} - returned {us}|]
           liftIO $ putStrLn [qc|=========== modifed settings user: {narekTranslationName} |]
           editRespuesta chatId msg_id inline_msg_id  [qc|Narek - choosed {narekTranslationName}|] $
                         Just (nareksKeyboardMarkup lang narekTranslationName)
@@ -212,7 +207,6 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
           us <- modifyUserConfig userId cfg'
           let  lang = config'menuLanguage cfg
 
-          liftIO $ putStrLn [qc|=========== modifed settings user: {userId} {cfg'} - returned {us}|]
           liftIO $ putStrLn [qc|=========== modifed settings user: {narekName} |]
           editRespuesta chatId msg_id  inline_msg_id [qc|Parallel Nareks - choosed {pSet}|] $
                         Just (parallelNareksKeyboardMarkup lang pSet)
@@ -294,7 +288,6 @@ editRespuesta chatId  msgId inlineMsgId msg keyborad = do
                 (Just HTML)
                 Nothing keyborad
   res <- ($) editMessageText telegramToken request manager
-  liftIO $ putStrLn $ show res
   -- let id_ = case res of
   --             Right rm -> message_id $ result rm
   --             Left e   -> error $ show e

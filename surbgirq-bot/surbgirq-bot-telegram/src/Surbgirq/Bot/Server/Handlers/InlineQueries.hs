@@ -45,13 +45,12 @@ import Surbgirq.Utils
 
 handleInlineQuery :: InlineQuery -> Bot ()
 handleInlineQuery iq@InlineQuery{query_from = User{..}, ..} = do
-  liftIO $ putStrLn $ "Inline query -> " ++ (show iq)
   let query = if T.length query_offset > 0
               then query_offset
               else query_query
   onCommand query
   cfg@UserSettings{..} <- getUserConfig (UserId user_id)
-  liftIO $ putStrLn $  show cfg
+  return ()
 
   where
     onCommand (T.stripPrefix "/random" -> Just _)      = return ()
@@ -138,7 +137,7 @@ inlineReadVerses' userId iqId verseRef@VerseReference{..} = do
   res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
-      _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
+      _ <- liftIO $ putStrLn "Error: answerInlineQuery failed"
       return ()
     Right r -> do
       _ <- liftIO $ putStrLn $ "Response: " ++ (show r)
@@ -235,7 +234,7 @@ inlineVerse userId iqId verseRef@VerseReference{..} = do
   res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
-      _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
+      _ <- liftIO $ putStrLn "Error: answerInlineQuery failed"
       return ()
     Right r -> do
       _ <- liftIO $ putStrLn $ "Response: " ++ (show r)
@@ -317,7 +316,7 @@ inlineChapter userId iqId (girq, trans) = do
   res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
-      _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
+      _ <- liftIO $ putStrLn "Error: answerInlineQuery failed"
       return ()
     Right r -> do
       _ <- liftIO $ putStrLn $ "Response: " ++ (show r)
@@ -362,7 +361,7 @@ inlineSettings iqId = do
   res <- ($) answerInlineQuery telegramToken request manager
   case res of
     Left e -> do
-      _ <- liftIO $ putStrLn $ "Error: " ++ (show e)
+      _ <- liftIO $ putStrLn "Error: answerInlineQuery failed"
       return ()
     Right r -> do
       _ <- liftIO $ putStrLn $ "Response: " ++ (show r)
