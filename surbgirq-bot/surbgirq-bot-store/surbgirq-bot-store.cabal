@@ -25,7 +25,7 @@ library
   other-modules: Paths_surbgirq_bot_store
                  Surbgirq.Bot.Store.Query
                  Surbgirq.Bot.Store.Types
-  build-depends: base ^>=4.17.2.1
+  build-depends: base >= 4.17.2.1 && < 5
                , surbgirq-types
                , surbgirq-bot-state
                , surbgirq-bot-types
@@ -47,7 +47,7 @@ test-suite surbgirq-bot-store-test
   other-modules: Paths_surbgirq_bot_store
   hs-source-dirs: test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends: base ^>=4.17.2.1
+  build-depends: base >= 4.17.2.1 && < 5
                , surbgirq-types
   default-extensions: TemplateHaskell
                       OverloadedStrings

@@ -1,14 +1,11 @@
+with-compiler: ghc-9.6.7
 packages:
+  -- local packages
   surbgirq-types
   surbgirq-utils
-  
-#  surbgirq-api/surbgirq-api
-#  surbgirq-api/surbgirq-api-client
+  surbgirq-api/surbgirq-api
   surbgirq-api/surbgirq-api-instances
   surbgirq-api/surbgirq-neo4j-client
-  surbgirq-shell
-#  surbgirq-db
-#  surbgirq-service
   surbgirq-bot/surbgirq-bot-telegram
   surbgirq-bot/surbgirq-bot-state
   surbgirq-bot/surbgirq-bot-store
@@ -16,3 +13,8 @@ packages:
   surbgirq-web/verse-explorer/service
   common
   surbgirq
+
+  -- external cloned deps
+  ../haskell-telegram-api
+  -- ../fbmessenger-api-hs
+  ../hs-connection

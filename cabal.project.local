@@ -1,0 +1,3 @@
+package *
+  -- Tweak -j based on your CPU cores.
+  ghc-options: -j4 +RTS -A128m -n4m -RTS

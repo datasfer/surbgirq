@@ -23,8 +23,7 @@ import qualified Data.Text            as T
 import qualified Web.Telegram.API.Bot as Tg
 
 -- import Servant.API    (botApiHost)
-import Servant.Client
-    (BaseUrl(..), ClientEnv(..), ClientError, Scheme(..), defaultMakeClientRequest)
+import Servant.Client (BaseUrl(..), ClientEnv(..), ClientError, Scheme(..), mkClientEnv)
 
 import Surbgirq.Bot.Monad
 import Surbgirq.Bot.Types
@@ -54,7 +53,7 @@ runCustomClient tcm token manager = do
     let url = T.unpack $ botApiHost
         telegramBaseUrl = BaseUrl Https url botApiPort ""
 
-    liftIO $ Tg.runClient' tcm token (ClientEnv manager telegramBaseUrl Nothing defaultMakeClientRequest)
+    liftIO $ Tg.runClient' tcm token (mkClientEnv manager telegramBaseUrl)
 
 -- IO context seems more preferable, it easy to lift than unlift
 -- sendMessage :: Token -> SendMessageRequest -> Manager -> Bot (Either ClientError MessageResponse)

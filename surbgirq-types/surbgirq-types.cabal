@@ -1,6 +1,4 @@
 cabal-version:      3.0
-
-
 name:           surbgirq-types
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/arthurvard/surbgirq-types#readme>
@@ -33,7 +31,7 @@ library
                  Surbgirq.Types.Instances
                  Surbgirq.Types.Abbreviation.GirqAbbr
                  Surbgirq.Types.Abbreviation.TranslationIDAbbr
-  build-depends: base ^>=4.17.2.1
+  build-depends: base >= 4.17.2.1 && < 5
                , common
                , aeson
                , text
@@ -49,7 +47,7 @@ test-suite surbgirq-types-test
   other-modules: Paths_surbgirq_types
   hs-source-dirs: test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends: base ^>=4.17.2.1
+  build-depends: base >= 4.17.2.1 && < 5
                , surbgirq-types
   default-extensions: TemplateHaskell
                       OverloadedStrings

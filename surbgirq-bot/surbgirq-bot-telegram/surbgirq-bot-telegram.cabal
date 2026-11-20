@@ -58,7 +58,7 @@ library
                  Surbgirq.Bot.Server.Helpers.HelpMessages
 
   hs-source-dirs: src
-  build-depends: base ^>=4.17.2.1
+  build-depends: base >= 4.17.2.1 && < 5
                , surbgirq-neo4j-client
                , surbgirq-types
                , surbgirq-bot-state
@@ -70,7 +70,7 @@ library
                  --
                , telegram-api
               -- , fbmessenger-api
-               , fb
+              -- , fb
                , aeson
                , servant >= 0.16                                                                                                                                                                                                         
                , servant-server                                                                                                                                                                                                          
@@ -98,7 +98,7 @@ library
 --   other-modules: Paths_surbgirq_bot_telegram
 --   hs-source-dirs: app
 --   ghc-options: -threaded -rtsopts -with-rtsopts=-N
---   build-depends: base ^>=4.17.2.1
+--   build-depends: base >= 4.17.2.1 && < 5
 --                , surbgirq-bot-telegram
 --                , text
 --   default-language: Haskell2010
@@ -109,6 +109,6 @@ test-suite surbgirq-telebot-test
   other-modules: Paths_surbgirq_bot
   hs-source-dirs: test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends: base ^>=4.17.2.1
+  build-depends: base >= 4.17.2.1 && < 5
                , surbgirq-bot
   default-language: Haskell2010

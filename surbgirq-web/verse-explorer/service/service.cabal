@@ -28,7 +28,7 @@ library
 
 --  ghc-options:     -Wall -Werror
   hs-source-dirs:   src/
-  build-depends:    base ^>=4.17.2.1
+  build-depends: base >= 4.17.2.1 && < 5
                   , surbgirq-types
                   , surbgirq-neo4j-client
                   , surbgirq-bot-telegram
@@ -68,7 +68,7 @@ test-suite service-spec
   main-is:          Spec.hs
   other-modules:    VE.Server
                     Paths_service
-  build-depends:    base ^>=4.17.2.1
+  build-depends: base >= 4.17.2.1 && < 5
                   , bytestring
                   , hspec
                   , QuickCheck
