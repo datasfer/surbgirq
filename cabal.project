@@ -17,4 +17,3 @@ packages:
   -- external cloned deps
   ../haskell-telegram-api
   -- ../fbmessenger-api-hs
-  ../hs-connection

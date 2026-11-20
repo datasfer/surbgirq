@@ -119,7 +119,6 @@ Nothing runs this code in public at the moment. Fix these before it does:
 | `html-scraper --z1805` runs the v1805 parser; `--json` and `--csv` still write YAML. `theodata/ar94-books.yaml` points at `e1994-T`. | Fix with the next pipeline run |
 | Tests are stubs ("not yet implemented"); `surbgirq-db`'s test needs a live Neo4j; several test suites name modules that don't exist. | Real tests where the code is touched |
 | `master`'s `cabal.project` doesn't list the forked dependencies, so a plain Cabal build can't resolve them; use Stack there. | One build setup after merging the branches |
-| The `surbgirq` executable opens a hasbolt connection pool and never serves; on `bump-9.6.7` it is the only reason the build needs the `hs-connection` fork. | Remove it together with the dead packages |
 | The Facebook Messenger integration (2020) is dead code, and commented out on `bump-9.6.7`. | Remove it |
 
 ## License
