@@ -5,7 +5,7 @@ shared, so the graph can be rebuilt from the right sources, with credit.
 
 | Dataset | IDs in the code | Digital source used | Status | Shared? |
 |---|---|---|---|---|
-| **Zohrab Bible**, Venice 1805, Classical Armenian (Grabar), edited by Hovhannes Zohrabian, with his variant notes | `v1805-T`, `z1805-T` | `v1805`: an EPUB e-book, probably made from qahana.am's typed text (to be confirmed). `z1805`: the Zohrab text of the Arak29 Foundation's site (bible.armeniancathedral.org), with the variant notes | Public domain | Planned, as a release download |
+| **Zohrab Bible**, Venice 1805, Classical Armenian (Grabar), edited by Hovhannes Zohrabian, with his variant notes | `v1805-T`, `z1805-T` | `v1805`: the EPUB e-book from [bible.ovanitas.com](https://bible.ovanitas.com/) (Ovanitas, 2018), made from qahana.am's typed text; its pages were extracted and parsed. `z1805`: the Zohrab text of the Arak29 Foundation's site (bible.armeniancathedral.org), with the variant notes | Public domain | Planned, as a release download |
 | **Narek**, Grigor Narekatsi's *Book of Lamentations* (about 1002), the Classical Armenian original, 95 chapters | `narekaci-T` (`Narek_Grabar`) | to be confirmed | Public domain | Planned, once the source is confirmed |
 | **King James Version** (the 1769 text) | `kjv-T` | through Theographic | Public domain, except in the UK (Crown rights) | Through Theographic |
 | **Theographic Bible Metadata**: people, places, events, years, people groups, Easton's Bible Dictionary (1897), all linked to KJV verses; by Robert Rouse | the KJV layer | [github.com/robertrouse/theographic-bible-metadata](https://github.com/robertrouse/theographic-bible-metadata) | CC BY-SA 4.0, which applies to the CSVs derived from it too | Download it from its repository and convert it with `theographic` |
@@ -26,7 +26,8 @@ translations); `theodata/corpora.conf` doesn't include them.
 
 ## Credits
 
-- **qahana.am:** typed texts of the Armenian Bible: the saved pages, and probably the e-book's source.
+- **qahana.am:** typed texts of the Armenian Bible: the saved pages, and the text of the Ovanitas e-book.
+- **Ovanitas** ([bible.ovanitas.com](https://bible.ovanitas.com/)): the Zohrab 1805 e-book (EPUB) that `v1805` was parsed from.
 - **The Arak29 Charitable Foundation** (arak29.org, bible.armeniancathedral.org): the annotated Classical Armenian Bible and
   the Zohrab text with variant notes.
 - **Theographic Bible Metadata** by Robert Rouse (CC BY-SA 4.0), and the sources it credits.
