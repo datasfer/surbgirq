@@ -52,7 +52,7 @@ runAppM e = runStdoutLoggingT . flip runReaderT e . unAppM
 api :: Proxy ExplorerAPI
 api = Proxy
 
--- | Make WAI application of a blockexper api  server
+-- | Make WAI application of a verse explorer API server
 app :: Application
 app  = simpleCors $ logStdoutDev $
         serve api $ (hoistServer api liftIO server)
