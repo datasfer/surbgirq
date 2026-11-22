@@ -59,6 +59,34 @@ stack exec -- verse-explorer         # the web page: config/verse-explorer.yaml,
 The bot also needs its own token ([docs/bot.md](docs/bot.md)), the graph in Neo4j
 ([docs/neo4j-import.md](docs/neo4j-import.md)), and `surbgirq-graph-api` listening on `localhost:33010`.
 
+## Secrets
+
+No secret is committed. Tokens and passwords come from environment variables, set in git-ignored files (`.env` and
+`.env.*`, except `.env.example`):
+
+- **the bot's token:** still hard-coded until the next fix; see [Known issues](#known-issues--security).
+
+**A pre-commit hook** in [`.githooks/`](.githooks/pre-commit) stops a commit when a staged file contains anything
+[gitleaks](https://github.com/gitleaks/gitleaks) finds, a Telegram bot token in any form, or a literal password in a config
+file. Turn it on once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+It needs gitleaks 8.19 or newer on your `PATH`: `winget install --id Gitleaks.Gitleaks --exact` on Windows,
+`brew install gitleaks` on macOS. On Linux, download `gitleaks_<version>_linux_x64.tar.gz` and
+`gitleaks_<version>_checksums.txt` from its [releases](https://github.com/gitleaks/gitleaks/releases), then:
+
+```bash
+sha256sum --ignore-missing -c gitleaks_*_checksums.txt
+tar -xzf gitleaks_*_linux_x64.tar.gz gitleaks
+install -D -m 755 gitleaks ~/.local/bin/gitleaks
+```
+
+The hook names the file and the line, never the value. On a false alarm, check twice, then commit once with
+`git commit --no-verify`.
+
 ## Data
 
 - **This repository holds code, not data.** The pipeline's inputs and outputs (HTML, YAML, CSV) lived in a `data/` folder
