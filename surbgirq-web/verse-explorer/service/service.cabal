@@ -33,13 +33,10 @@ library
                   , surbgirq-neo4j-client
                   , surbgirq-bot-telegram
                   , servant
-                  , servant-websockets
                   , servant-server
                   , servant-lucid
                   , interpolatedstring-perl6
-                  , lens
                   , wai
-                  , websockets
                   , http-api-data
                   , text
                   , casing
@@ -50,12 +47,8 @@ library
                   , mtl
                   , wai-cors
                   , wai-extra
-                  , servant-lucid
                   , lucid
                   , monad-logger
-                  , data-dword
-                  , gitrev >= 1.3.1
-                  , sqlite-simple
                   , containers
   default-language: Haskell2010
   default-extensions:

@@ -6,7 +6,6 @@ pkgs.mkShell {
     pkgs.zlib
     pkgs.sqlite
     pkgs.pkg-config
-    pkgs.libpq
     pkgs.openssl
     pkgs.git
     pkgs.curl

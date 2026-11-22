@@ -65,9 +65,6 @@ library
                , surbgirq-utils
                , surbgirq-bot-store
                , surbgirq-bot-types
-                 --
-               , postgresql-simple
-                 --
                , telegram-api
               -- , fbmessenger-api
               -- , fb

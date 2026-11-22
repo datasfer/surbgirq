@@ -7,7 +7,7 @@ from the author's notes of 2024–2026.
 
 | GHC | Stackage resolver | Notes |
 |---|---|---|
-| 9.6.7 | `lts-22.44` | `stack.yaml` sets `allow-newer: true`, and asks for `-j4` with large GHC heaps for every package (so does `cabal.project.local`): lower `-j` on a small machine. `surbgirq-shell` is left out of the build (a `selda` conflict; see the README's Known issues). The Facebook Messenger packages are commented out. `shell.nix` is a plain `mkShell` (zlib, sqlite, libpq, openssl, HLS). |
+| 9.6.7 | `lts-22.44` | `stack.yaml` sets `allow-newer: true`, and asks for `-j4` with large GHC heaps for every package (so does `cabal.project.local`): lower `-j` on a small machine. `surbgirq-shell` is left out of the build (a `selda` conflict; see the README's Known issues). The Facebook Messenger packages are commented out. `shell.nix` is a plain `mkShell` (zlib, sqlite, openssl, HLS). |
 
 ```bash
 stack build        # Stack installs GHC 9.6.7 and fetches the Telegram fork at its pinned commit
@@ -42,7 +42,8 @@ Two build failures and their fixes, from the same notes:
 - `regex-pcre` failed (`[S-7011]`) until `pkg-config` was installed.
 
 The notes also list `libghc-regex-pcre-dev`, `libghc-regex-base-dev`, `libghc-regex-tdfa-dev`, `libpcre2-posix3`, `libgmp-dev`
-and `libgbm-dev`. The PostgreSQL client library (`libpq`) is in `shell.nix` as well.
+and `libgbm-dev`. No package needs PostgreSQL's client library (`libpq`) any more: `postgresql-simple`, the only user, was
+listed but never imported, and is gone since November 2026.
 
 ## Executables
 
