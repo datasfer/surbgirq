@@ -64,6 +64,8 @@ The bot also needs its own token ([docs/bot.md](docs/bot.md)), the graph in Neo4
 No secret is committed. Tokens and passwords come from environment variables, set in git-ignored files (`.env` and
 `.env.*`, except `.env.example`):
 
+- **Neo4j's password:** in `docker/.env`, which Compose reads by itself; copy [`docker/.env.example`](docker/.env.example), and
+  see [docs/neo4j-import.md](docs/neo4j-import.md);
 - **the bot's token:** still hard-coded until the next fix; see [Known issues](#known-issues--security).
 
 **A pre-commit hook** in [`.githooks/`](.githooks/pre-commit) stops a commit when a staged file contains anything
@@ -145,7 +147,6 @@ Nothing runs this code in public at the moment. Fix these before it does:
 | A reference without a translation word uses the translation of its book abbreviation: Armenian abbreviations mean the 1994 translation (which public data won't include), English ones the KJV. The user's translation setting is ignored for references. | Use the setting as the default, and default to a public text |
 | User settings live in memory (an STM `TVar`) and are lost on restart. | A small persistent store |
 | The Docker Compose files run **Neo4j Enterprise** and accept its commercial licence (`NEO4J_ACCEPT_LICENSE_AGREEMENT=yes`). | Neo4j Community ([docs/neo4j-import.md](docs/neo4j-import.md)) |
-| **The Compose file publishes Neo4j's ports 7474 and 7687 on every interface,** which Docker opens past a host firewall such as `ufw`, and it lowers the minimum password length to 1 (`NEO4J_dbms_security_auth__minimum__password__length`). | Publish the ports on `127.0.0.1` only (or not at all); drop that setting |
 | On Neo4j 2026.x the import needs `--vector-delimiter` (its default, `;`, is our column delimiter), and `--multiline-fields=true` slows the whole import although only Easton's dictionary needs it. | [docs/neo4j-import.md](docs/neo4j-import.md) |
 | The verse explorer was adapted from an earlier block-explorer prototype by the same author: `app.js` still has a live counter and a filter dialog that nothing feeds, and some names (`txhash`, `tx-list`) remain. Its search always answers "Not found"; `/about` is a placeholder. | Rework the page during the revival |
 | **The data pipeline (`surbgirq-shell`) is out of the build** since the GHC 9.6.7 upgrade: the author's note in `stack.yaml` names a `selda` conflict. So the CSV converters can't be rebuilt from `master` at the moment. | Update or replace `selda`, and bring the package back |

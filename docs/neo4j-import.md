@@ -10,15 +10,18 @@ The graph is always rebuilt from scratch: generate the CSVs ([data-pipeline.md](
 | | |
 |---|---|
 | Image | `neo4j:5.26.6-enterprise` (5.15 in 2024; 5.18.1 on the former `fix-api` branch) |
-| Ports | 7474 (Browser) and 7687 (Bolt), published on every interface (see the README's Known issues); Bolt is advertised as `neo4j.datasfer.com:7687`, so change that to your host |
+| Ports | 7474 (Browser) and 7687 (Bolt), published on `127.0.0.1` unless `PUBLISH_ADDRESS` in `docker/.env` says otherwise; from another machine, use an SSH tunnel (`ssh -L 7474:127.0.0.1:7474 -L 7687:127.0.0.1:7687 <host>`). Bolt is advertised as `neo4j.datasfer.com:7687`, so change that to your host |
 | Memory | heap up to 4 GB, page cache 2 GB |
 | Volumes | `~/neo4j_data/` with `data`, `conf`, `import`, `plugins` and `logs` (create them first); `~/scriptures`, the pipeline's output with the CSVs under `csv/`, at `/scriptures`; this repository's `scripts/` at `/import-scripts` |
 
-Set your own password in `NEO4J_AUTH` (the file says `neo4j/CHANGE_ME`). The older files (`docker-compose_4.0.4.yml`,
-`old_docker.yaml`, `neo4j/Dockerfile`, `neo4j/runNeo4jDocker.sh`) are for Neo4j 4.x and are kept for reference.
+The password comes from `docker/.env`, which git ignores: copy `docker/.env.example` to `docker/.env` and set `NEO4J_AUTH` to
+`neo4j/` followed by your password (8 characters or more). Without it, Compose stops with a message naming the file. The older
+files (`docker-compose_4.0.4.yml`, `old_docker.yaml`, `neo4j/Dockerfile`, `neo4j/runNeo4jDocker.sh`) are for Neo4j 4.x and are
+kept for reference.
 
 ```bash
 cd docker
+cp .env.example .env              # then set NEO4J_AUTH in .env
 mkdir -p ~/neo4j_data/{data,conf,import,plugins,logs}
 docker compose up -d
 docker exec -it neo bash          # then, inside the container: cd /scriptures/csv && bash /import-scripts/all-import.sh
