@@ -25,6 +25,7 @@ import Network.Wai                          (Application)
 import Network.Wai.Middleware.RequestLogger (logStdoutDev)
 
 import Lucid.Instances ()
+import Servant.Client     (ClientEnv)
 import Servant.HTML.Lucid
 
 import qualified Data.Text as T
@@ -52,10 +53,11 @@ runAppM e = runStdoutLoggingT . flip runReaderT e . unAppM
 api :: Proxy ExplorerAPI
 api = Proxy
 
--- | Make WAI application of a verse explorer API server
-app :: Application
-app  = simpleCors $ logStdoutDev $
-        serve api $ (hoistServer api liftIO server)
+-- | Make WAI application of a verse explorer API server; it calls surbgirq-graph-api through the given
+-- client (GRAPH_API_URL)
+app :: ClientEnv -> Application
+app graphApi = simpleCors $ logStdoutDev $
+        serve api $ (hoistServer api liftIO (server graphApi))
 
 
 testBooks :: TranslationID -> IO [Book]
@@ -105,17 +107,18 @@ searchByWordEndpoint (SearchRequest word) = return FoundNothing
 -- server = bookList :<|> bookListByText -- getBooksHandler -- E1994T) -- bookList
 --          :<|> getBooksHandler
 -- --         :<|> testBooks
-server :: ServerT ExplorerAPI IO
-server = ( (getBooksHandler E1994T)
+server :: ClientEnv -> ServerT ExplorerAPI IO
+server graphApi =
+         ( (getBooksHandler graphApi E1994T)
          :<|> about
          :<|> searchByWordEndpoint
-         :<|> getBooksHandler
-         :<|> getVerseRangeHandler
-         :<|> getOneVerseHandler
-         :<|> getChapterSectionsHandler
-         :<|> getChapterOneSectionHandler
-         :<|> getBookSectionsHandler
-         :<|> getChapterVerseNumberHandler
+         :<|> getBooksHandler graphApi
+         :<|> getVerseRangeHandler graphApi
+         :<|> getOneVerseHandler graphApi
+         :<|> getChapterSectionsHandler graphApi
+         :<|> getChapterOneSectionHandler graphApi
+         :<|> getBookSectionsHandler graphApi
+         :<|> getChapterVerseNumberHandler graphApi
          )
 
 

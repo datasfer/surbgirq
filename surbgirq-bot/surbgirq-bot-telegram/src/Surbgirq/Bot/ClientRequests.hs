@@ -1,114 +1,90 @@
 {-# LANGUAGE DataKinds #-}
 
 {-|
-Module      : Surbgirq.Bot.Server
-Description : endpoint handlers to call the local neo4j db acccess api
+Module      : Surbgirq.Bot.ClientRequests
+Description : calls to surbgirq-graph-api, the REST API over the Neo4j graph
 
-Implement local graphdb rest api calls
+One client for the graph API, made once at start-up from GRAPH_API_URL ('graphApiClient'), and the calls
+the bot and the verse explorer make with it.
 -}
 
 module Surbgirq.Bot.ClientRequests (
-   getBooksHandler
+   graphApiClient
+ , getBooksHandler
  , getVerseRangeHandler
  , getOneVerseHandler
  , getBookSectionsHandler
  , getChapterSectionsHandler
  , getChapterOneSectionHandler
  , getChapterVerseNumberHandler
-
- -- , bookChapterNums
- -- , bookChapterSectionNums
- -- , bookChapterVerseNums
  ) where
 
 
-import Network.HTTP.Client     (Manager, defaultManagerSettings, newManager)
+import Data.List               (dropWhileEnd, isSuffixOf)
+import Network.HTTP.Client     (newManager)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
-import Servant.Client
+import Servant.Client          (BaseUrl (..), ClientEnv, ClientM, mkClientEnv, parseBaseUrl, runClientM)
+import System.Exit             (die)
 
 import Surbgirq.API.GraphDBClient
 import Surbgirq.Types
 
 ------------------------------------------------------------
---
+-- The client
 ------------------------------------------------------------
 
+-- | The client for surbgirq-graph-api at the given URL: the API's root, without @/api@ (the routes add
+-- it). It stops the program with a message naming GRAPH_API_URL when the URL isn't usable. Both @http@
+-- and @https@ work.
+graphApiClient :: String -> IO ClientEnv
+graphApiClient url =
+  case (parseBaseUrl url :: Maybe BaseUrl) of
+    Nothing -> die $ "GRAPH_API_URL is not a valid http or https URL: " <> url
+    Just base
+      | "/api" `isSuffixOf` dropWhileEnd (== '/') (baseUrlPath base) ->
+          die $ "GRAPH_API_URL must be the API's root, without /api at the end (the routes add it): " <> url
+      | otherwise -> do
+          mgr <- newManager tlsManagerSettings
+          pure (mkClientEnv mgr base)
 
-
-getBooksHandler :: TranslationID -> IO [Book]
-getBooksHandler translation = do
-  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
-  mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getAllBooks' translation -- mgr
-  case mres of
-    Left e  -> error $ show e -- throwIO $ ClientError e
-    Right a -> pure a
-
-
-
-getVerseRangeHandler :: TranslationID -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> IO [Verse]
-getVerseRangeHandler translation girq ch v1 v2 = do
-  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
-  mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getVerseRange' translation girq ch v1 v2 -- mgr
-  case mres of
-    Left e  -> error $ show e -- throwIO $ ClientError e
-    Right a -> pure a
-
-
-getOneVerseHandler :: TranslationID -> Girq -> ChapterNum -> VerseNum -> IO [Verse]
-getOneVerseHandler translation girq ch v1 = do
-  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
-  mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getOneVerse' translation girq ch v1
-  case mres of
-    Left e  -> error $ show e -- throwIO $ ClientError e
-    Right a -> pure a
-
-
-
--- | Sections
-getBookSectionsHandler :: TranslationID -> Girq -> IO [Section]
-getBookSectionsHandler translation girq = do
-  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
-  mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getBookSections' translation girq
-  case mres of
-    Left e  -> error $ show e -- throwIO $ ClientError e
-    Right a -> pure a
-
-getChapterSectionsHandler :: TranslationID -> Girq -> ChapterNum -> IO [Section]
-getChapterSectionsHandler translation girq ch = do
-  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
-  mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getChapterSections' translation girq ch
-  case mres of
-    Left e  -> error $ show e -- throwIO $ ClientError e
-    Right a -> pure a
-
-
-getChapterOneSectionHandler :: TranslationID -> Girq -> ChapterNum -> SectionNum -> IO [Section]
-getChapterOneSectionHandler translation girq ch sec = do
-  let dialect = Ashxarhabar
-  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
-  mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getChapterOneSection' translation girq ch sec
-  case mres of
-    Left e  -> error $ show e -- throwIO $ ClientError e
-    Right a -> pure a
-
-getChapterVerseNumberHandler :: TranslationID -> Girq -> ChapterNum -> IO Int
-getChapterVerseNumberHandler translation girq ch = do
-  env <-  mkClientEnv <$> newManager defaultManagerSettings <*> parseBaseUrl "http://localhost:33010"
-  mgr <-  newManager tlsManagerSettings
-  mres <- flip runClientM env $ getChapterVerseNumber' translation girq ch
-  case mres of
+-- | Runs one call. A failed call still ends in 'error' until the bot learns to always answer 200
+-- (Revival, step 3).
+runGraphCall :: ClientEnv -> ClientM a -> IO a
+runGraphCall env request = do
+  res <- runClientM request env
+  case res of
     Left e  -> error $ show e
     Right a -> pure a
 
+------------------------------------------------------------
+-- The calls
+------------------------------------------------------------
 
+getBooksHandler :: ClientEnv -> TranslationID -> IO [Book]
+getBooksHandler env translation =
+  runGraphCall env $ getAllBooks' translation
 
+getVerseRangeHandler :: ClientEnv -> TranslationID -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> IO [Verse]
+getVerseRangeHandler env translation girq ch v1 v2 =
+  runGraphCall env $ getVerseRange' translation girq ch v1 v2
 
+getOneVerseHandler :: ClientEnv -> TranslationID -> Girq -> ChapterNum -> VerseNum -> IO [Verse]
+getOneVerseHandler env translation girq ch v1 =
+  runGraphCall env $ getOneVerse' translation girq ch v1
 
+-- | Sections
+getBookSectionsHandler :: ClientEnv -> TranslationID -> Girq -> IO [Section]
+getBookSectionsHandler env translation girq =
+  runGraphCall env $ getBookSections' translation girq
 
+getChapterSectionsHandler :: ClientEnv -> TranslationID -> Girq -> ChapterNum -> IO [Section]
+getChapterSectionsHandler env translation girq ch =
+  runGraphCall env $ getChapterSections' translation girq ch
 
+getChapterOneSectionHandler :: ClientEnv -> TranslationID -> Girq -> ChapterNum -> SectionNum -> IO [Section]
+getChapterOneSectionHandler env translation girq ch sec =
+  runGraphCall env $ getChapterOneSection' translation girq ch sec
+
+getChapterVerseNumberHandler :: ClientEnv -> TranslationID -> Girq -> ChapterNum -> IO Int
+getChapterVerseNumberHandler env translation girq ch =
+  runGraphCall env $ getChapterVerseNumber' translation girq ch

@@ -57,7 +57,8 @@ stack exec -- verse-explorer         # the web page: config/verse-explorer.yaml,
 ```
 
 The bot also needs its own token ([docs/bot.md](docs/bot.md)), the graph in Neo4j
-([docs/neo4j-import.md](docs/neo4j-import.md)), and `surbgirq-graph-api` listening on `localhost:33010`.
+([docs/neo4j-import.md](docs/neo4j-import.md)), and `surbgirq-graph-api` listening on `localhost:33010` (or wherever
+`GRAPH_API_URL` points).
 
 ## Secrets
 
@@ -143,7 +144,6 @@ Nothing runs this code in public at the moment. Fix these before it does:
 | **A failing handler answers 500,** so Telegram retries and holds back that chat's later updates. Some handlers call `error` when an API call fails. | Catch errors, always answer 200 |
 | The bot's logs were cut down before publishing (no token, no user data), so they say little about failures. | Structured logging that never prints the token or user data |
 | The bot asks `surbgirq-graph-api` for one verse and for sections under `api/scriptures/…`, but the API serves them under `api/verses/…`; `…/verses/count` always returns 100. The verse explorer forwards the same routes. | Align the two when the bot runs again |
-| The API address is hard-coded (`http://localhost:33010` in `ClientRequests.hs`). | Configuration |
 | A reference without a translation word uses the translation of its book abbreviation: Armenian abbreviations mean the 1994 translation (which public data won't include), English ones the KJV. The user's translation setting is ignored for references. | Use the setting as the default, and default to a public text |
 | User settings live in memory (an STM `TVar`) and are lost on restart. | A small persistent store |
 | The Docker Compose files run **Neo4j Enterprise** and accept its commercial licence (`NEO4J_ACCEPT_LICENSE_AGREEMENT=yes`). | Neo4j Community ([docs/neo4j-import.md](docs/neo4j-import.md)) |

@@ -35,9 +35,11 @@ data BotSpec = BotSpec
   } deriving(Show)
 
 data TelegramBotConfig = TelegramBotConfig
-    { telegramBotConfig'dbName     :: String
-    , telegramBotConfig'botApiHost :: String
-    , telegramBotConfig'botApiPort :: Int
+    { telegramBotConfig'dbName      :: String
+    , telegramBotConfig'botApiHost  :: String
+    , telegramBotConfig'botApiPort  :: Int
+    , telegramBotConfig'graphApiUrl :: String
+    -- ^ surbgirq-graph-api's root, without /api (GRAPH_API_URL)
     } deriving (Show)
 
 

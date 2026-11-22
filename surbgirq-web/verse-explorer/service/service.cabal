@@ -33,6 +33,7 @@ library
                   , surbgirq-neo4j-client
                   , surbgirq-bot-telegram
                   , servant
+                  , servant-client
                   , servant-server
                   , servant-lucid
                   , interpolatedstring-perl6

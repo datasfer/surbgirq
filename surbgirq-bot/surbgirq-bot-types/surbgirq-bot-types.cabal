@@ -35,6 +35,7 @@ library
                , data-default
                , http-client          
                , telegram-api
+               , servant-client
                , text
                , containers
                , interpolatedstring-perl6

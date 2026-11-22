@@ -22,6 +22,7 @@ import Data.Maybe
 
 import Settings
 import Sigterm
+import Surbgirq.Bot.ClientRequests (graphApiClient)
 import Types
 import VerseExplorer
 
@@ -32,8 +33,9 @@ main = do
   ExplorerSettings{..} <- getExplorerSettings "Verse Explorer web server ..."
   let port = serverPort explorer'server
       staticPath = serverStaticDir explorer'server
-  putStrLn $ mconcat ["Start verse explorer on port: ", show port]
-  Warp.run port $ staticPolicy (noDots >-> addBase staticPath) $ app
+  graphApi <- graphApiClient explorer'graphApiUrl
+  putStrLn $ mconcat ["Start verse explorer on port: ", show port, "; the graph API at ", explorer'graphApiUrl]
+  Warp.run port $ staticPolicy (noDots >-> addBase staticPath) $ app graphApi
 
 
 

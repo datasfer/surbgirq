@@ -21,6 +21,7 @@ import Data.IORef
 
 import Control.Monad.Reader
 import Lucid
+import Servant.Client       (ClientEnv)
 
 
 import Surbgirq.Bot.ClientRequests
@@ -64,13 +65,15 @@ sendBooks chatId book | T.null book = allBooks chatId
 
 allBooks :: ChatId -> Bot ()
 allBooks chatId = do
-    books <- liftIO $ getBooksHandler E1994T
+    BotConfig{..} <- ask
+    books <- liftIO $ getBooksHandler graphApi E1994T
     sendAsParts chatId books
 --    forM_ books $ \book -> let htmlText = TL.toStrict . renderText $ toHtml book in sendHtml chatId htmlText
 
 sendBooks_ :: ChatId -> Bot ()
 sendBooks_ chatId = do
-    books <- liftIO $ getBooksHandler E1994T
+    BotConfig{..} <- ask
+    books <- liftIO $ getBooksHandler graphApi E1994T
     let booksHtml =  TL.toStrict . renderText $ toHtml books
     sendHtml chatId  booksHtml
 
@@ -98,9 +101,9 @@ sendChapterSections chatId userId argString = do
   -- liftIO $ putStrLn [qc|TTTT Translation: {translation}|]
 
   secRes <- liftIO $ case (bookRes, chRes, secRes) of
-    (Just girq, Just chapter, Just section) -> Right <$> getChapterOneSectionHandler (getCfgTranslation cfg girq) girq chapter section
-    (Just girq, Just chapter, Nothing) -> Right <$> getChapterSectionsHandler (getCfgTranslation cfg girq) girq chapter
-    (Just girq, Nothing, Nothing) -> Right <$> getBookSectionsHandler (getCfgTranslation cfg girq) girq
+    (Just girq, Just chapter, Just section) -> Right <$> getChapterOneSectionHandler graphApi (getCfgTranslation cfg girq) girq chapter section
+    (Just girq, Just chapter, Nothing) -> Right <$> getChapterSectionsHandler graphApi (getCfgTranslation cfg girq) girq chapter
+    (Just girq, Nothing, Nothing) -> Right <$> getBookSectionsHandler graphApi (getCfgTranslation cfg girq) girq
     (Nothing, _, _) ->  pure $ Left [qc|Failed parse book: {book}|]
   case secRes of
     Right secs -> do
@@ -128,8 +131,8 @@ sendVerse' sendAtOnce chatId userId vRef@VerseReference{..} = do
 
       let defaultTrans = fromMaybe E1994T $ readTranslation [config'bible cfg]
 
-      vs <- liftIO $ getVerses defaultTrans vRef
-      maxVerseNum <- liftIO $ getChapterVerseNumberHandler defaultTrans verseRef'book $ ChapterNum verseRef'chapter
+      vs <- liftIO $ getVerses graphApi defaultTrans vRef
+      maxVerseNum <- liftIO $ getChapterVerseNumberHandler graphApi defaultTrans verseRef'book $ ChapterNum verseRef'chapter
 
       if sendAtOnce
       then do
@@ -150,26 +153,26 @@ sendVerse' sendAtOnce chatId userId vRef@VerseReference{..} = do
 
 
 
-getVerse' :: TranslationID -> ChatId -> VerseReference -> IO [Verse]
-getVerse' defaTrans chatId vRef@VerseReference{..} = getVerses defaTrans vRef
+getVerse' :: ClientEnv -> TranslationID -> ChatId -> VerseReference -> IO [Verse]
+getVerse' graphApi defaTrans chatId vRef@VerseReference{..} = getVerses graphApi defaTrans vRef
 
 
-getVerses :: TranslationID -> VerseReference -> IO [Verse]
-getVerses defTrans vRef@VerseReference{..} = do
+getVerses :: ClientEnv -> TranslationID -> VerseReference -> IO [Verse]
+getVerses graphApi defTrans vRef@VerseReference{..} = do
   let translation = fromMaybe defTrans verseRef'translation
-  maxVerseNum <- getChapterVerseNumberHandler translation verseRef'book $ ChapterNum verseRef'chapter
+  maxVerseNum <- getChapterVerseNumberHandler graphApi translation verseRef'book $ ChapterNum verseRef'chapter
   case (verseRef'from, verseRef'to) of
-    (Nothing, Nothing)   -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
-    (Just from, Nothing) -> getOneVerseHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)
-    (Just from, Just to) -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum from) (VerseNum <$> Just  to)
-    (Nothing, Just to)   -> getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just to)
+    (Nothing, Nothing)   -> getVerseRangeHandler graphApi translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
+    (Just from, Nothing) -> getOneVerseHandler graphApi translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum from)
+    (Just from, Just to) -> getVerseRangeHandler graphApi translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum from) (VerseNum <$> Just  to)
+    (Nothing, Just to)   -> getVerseRangeHandler graphApi translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just to)
 
 
-getChapterVerses :: TranslationID -> VerseReference -> IO [Verse]
-getChapterVerses defTrans vRef@VerseReference{..} = do
+getChapterVerses :: ClientEnv -> TranslationID -> VerseReference -> IO [Verse]
+getChapterVerses graphApi defTrans vRef@VerseReference{..} = do
   let translation = fromMaybe defTrans verseRef'translation
-  maxVerseNum <- getChapterVerseNumberHandler translation verseRef'book $ ChapterNum verseRef'chapter
-  getVerseRangeHandler translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
+  maxVerseNum <- getChapterVerseNumberHandler graphApi translation verseRef'book $ ChapterNum verseRef'chapter
+  getVerseRangeHandler graphApi translation verseRef'book (ChapterNum verseRef'chapter) (VerseNum 1) (VerseNum <$> Just maxVerseNum)
 
 
 

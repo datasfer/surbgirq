@@ -215,6 +215,7 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
 
       -- | verse pagination
       onCommand UserSettings{..} (T.stripPrefix "go_to_verseRef#" -> Just args) = do
+        BotConfig{..} <- ask
         liftIO $ putStrLn [qc|=========== verse pagination {args}|]
 
         case parseVerseRef args of
@@ -222,7 +223,7 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
             let def1 = fromMaybe E1994T (readTranslation [config'bible])
                 defaultTrans = fromMaybe def1 verseRef'translation
 
-            vs <- liftIO $ getVerse' defaultTrans chatId verseRef
+            vs <- liftIO $ getVerse' graphApi defaultTrans chatId verseRef
             let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml verseRef)
 
             liftIO $ putStrLn . T.unpack $ toRefText defaultTrans verseRef

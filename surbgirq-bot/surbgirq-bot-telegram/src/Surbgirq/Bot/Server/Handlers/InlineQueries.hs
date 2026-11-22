@@ -95,7 +95,7 @@ inlineReadVerses' userId iqId verseRef@VerseReference{..} = do
   let def1 = getCfgTranslation cfg verseRef'book
       defaultTrans = fromMaybe def1 verseRef'translation
 
-  vs <- liftIO $ getVerses defaultTrans verseRef
+  vs <- liftIO $ getVerses graphApi defaultTrans verseRef
 
   let
       currentPage = fromMaybe 1 verseRef'from
@@ -176,7 +176,7 @@ inlineVerse userId iqId verseRef@VerseReference{..} = do
   _ <- liftIO $ putStrLn $ ">InlineVerse defaultTrans: " ++ (show defaultTrans)
   _ <- liftIO $ putStrLn $ ">InlineVerse VerseRef: " ++ (show verseRef)
   _ <- liftIO $ putStrLn $ ">InlineVerse offset: " ++ (show offset)
-  vs <- liftIO $ getVerses defaultTrans queryRef
+  vs <- liftIO $ getVerses graphApi defaultTrans queryRef
          -- liftIO $ case verseRef'to of
          --     Nothing -> getOneVerseHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum <$> verseRef'from)
          --     Just v  -> getVerseRangeHandler Ashxarhabar verseRef'book (ChapterNum verseRef'chapter) (VerseNum verseRef'from) (VerseNum <$> Just v)
@@ -258,7 +258,7 @@ inlineChapter userId iqId (girq, trans) = do
       defaultTrans = trans
       verseRef = VerseReference (Just trans)  girq 1 Nothing Nothing True
       offset@(queryRef, queryOffsetTxt) = toOffset 50 verseRef
-  vs <- liftIO $ getChapterVerses defaultTrans queryRef
+  vs <- liftIO $ getChapterVerses graphApi defaultTrans queryRef
 
   _ <- liftIO $ putStrLn $ "Inline Ref: " ++ (show verseRef)
   _ <- liftIO $ putStrLn $ "Offset Ref: " ++ (show offset)

@@ -41,6 +41,7 @@ import Data.Monoid
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
+import Servant.Client                (ClientEnv)
 import Servant.Server
 import System.Environment
 import Text.Regex.Posix
@@ -61,8 +62,8 @@ import Surbgirq.Bot.Types
 
 --
 -- https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/logOut
-startApp :: String -> String -> Int -> IO ()
-startApp dbName botApiUrl port = do
+startApp :: ClientEnv -> String -> String -> Int -> IO ()
+startApp graphApi' dbName botApiUrl port = do
   putStrLn "Surbgirq bot started..."
   manager' <- newManager tlsManagerSettings
   fbManager <- newManager tlsManagerSettings
@@ -78,6 +79,7 @@ startApp dbName botApiUrl port = do
         , botApiHost = T.pack botApiUrl
         , botApiPort = port
         , apiCachTime = Just 333 --  amount of time in seconds that the result may be cached on the server.
+        , graphApi = graphApi'
         , facebookVerifyToken = fbVerifyToken
         , facebookPageToken = fbPageToken
         , manager = manager'

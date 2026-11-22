@@ -14,6 +14,7 @@ import Data.Monoid ((<>))
 import Common.Aeson
 import Common.Yaml
 import Sigterm
+import Surbgirq.Bot.ClientRequests (graphApiClient)
 import Surbgirq.Bot.Telegram
 import Types.BotSettings
 
@@ -28,13 +29,15 @@ main = do
   let dbName = telegramBotConfig'dbName $ bot'telegram surbgirq'bots
       botApiHost = telegramBotConfig'botApiHost $ bot'telegram surbgirq'bots
       botApiPort = telegramBotConfig'botApiPort $ bot'telegram surbgirq'bots
+      graphApiUrl = telegramBotConfig'graphApiUrl $ bot'telegram surbgirq'bots
 
   putStrLn "Please, enter Telegram bot's API token:"
   putStrLn $ mconcat [" with db: ", dbName]
   putStrLn $ show bot
 --  getEnvToken "TELEGRAM_BOT_TOKEN" >>= run
 --  token <- T.pack <$> getLine
-  startApp dbName botApiHost botApiPort  -- run $ token
+  graphApi <- graphApiClient graphApiUrl
+  startApp graphApi dbName botApiHost botApiPort  -- run $ token
 
 
 data CmdOptions = CmdOptions

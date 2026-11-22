@@ -8,6 +8,7 @@ import Data.IORef
 import Data.Text            (Text)
 import GHC.Generics         (Generic)
 import Network.HTTP.Client  (Manager)
+import Servant.Client       (ClientEnv)
 import Web.Telegram.API.Bot (Token)
 
 import Data.Aeson
@@ -30,6 +31,8 @@ data BotConfig = BotConfig
   -- ^ telegram bot api server port
   , apiCachTime         :: Maybe Int
   -- ^ api wide cach time
+  , graphApi            :: ClientEnv
+  -- ^ the client for surbgirq-graph-api, made once at start-up (GRAPH_API_URL)
 
   , facebookVerifyToken :: Text
   , facebookPageToken   :: Text

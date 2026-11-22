@@ -33,7 +33,9 @@ instance FromJSON HostPreference where
 
 
 data ExplorerSettings = ExplorerSettings
-  { explorer'server     :: !ServerSettings
+  { explorer'server      :: !ServerSettings
+  , explorer'graphApiUrl :: !String
+  -- ^ surbgirq-graph-api's root, without /api (GRAPH_API_URL)
   } deriving (Show)
 
 data ServerSettings = ServerSettings

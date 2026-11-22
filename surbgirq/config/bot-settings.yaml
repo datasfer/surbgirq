@@ -5,3 +5,5 @@ bots:
     # 192.0.2.10/bot
     botApiHost: "_env:BOT_API_URL:api.telegram.org"
     botApiPort: _env:BOT_API_PORT:443
+    # surbgirq-graph-api's root, without /api (the routes add it)
+    graphApiUrl: "_env:GRAPH_API_URL:http://localhost:33010"

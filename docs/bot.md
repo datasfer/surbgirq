@@ -59,8 +59,8 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
    Put your token in its place, and don't commit it. Reading it from the environment is the first planned fix (README,
    Known issues).
 2. **The data.** The graph in Neo4j ([neo4j-import.md](neo4j-import.md)), and
-   [`surbgirq-graph-api`](https://github.com/datasfer/surbgirq-graph-api) on `http://localhost:33010` (hard-coded in
-   `Surbgirq.Bot.ClientRequests`).
+   [`surbgirq-graph-api`](https://github.com/datasfer/surbgirq-graph-api) on `http://localhost:33010`, or wherever
+   `GRAPH_API_URL` points: the API's root, without `/api`.
 3. **The configuration,** `surbgirq/config/bot-settings.yaml`:
 
    ```yaml
@@ -69,6 +69,7 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
        dbName: "db/telebot"
        botApiHost: "_env:BOT_API_URL:api.telegram.org"
        botApiPort: _env:BOT_API_PORT:443
+       graphApiUrl: "_env:GRAPH_API_URL:http://localhost:33010"
    ```
 
    `_env:NAME:default` reads an environment variable, with a default. Set `BOT_API_URL` and `BOT_API_PORT` only for a
@@ -113,8 +114,10 @@ log the bot out of the cloud server once (`https://api.telegram.org/bot<token>/l
 
 ## The API the bot calls
 
-`Surbgirq.Bot.ClientRequests` calls the graph API at `http://localhost:33010`, on `surbgirq-graph-api`'s `/api/…` routes. Four
-of them don't match the API yet (README, Known issues). Until 2026 the bot called the 2020 .NET API's routes, e.g.
+`Surbgirq.Bot.ClientRequests` calls the graph API at `GRAPH_API_URL` (default `http://localhost:33010`), on
+`surbgirq-graph-api`'s `/api/…` routes, through one HTTP client made at start-up; a URL that isn't valid, or that ends in
+`/api`, stops the bot and the verse explorer with a message. Four of the routes don't match the API yet (README, Known
+issues). Until 2026 the bot called the 2020 .NET API's routes, e.g.
 `/scripture/{translation}/books/{book}/chapters/{chapter}/verses/{from}?v2={to}`.
 
 ## Facebook Messenger
