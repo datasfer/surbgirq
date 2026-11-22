@@ -52,11 +52,12 @@ The short version; system packages, the Cabal build and the fork are in [docs/bu
 ```bash
 stack build                          # GHC 9.6.7 (lts-22.44); Stack installs the compiler and fetches the Telegram fork
 cd surbgirq                          # the package folder inside the repository: the config paths are relative to it
-stack exec -- telegram-bot           # the bot: config/bot-settings.yaml, webhook server on port 5000
-stack exec -- verse-explorer         # the web page: config/verse-explorer.yaml, port 8009
+stack exec -- telegram-bot           # the bot: config/bot-settings.yaml, webhook server on 127.0.0.1:5000
+stack exec -- verse-explorer         # the web page: config/verse-explorer.yaml, on 127.0.0.1:8009
 ```
 
-The bot also needs its own token ([docs/bot.md](docs/bot.md)), the graph in Neo4j
+The bot also needs its token and a webhook secret in the environment: copy `.env.example` to `.env`, fill it in, and load
+it with `set -a; . ./.env; set +a` ([docs/bot.md](docs/bot.md)). Both programs need the graph in Neo4j
 ([docs/neo4j-import.md](docs/neo4j-import.md)), and `surbgirq-graph-api` listening on `localhost:33010` (or wherever
 `GRAPH_API_URL` points).
 
@@ -67,7 +68,8 @@ No secret is committed. Tokens and passwords come from environment variables, se
 
 - **Neo4j's password:** in `docker/.env`, which Compose reads by itself; copy [`docker/.env.example`](docker/.env.example), and
   see [docs/neo4j-import.md](docs/neo4j-import.md);
-- **the bot's token:** still hard-coded until the next fix; see [Known issues](#known-issues--security).
+- **the bot's token and webhook secret:** `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` in the root `.env`; copy
+  [`.env.example`](.env.example). The bot refuses to start without them, and never prints them.
 
 **A pre-commit hook** in [`.githooks/`](.githooks/pre-commit) stops a commit when a staged file contains anything
 [gitleaks](https://github.com/gitleaks/gitleaks) finds, a Telegram bot token in any form, or a literal password in a config
@@ -139,8 +141,7 @@ Nothing runs this code in public at the moment. Fix these before it does:
 
 | Issue | Planned fix |
 |---|---|
-| **The bot token is hard-coded** in `Telegram.hs`. The public copy holds the placeholder `REMOVED-TELEGRAM-TOKEN`, so the bot doesn't work until a real token is put there. | Read it from the configuration or an environment variable |
-| **The webhook is open:** no secret path, and no `X-Telegram-Bot-Api-Secret-Token` check (the check is a stub, `let b = True`). | Set `secret_token` in `setWebhook` and check the header |
+| **The webhook is open:** no `X-Telegram-Bot-Api-Secret-Token` check yet (the check is a stub, `let b = True`). The bot already reads the secret at start-up (`TELEGRAM_WEBHOOK_SECRET`). | Check the header against it, and send it with `setWebhook`'s `secret_token` |
 | **A failing handler answers 500,** so Telegram retries and holds back that chat's later updates. Some handlers call `error` when an API call fails. | Catch errors, always answer 200 |
 | The bot's logs were cut down before publishing (no token, no user data), so they say little about failures. | Structured logging that never prints the token or user data |
 | The bot asks `surbgirq-graph-api` for one verse and for sections under `api/scriptures/…`, but the API serves them under `api/verses/…`; `…/verses/count` always returns 100. The verse explorer forwards the same routes. | Align the two when the bot runs again |

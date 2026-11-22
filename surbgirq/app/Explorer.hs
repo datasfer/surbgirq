@@ -31,11 +31,14 @@ main :: IO ()
 main = do
   installSigtermHandler
   ExplorerSettings{..} <- getExplorerSettings "Verse Explorer web server ..."
-  let port = serverPort explorer'server
+  let host = serverHost explorer'server
+      port = serverPort explorer'server
       staticPath = serverStaticDir explorer'server
+      warpSettings = Warp.setHost host $ Warp.setPort port Warp.defaultSettings
   graphApi <- graphApiClient explorer'graphApiUrl
-  putStrLn $ mconcat ["Start verse explorer on port: ", show port, "; the graph API at ", explorer'graphApiUrl]
-  Warp.run port $ staticPolicy (noDots >-> addBase staticPath) $ app graphApi
+  putStrLn $ mconcat [ "Verse explorer: listening on ", show host, " port ", show port
+                     , "; the graph API at ", explorer'graphApiUrl ]
+  Warp.runSettings warpSettings $ staticPolicy (noDots >-> addBase staticPath) $ app graphApi
 
 
 

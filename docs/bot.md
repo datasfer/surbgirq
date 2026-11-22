@@ -54,10 +54,13 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
 
 ## Running it
 
-1. **A bot and its token.** Create a bot with [@BotFather](https://t.me/BotFather). The token is hard-coded in
-   `surbgirq-bot/surbgirq-bot-telegram/src/Surbgirq/Bot/Telegram.hs`; the public copy has `REMOVED-TELEGRAM-TOKEN` there.
-   Put your token in its place, and don't commit it. Reading it from the environment is the first planned fix (README,
-   Known issues).
+1. **A bot, its token and a webhook secret.** Create a bot with [@BotFather](https://t.me/BotFather). Copy `.env.example`
+   (in the repository's root) to `.env`, which git ignores, and fill in:
+   - `TELEGRAM_BOT_TOKEN`: the token, without the `bot` prefix;
+   - `TELEGRAM_WEBHOOK_SECRET`: 1 to 256 letters, digits, `_` and `-`, e.g. from `openssl rand -hex 32`.
+
+   Load it into your shell from the repository's root with `set -a; . ./.env; set +a`. The bot refuses to start, naming
+   the variable, when one is missing or malformed, and it never prints either value.
 2. **The data.** The graph in Neo4j ([neo4j-import.md](neo4j-import.md)), and
    [`surbgirq-graph-api`](https://github.com/datasfer/surbgirq-graph-api) on `http://localhost:33010`, or wherever
    `GRAPH_API_URL` points: the API's root, without `/api`.
@@ -67,39 +70,43 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
    bots:
      telegram:
        dbName: "db/telebot"
-       botApiHost: "_env:BOT_API_URL:api.telegram.org"
-       botApiPort: _env:BOT_API_PORT:443
+       botApiHost: "_env:TELEGRAM_API_HOST:api.telegram.org"
+       botApiPort: _env:TELEGRAM_API_PORT:443
        graphApiUrl: "_env:GRAPH_API_URL:http://localhost:33010"
+       listenHost: "_env:BOT_LISTEN_HOST:127.0.0.1"
+       listenPort: _env:BOT_LISTEN_PORT:5000
    ```
 
-   `_env:NAME:default` reads an environment variable, with a default. Set `BOT_API_URL` and `BOT_API_PORT` only for a
-   self-hosted Bot API server (below).
-4. **Start it** from the `surbgirq/` package folder inside the repository: `cd surbgirq && stack exec -- telegram-bot`. It serves `GET /version` and `POST /tg-webhook` on port 5000.
-5. **HTTPS and the webhook.** Telegram delivers webhooks over HTTPS only, on port 443, 80, 88 or 8443. The author ran nginx
-   with a Let's Encrypt certificate in front of the bot:
+   `_env:NAME:default` takes the environment variable `NAME` when it's set, and the default otherwise (all of them are in
+   `.env.example`). Set `TELEGRAM_API_HOST` and `TELEGRAM_API_PORT` only for a self-hosted Bot API server (below).
+4. **Start it** from the `surbgirq/` package folder inside the repository: `cd surbgirq && stack exec -- telegram-bot`. It
+   serves `GET /version` and `POST /tg-webhook` on `127.0.0.1:5000`.
 
-   ```nginx
-   server {
-       server_name bot.example.org;
-       listen 443 ssl http2;
-       ssl_certificate     /etc/letsencrypt/live/bot.example.org/fullchain.pem;
-       ssl_certificate_key /etc/letsencrypt/live/bot.example.org/privkey.pem;
+   **Try it without a webhook:** post a fake `/help` message with your chat ID (in a private chat it's your user ID, which
+   e.g. @userinfobot shows), after starting a chat with your bot. The bot answers in Telegram, since only its reply goes
+   out:
 
-       location / {
-           proxy_set_header Host $http_host;
-           proxy_set_header X-Forwarded-Proto https;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_pass http://127.0.0.1:5000/;
-       }
+   ```bash
+   curl -s -X POST http://127.0.0.1:5000/tg-webhook -H 'Content-Type: application/json' -d '{"update_id": 1,
+     "message": {"message_id": 1, "date": 0, "text": "/help",
+       "chat": {"id": YOUR_CHAT_ID, "type": "private"},
+       "from": {"id": YOUR_CHAT_ID, "is_bot": false, "first_name": "Test"}}}'
+   ```
+5. **HTTPS and the webhook.** Telegram delivers webhooks over HTTPS only, on port 443, 80, 88 or 8443, so a reverse proxy
+   in front of the bot ends HTTPS and forwards to `127.0.0.1:5000`. With [Caddy](https://caddyserver.com/), which gets and
+   renews the certificate itself:
+
+   ```caddyfile
+   bot.example.org {
+       reverse_proxy 127.0.0.1:5000
    }
    ```
 
-   Get the certificate with `sudo certbot --nginx -d bot.example.org`, and test its renewal with
-   `sudo certbot renew --dry-run`. Then register the webhook, and check it:
+   (The author ran nginx with a Let's Encrypt certificate before; there it's `proxy_pass http://127.0.0.1:5000/;`.) Then
+   register the webhook, and check it:
 
    ```text
-   https://api.telegram.org/bot<token>/setWebhook?url=https://bot.example.org/tg-webhook
+   https://api.telegram.org/bot<token>/setWebhook?url=https://bot.example.org/tg-webhook&secret_token=<TELEGRAM_WEBHOOK_SECRET>
    https://api.telegram.org/bot<token>/getWebhookInfo
    ```
 
@@ -110,7 +117,8 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
 
 [`docker/telegram-bot-api/`](../docker/telegram-bot-api/README.md) builds Telegram's own Bot API server. To move the bot to it:
 log the bot out of the cloud server once (`https://api.telegram.org/bot<token>/logOut`), start the local server, and set
-`BOT_API_URL` and `BOT_API_PORT`. The bot always uses HTTPS for the Bot API, so the local server needs a TLS proxy in front.
+`TELEGRAM_API_HOST` and `TELEGRAM_API_PORT`. The bot always uses HTTPS for the Bot API, so the local server needs a TLS proxy
+in front.
 
 ## The API the bot calls
 

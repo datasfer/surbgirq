@@ -25,6 +25,8 @@ data BotConfig = BotConfig
   -- * Api wide settins
     telegramToken       :: Token
   -- ^ telegram bot token
+  , webhookSecret       :: Text
+  -- ^ the webhook's secret token (TELEGRAM_WEBHOOK_SECRET); its check comes next (README, Known issues)
   , botApiHost          :: Text
   -- ^ telegram bot api server host
   , botApiPort          :: Int

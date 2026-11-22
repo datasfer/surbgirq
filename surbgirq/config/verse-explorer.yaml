@@ -1,6 +1,7 @@
 server:
-        host: "*"
-        port: 8009
+        # Where the verse explorer listens; 127.0.0.1 keeps it on this machine
+        host: "_env:EXPLORER_HOST:127.0.0.1"
+        port: _env:EXPLORER_PORT:8009
         detailedRequestLogging: true
         ipFromHeader: true
         staticDir: "_env:EXPLORER_STATIC_PATH:../surbgirq-web/verse-explorer/front/"

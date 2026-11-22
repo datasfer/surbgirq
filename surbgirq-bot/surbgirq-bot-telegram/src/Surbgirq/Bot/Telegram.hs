@@ -10,12 +10,14 @@
 {-# LANGUAGE ViewPatterns               #-}
 module Surbgirq.Bot.Telegram
     ( startApp
+    , StartSettings (..)
     , app
     ) where
 import Control.Monad                 (replicateM)
 import Data.Char                     (isNumber)
 import Data.List                     (intercalate, intersperse)
 import Data.List.Split               (chunksOf)
+import Data.String                   (fromString)
 import Data.Text                     (Text, empty)
 import Data.Version                  (makeVersion, showVersion)
 import GHC.Generics                  hiding (from)
@@ -60,26 +62,45 @@ import Surbgirq.Bot.Types
 --         logger.info("Using local bot API, logout result: %s", r.text)
 -- print "API endpoint: %s", bot.base_url
 
---
--- https://api.telegram.org/botREMOVED-TELEGRAM-TOKEN/logOut
-startApp :: ClientEnv -> String -> String -> Int -> IO ()
-startApp graphApi' dbName botApiUrl port = do
-  putStrLn "Surbgirq bot started..."
+-- (Moving to a local Bot API server: log the bot out of the cloud one first,
+-- https://api.telegram.org/bot<token>/logOut; see docs/bot.md.)
+
+-- | What the bot needs at start-up: bot-settings.yaml, where an environment variable overrides each value,
+-- and the two secrets, read from the environment only (see .env.example).
+data StartSettings = StartSettings
+  { start'telegramApiHost :: String
+  -- ^ the Telegram Bot API server: Telegram's own, or a local telegram-bot-api (TELEGRAM_API_HOST)
+  , start'telegramApiPort :: Int
+  -- ^ its port (TELEGRAM_API_PORT)
+  , start'graphApi        :: ClientEnv
+  -- ^ the client for surbgirq-graph-api (GRAPH_API_URL)
+  , start'listenHost      :: String
+  -- ^ where the webhook server listens (BOT_LISTEN_HOST)
+  , start'listenPort      :: Int
+  -- ^ its port (BOT_LISTEN_PORT)
+  , start'token           :: Text
+  -- ^ the bot's token, without the "bot" prefix (TELEGRAM_BOT_TOKEN)
+  , start'webhookSecret   :: Text
+  -- ^ the webhook's secret token (TELEGRAM_WEBHOOK_SECRET)
+  }
+
+startApp :: StartSettings -> IO ()
+startApp StartSettings{..} = do
   manager' <- newManager tlsManagerSettings
   fbManager <- newManager tlsManagerSettings
   ref <- liftIO $ newIORef (0 :: Int)
   state <- newTVarIO def
 
-  let telegramToken' = "REMOVED-TELEGRAM-TOKEN"
-      fbVerifyToken = "123456"
+  let fbVerifyToken = "123456"
       fbPageToken = "REMOVED-FACEBOOK-TOKEN"
 
       config = BotConfig
-        { telegramToken = Token $ T.pack $ "bot" <> telegramToken'
-        , botApiHost = T.pack botApiUrl
-        , botApiPort = port
+        { telegramToken = Token $ "bot" <> start'token
+        , webhookSecret = start'webhookSecret
+        , botApiHost = T.pack start'telegramApiHost
+        , botApiPort = start'telegramApiPort
         , apiCachTime = Just 333 --  amount of time in seconds that the result may be cached on the server.
-        , graphApi = graphApi'
+        , graphApi = start'graphApi
         , facebookVerifyToken = fbVerifyToken
         , facebookPageToken = fbPageToken
         , manager = manager'
@@ -87,6 +108,8 @@ startApp graphApi' dbName botApiUrl port = do
         , ref = ref
         , state = state
         }
-  putStrLn $ concat ["BOT API endpoint: ", botApiUrl, ":", show port]
+      warpSettings = setHost (fromString start'listenHost) $ setPort start'listenPort defaultSettings
 
-  run 5000 $ app config
+  putStrLn $ concat [ "Surbgirq bot: listening on ", start'listenHost, ":", show start'listenPort
+                    , "; Telegram at ", start'telegramApiHost, ":", show start'telegramApiPort ]
+  runSettings warpSettings $ app config

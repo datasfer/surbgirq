@@ -1,9 +1,12 @@
 bots:
   telegram:
     dbName: "db/telebot"
-    #  api.telegram.org
-    # 192.0.2.10/bot
-    botApiHost: "_env:BOT_API_URL:api.telegram.org"
-    botApiPort: _env:BOT_API_PORT:443
+    # The Telegram Bot API server: Telegram's own, or a local telegram-bot-api server (docs/bot.md)
+    botApiHost: "_env:TELEGRAM_API_HOST:api.telegram.org"
+    botApiPort: _env:TELEGRAM_API_PORT:443
     # surbgirq-graph-api's root, without /api (the routes add it)
     graphApiUrl: "_env:GRAPH_API_URL:http://localhost:33010"
+    # Where the webhook server listens. Behind a reverse proxy (Caddy, nginx) keep 127.0.0.1;
+    # in a container, 0.0.0.0.
+    listenHost: "_env:BOT_LISTEN_HOST:127.0.0.1"
+    listenPort: _env:BOT_LISTEN_PORT:5000

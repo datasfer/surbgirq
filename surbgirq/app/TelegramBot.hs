@@ -4,12 +4,14 @@
 
 module Main where
 
-import qualified Data.Text as T
+import           Data.Char          (isAlphaNum, isAscii, isDigit)
+import qualified Data.Text          as T
+import           System.Environment (lookupEnv)
+import           System.Exit        (die)
 
 import Options.Applicative
 
 import Data.Aeson  (FromJSON)
-import Data.Monoid ((<>))
 
 import Common.Aeson
 import Common.Yaml
@@ -22,22 +24,56 @@ import Types.BotSettings
 -- Start Telegram bot webhook
 ------------------------------------------------------------
 
+-- | The settings come from config/bot-settings.yaml, where an environment variable overrides each value;
+-- the two secrets come from the environment only (see .env.example). Nothing secret is printed.
 main :: IO ()
 main = do
   installSigtermHandler
-  bot@BotSettings{..} <- getBotSettings "Bots Config"
-  let dbName = telegramBotConfig'dbName $ bot'telegram surbgirq'bots
-      botApiHost = telegramBotConfig'botApiHost $ bot'telegram surbgirq'bots
-      botApiPort = telegramBotConfig'botApiPort $ bot'telegram surbgirq'bots
-      graphApiUrl = telegramBotConfig'graphApiUrl $ bot'telegram surbgirq'bots
+  BotSettings{..} <- getBotSettings "Bots Config"
+  let tg = bot'telegram surbgirq'bots
+  token <- requireSecret "TELEGRAM_BOT_TOKEN" isBotToken
+             "doesn't look like a bot token: digits, a colon, then the key, without the \"bot\" prefix"
+  secret <- requireSecret "TELEGRAM_WEBHOOK_SECRET" isWebhookSecret
+              "must be 1 to 256 characters: letters, digits, _ and -"
+  graphApi <- graphApiClient (telegramBotConfig'graphApiUrl tg)
+  putStrLn $ "Surbgirq bot: the graph API at " <> telegramBotConfig'graphApiUrl tg
+  startApp StartSettings
+    { start'telegramApiHost = telegramBotConfig'botApiHost tg
+    , start'telegramApiPort = telegramBotConfig'botApiPort tg
+    , start'graphApi        = graphApi
+    , start'listenHost      = telegramBotConfig'listenHost tg
+    , start'listenPort      = telegramBotConfig'listenPort tg
+    , start'token           = token
+    , start'webhookSecret   = secret
+    }
 
-  putStrLn "Please, enter Telegram bot's API token:"
-  putStrLn $ mconcat [" with db: ", dbName]
-  putStrLn $ show bot
---  getEnvToken "TELEGRAM_BOT_TOKEN" >>= run
---  token <- T.pack <$> getLine
-  graphApi <- graphApiClient graphApiUrl
-  startApp graphApi dbName botApiHost botApiPort  -- run $ token
+
+-- | A secret from the environment. It stops the program with a message naming the variable when the value
+-- is missing, empty or malformed; the message never shows the value. Surrounding spaces and a trailing CR
+-- (a .env file saved on Windows) are stripped.
+requireSecret :: String -> (T.Text -> Bool) -> String -> IO T.Text
+requireSecret name isValid problem = do
+  value <- fmap (T.strip . T.pack) <$> lookupEnv name
+  case value of
+    Nothing -> die $ name <> " is not set (see .env.example)"
+    Just v
+      | T.null v        -> die $ name <> " is empty (see .env.example)"
+      | not (isValid v) -> die $ name <> " " <> problem
+      | otherwise       -> pure v
+
+-- | Digits (the bot's ID), a colon, then the key: ASCII letters, digits, _ and -.
+isBotToken :: T.Text -> Bool
+isBotToken t =
+  let (botId, rest) = T.breakOn ":" t
+      key           = T.drop 1 rest
+  in  not (T.null botId) && T.all isDigit botId && T.length key >= 30 && T.all isTokenChar key
+
+-- | Telegram's rule for a webhook's secret_token: 1 to 256 characters, ASCII letters, digits, _ and -.
+isWebhookSecret :: T.Text -> Bool
+isWebhookSecret t = T.length t <= 256 && T.all isTokenChar t
+
+isTokenChar :: Char -> Bool
+isTokenChar c = (isAscii c && isAlphaNum c) || c == '_' || c == '-'
 
 
 data CmdOptions = CmdOptions

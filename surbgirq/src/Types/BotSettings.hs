@@ -37,9 +37,15 @@ data BotSpec = BotSpec
 data TelegramBotConfig = TelegramBotConfig
     { telegramBotConfig'dbName      :: String
     , telegramBotConfig'botApiHost  :: String
+    -- ^ the Telegram Bot API server (TELEGRAM_API_HOST)
     , telegramBotConfig'botApiPort  :: Int
+    -- ^ its port (TELEGRAM_API_PORT)
     , telegramBotConfig'graphApiUrl :: String
     -- ^ surbgirq-graph-api's root, without /api (GRAPH_API_URL)
+    , telegramBotConfig'listenHost  :: String
+    -- ^ where the webhook server listens (BOT_LISTEN_HOST)
+    , telegramBotConfig'listenPort  :: Int
+    -- ^ its port (BOT_LISTEN_PORT)
     } deriving (Show)
 
 
