@@ -28,6 +28,8 @@ ghc-options:
 extra-deps:
   - git: https://github.com/ArthurVard/haskell-telegram-api.git
     commit: 94c40a15515920a4919fb4dc1a7ee008d598765d
+  - git: https://github.com/datasfer/tomarion.git
+    commit: a1e6de12983db6d5d995f4e7bfebb701f6845753
 #  - git: https://github.com/ArthurVard/fbmessenger-api-hs.git
 #    commit: 409b9369d3989077c09f693c33629a3abe4bac44
  # - selda-0.5.2.0@sha256:9685a946db19b75d2d3ca141a6f139457672abecd0bb963ab4d4ae01454fec86,2719

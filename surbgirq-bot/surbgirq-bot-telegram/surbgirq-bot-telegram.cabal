@@ -66,6 +66,7 @@ library
                , surbgirq-bot-store
                , surbgirq-bot-types
                , telegram-api
+               , tomarion
               -- , fbmessenger-api
               -- , fb
                , aeson
