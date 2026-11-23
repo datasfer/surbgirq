@@ -82,7 +82,9 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
 4. **Start it** from the `surbgirq/` package folder inside the repository: `cd surbgirq && stack exec -- telegram-bot`. It
    serves `GET /version` and `POST /tg-webhook` on `127.0.0.1:5000`. A `POST /tg-webhook` without the
    `X-Telegram-Bot-Api-Secret-Token` header set to `TELEGRAM_WEBHOOK_SECRET` gets 401, and one log line; Telegram sends
-   that header once `setWebhook` has the secret (step 5).
+   that header once `setWebhook` has the secret (step 5). With the right header, every update gets 200, even when
+   handling it fails: a non-2xx answer would make Telegram resend the update and hold back that chat's next ones, so the
+   failure goes to the log (stderr, one line each) instead.
 
    **Try it without a webhook:** post a fake `/help` message with your chat ID (in a private chat it's your user ID, which
    e.g. @userinfobot shows), after starting a chat with your bot. The bot answers in Telegram, since only its reply goes

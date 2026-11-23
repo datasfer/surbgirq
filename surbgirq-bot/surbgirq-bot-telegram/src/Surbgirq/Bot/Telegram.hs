@@ -13,7 +13,7 @@ module Surbgirq.Bot.Telegram
     , StartSettings (..)
     , app
     ) where
-import Control.Monad                 (replicateM)
+import Control.Monad                 (replicateM, when)
 import Data.Char                     (isNumber)
 import Data.List                     (intercalate, intersperse)
 import Data.List.Split               (chunksOf)
@@ -50,6 +50,7 @@ import Text.Regex.Posix
 
 import Surbgirq.Bot.App
 import Surbgirq.Bot.Server.TelegramAPI
+import Surbgirq.Bot.Server.Webhook   (logLine)
 import Surbgirq.Bot.Types
 
 ------------------------------------------------------------
@@ -108,7 +109,11 @@ startApp StartSettings{..} = do
         , ref = ref
         , state = state
         }
-      warpSettings = setHost (fromString start'listenHost) $ setPort start'listenPort defaultSettings
+      warpSettings = setOnException logWarpException
+                   $ setHost (fromString start'listenHost) $ setPort start'listenPort defaultSettings
+      -- what Warp prints by itself (a failure outside the update handling) goes through the same one-line log, which
+      -- replaces anything shaped like a bot token
+      logWarpException _ e = when (defaultShouldDisplayException e) $ logLine $ "Warp: " <> show e
 
   putStrLn $ concat [ "Surbgirq bot: listening on ", start'listenHost, ":", show start'listenPort
                     , "; Telegram at ", start'telegramApiHost, ":", show start'telegramApiPort ]

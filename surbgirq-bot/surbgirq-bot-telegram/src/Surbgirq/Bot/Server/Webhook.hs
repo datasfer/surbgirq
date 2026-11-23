@@ -5,20 +5,24 @@ Description : the handlers of GET /version and POST /tg-webhook
 module Surbgirq.Bot.Server.Webhook
     ( returnVersion
     , handleWebhook
+    , logLine
     ) where
 
+import Control.Exception      (SomeAsyncException, SomeException, fromException, tryJust)
 import Control.Monad.Except   (throwError)
 import Control.Monad.IO.Class (liftIO)
-import Control.Monad.Reader   (asks)
+import Control.Monad.Reader   (ask, asks, runReaderT)
 import Data.Aeson             ((.:))
 import Data.Bits              (xor, (.|.))
 import Data.Char              (isAsciiLower, isAsciiUpper, isDigit)
 import Data.List              (foldl')
+import Data.Maybe             (isJust)
 import Data.String            (fromString)
 import Data.Text              (Text)
 import Data.Version           (makeVersion, showVersion)
-import Servant.Server         (err401)
+import Servant.Server         (ServerError (..), err401, runHandler)
 import System.IO              (stderr)
+import Web.Telegram.API.Bot   (Update (..))
 
 import qualified Data.Aeson         as A
 import qualified Data.Aeson.Types   as A (parseMaybe)
@@ -52,7 +56,7 @@ handleWebhook secretHeader body = do
     Just given
       | not (sameSecret secret given) -> refuse "a wrong secret token"
       | otherwise -> case A.fromJSON body of
-          A.Success update  -> handleUpdate update
+          A.Success update  -> runUpdate update
           A.Error   problem -> liftIO $ logLine $
             "Webhook: update " <> updateIdOf body <> " doesn't decode, so it's skipped (200): " <> problem
   where
@@ -60,6 +64,25 @@ handleWebhook secretHeader body = do
     refuse what = do
       liftIO $ logLine $ "Webhook: 401 for a request with " <> what
       throwError err401
+
+
+-- | Handles one update, and Telegram gets 200 whatever happens inside: a failure, e.g. a graph API call that ends in
+-- 'error', is logged in one line instead, since a non-2xx answer makes Telegram resend the update and hold back the
+-- chat's next ones. Asynchronous exceptions, such as the bot being stopped, aren't caught.
+runUpdate :: Update -> Bot ()
+runUpdate update = do
+  config <- ask
+  outcome <- liftIO $ tryJust synchronous $ runHandler $ runReaderT (runBot (handleUpdate update)) config
+  liftIO $ case outcome of
+    Right (Right _)      -> pure ()
+    Right (Left problem) -> logLine $ prefix <> "ended in HTTP " <> show (errHTTPCode problem) <> "; Telegram gets 200"
+    Left exception       -> logLine $ prefix <> "failed; Telegram gets 200: " <> show exception
+  where
+    prefix = "Webhook: update " <> show (update_id update) <> " "
+    synchronous :: SomeException -> Maybe SomeException
+    synchronous e
+      | isJust (fromException e :: Maybe SomeAsyncException) = Nothing
+      | otherwise                                            = Just e
 
 
 -- | Compares the header with the secret without stopping at the first difference, so the time it takes doesn't tell
