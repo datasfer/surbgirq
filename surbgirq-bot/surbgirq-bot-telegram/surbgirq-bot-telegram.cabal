@@ -40,6 +40,7 @@ library
                    Surbgirq.Bot.Server.Handlers.CallbackQueries
                    Surbgirq.Bot.Server.Handlers.InlineQueries
                    Surbgirq.Bot.Server.Handlers.Messages
+                   Surbgirq.Bot.Server.Handlers.Feasts
 
                    Surbgirq.Bot.Server.Responses
                    Surbgirq.Bot.Server.Webhook

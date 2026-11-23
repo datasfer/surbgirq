@@ -47,7 +47,9 @@ helpMessage userId =  sendMessageRequest userId $ T.unlines
     , "/rand || /random - random verse from new testament - TODO"
     , "/rand Mat - random verse from Matthew - TODO"
     , "/today - Աստուածաշունչն այսօր - TODO"
-    , "/ton - ԵԿԵՂԵՑԱԿԱՆ ՏՈՆԵՐ - TODO"
+    , "/ton - ԵԿԵՂԵՑԱԿԱՆ ՏՈՆԵՐ - today and the next feasts"
+    , "/ton 2027 - the feasts and fasts of a year"
+    , "/zatik [year] - Easter (Զատիկ): the next one, or that year's"
     , "/md    -  markdown test"
     , "/html  - html markdown test"
     ]

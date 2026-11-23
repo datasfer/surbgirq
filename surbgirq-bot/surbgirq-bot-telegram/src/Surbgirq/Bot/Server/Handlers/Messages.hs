@@ -18,6 +18,7 @@ import qualified Data.Text       as T
 import Control.Monad.Reader
 
 import Surbgirq.Bot.Monad
+import Surbgirq.Bot.Server.Handlers.Feasts      (sendTon, sendZatik)
 import Surbgirq.Bot.Server.Responses
 import Surbgirq.Bot.Server.Settings.KeyboardMarkups
 import Surbgirq.Bot.Server.TelegramAPI
@@ -76,6 +77,8 @@ handleMessage msg@Message{..} = do
     onCommand userId (T.stripPrefix "/random" -> Just _)        = sendBooks_ chatId
     onCommand userId (T.stripPrefix "/md" -> Just _)            = testMd chatId
     onCommand userId (T.stripPrefix "/html" -> Just _)          = testHtml chatId
+    onCommand userId (T.stripPrefix "/ton" -> Just args)        = sendTon chatId userId date args
+    onCommand userId (T.stripPrefix "/zatik" -> Just args)      = sendZatik chatId userId date args
 
     onCommand userId (T.stripPrefix "/start" -> Just _)         = showSettings chatId userId
     onCommand userId (T.stripPrefix "/settings" -> Just _)      = showSettings chatId userId
