@@ -26,7 +26,7 @@ data BotConfig = BotConfig
     telegramToken       :: Token
   -- ^ telegram bot token
   , webhookSecret       :: Text
-  -- ^ the webhook's secret token (TELEGRAM_WEBHOOK_SECRET); its check comes next (README, Known issues)
+  -- ^ the webhook's secret token (TELEGRAM_WEBHOOK_SECRET): every POST /tg-webhook must carry it
   , botApiHost          :: Text
   -- ^ telegram bot api server host
   , botApiPort          :: Int

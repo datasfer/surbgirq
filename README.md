@@ -141,7 +141,6 @@ Nothing runs this code in public at the moment. Fix these before it does:
 
 | Issue | Planned fix |
 |---|---|
-| **The webhook is open:** no `X-Telegram-Bot-Api-Secret-Token` check yet (the check is a stub, `let b = True`). The bot already reads the secret at start-up (`TELEGRAM_WEBHOOK_SECRET`). | Check the header against it, and send it with `setWebhook`'s `secret_token` |
 | **A failing handler answers 500,** so Telegram retries and holds back that chat's later updates. Some handlers call `error` when an API call fails. | Catch errors, always answer 200 |
 | The bot's logs were cut down before publishing (no token, no user data), so they say little about failures. | Structured logging that never prints the token or user data |
 | The bot asks `surbgirq-graph-api` for one verse and for sections under `api/scriptures/…`, but the API serves them under `api/verses/…`; `…/verses/count` always returns 100. The verse explorer forwards the same routes. | Align the two when the bot runs again |

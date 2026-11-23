@@ -80,14 +80,17 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
    `_env:NAME:default` takes the environment variable `NAME` when it's set, and the default otherwise (all of them are in
    `.env.example`). Set `TELEGRAM_API_HOST` and `TELEGRAM_API_PORT` only for a self-hosted Bot API server (below).
 4. **Start it** from the `surbgirq/` package folder inside the repository: `cd surbgirq && stack exec -- telegram-bot`. It
-   serves `GET /version` and `POST /tg-webhook` on `127.0.0.1:5000`.
+   serves `GET /version` and `POST /tg-webhook` on `127.0.0.1:5000`. A `POST /tg-webhook` without the
+   `X-Telegram-Bot-Api-Secret-Token` header set to `TELEGRAM_WEBHOOK_SECRET` gets 401, and one log line; Telegram sends
+   that header once `setWebhook` has the secret (step 5).
 
    **Try it without a webhook:** post a fake `/help` message with your chat ID (in a private chat it's your user ID, which
    e.g. @userinfobot shows), after starting a chat with your bot. The bot answers in Telegram, since only its reply goes
-   out:
+   out. Load `.env` in this terminal too, for the header:
 
    ```bash
-   curl -s -X POST http://127.0.0.1:5000/tg-webhook -H 'Content-Type: application/json' -d '{"update_id": 1,
+   curl -s -X POST http://127.0.0.1:5000/tg-webhook -H 'Content-Type: application/json' \
+     -H "X-Telegram-Bot-Api-Secret-Token: $TELEGRAM_WEBHOOK_SECRET" -d '{"update_id": 1,
      "message": {"message_id": 1, "date": 0, "text": "/help",
        "chat": {"id": YOUR_CHAT_ID, "type": "private"},
        "from": {"id": YOUR_CHAT_ID, "is_bot": false, "first_name": "Test"}}}'
@@ -110,8 +113,9 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
    https://api.telegram.org/bot<token>/getWebhookInfo
    ```
 
-   When delivery fails, `getWebhookInfo` shows why in `last_error_message`, e.g. "Wrong response from the webhook: 500
-   Internal Server Error" or "Connection refused".
+   When delivery fails, `getWebhookInfo` shows why in `last_error_message`, e.g. "Wrong response from the webhook: 401
+   Unauthorized" (the webhook was set without `secret_token`, or with another value than the bot's) or "Connection
+   refused".
 
 ## A self-hosted Bot API server
 
