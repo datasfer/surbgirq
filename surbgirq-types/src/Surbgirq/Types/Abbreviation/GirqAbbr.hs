@@ -34,14 +34,22 @@ import Surbgirq.Types.Scripture
 --
 ------------------------------------------------------------
 
+-- | The book a name or an abbreviation stands for, and the translation of the list it's in. Case, surrounding spaces
+-- and a trailing dot don't matter ('normalizeAbbr'), so @ա հովհ@ finds @Ա Հովհ.@. A blank name finds nothing.
 findByAbbr :: Text -> Maybe (Girq, TranslationID)
-findByAbbr name = listToMaybe $ catMaybes $ map (\ (girq, bs) -> findAbbr name girq bs) abbr
-                                           -- concatMap (\ (AbbrBook t xs) -> any (==name) xs) abbr
+findByAbbr name
+    | T.null key = Nothing
+    | otherwise  = listToMaybe $ catMaybes $ map (\ (girq, bs) -> findAbbr girq bs) abbr
   where
-    findAbbr :: Text -> Girq -> [AbbrBook] -> Maybe (Girq, TranslationID)
-    findAbbr _ _ [] = Nothing
-    findAbbr name girq (AbbrBook t bs:xs) | any (\b -> T.toLower b == T.toLower name) bs = Just (girq, t)
-                                          | otherwise = findAbbr name girq xs
+    key = normalizeAbbr name
+    findAbbr :: Girq -> [AbbrBook] -> Maybe (Girq, TranslationID)
+    findAbbr _ [] = Nothing
+    findAbbr girq (AbbrBook t bs:xs) | any ((== key) . normalizeAbbr) bs = Just (girq, t)
+                                     | otherwise                         = findAbbr girq xs
+
+-- | A name as 'findByAbbr' compares it: in lower case, without surrounding spaces or a trailing dot.
+normalizeAbbr :: Text -> Text
+normalizeAbbr = T.toLower . T.dropWhileEnd (== '.') . T.strip
 
 data AbbrBook = AbbrBook TranslationID [Text]
 
@@ -218,7 +226,7 @@ james :: [AbbrBook]
 james = [mkAbbrBook E1994T jamesAm, sinodalBooks jamesRu, kjvBooks jamesEn]
   where
     jamesAm = ["Յակոբոս", "Յկ", "Հակոբոս", "Հկ"]
-    jamesRu = ["Иаков", " Иакова", "Иак"]
+    jamesRu = ["Иаков", "Иакова", "Иак"]
     jamesEn = ["James", "Jas"]
 
 

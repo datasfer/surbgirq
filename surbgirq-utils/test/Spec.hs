@@ -65,6 +65,23 @@ main = hspec $ do
       parseVerseRef "xyz 1 2" `shouldSatisfy` isLeft
     it "refuses a book without a chapter" $
       parseVerseRef "Mat" `shouldSatisfy` isLeft
+    it "reads a numbered book written with a space" $ do
+      "1 John 4 8" `parsesTo` (Nothing, John1, 4, Just 8, Nothing, False)
+      "1 Peter 1 3" `parsesTo` (Nothing, Peter1, 1, Just 3, Nothing, False)
+    it "reads a numbered book after a translation word" $
+      "kjv 1 John 4 8" `parsesTo` (Just KJVT, John1, 4, Just 8, Nothing, False)
+    it "reads a numbered book without its abbreviation's trailing dot" $
+      "Ա Հովհ 4 8" `parsesTo` (Nothing, John1, 4, Just 8, Nothing, False)
+    it "reads a numbered book whose name is listed without the space" $
+      "Ա Հովհաննես 4 8" `parsesTo` (Nothing, John1, 4, Just 8, Nothing, False)
+    it "reads a book whose number comes last" $
+      "Թագ Ա 3 5" `parsesTo` (Nothing, Kings1, 3, Just 5, Nothing, False)
+    it "keeps a one-word book when the next word is the chapter" $ do
+      "John 1 1" `parsesTo` (Nothing, John, 1, Just 1, Nothing, False)
+      "Ezra 1 5" `parsesTo` (Nothing, Ezra2, 1, Just 5, Nothing, False)
+    it "reads the numbers after the book's name, not inside it" $ do
+      "1John 4 8" `parsesTo` (Nothing, John1, 4, Just 8, Nothing, False)
+      "read 1John 5 3" `parsesTo` (Nothing, John1, 5, Just 3, Nothing, False)
 
   describe "toRefText" $ do
     forM_ [minBound .. maxBound] $ \translation ->

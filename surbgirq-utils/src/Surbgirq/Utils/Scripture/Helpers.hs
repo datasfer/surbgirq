@@ -27,18 +27,14 @@ parseVerseRef :: Text -> Either Text VerseReference
 parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text"
                          | otherwise =
      let str = verseRange
-         ws = T.words str
-         gs = readGirqs str
-         maybeTranslation = readTranslation $ take 1 ws
-         skip = maybe 1 (const 2) maybeTranslation
-         ns' = readNums skip str
-         ns = if null ns' then readNums 2 str else ns'
+         maybeTranslation = readTranslation $ take 1 $ T.words str
          combine = T.any (\x -> x ==':' || x =='-') str
-     in case gs of
+     in case readGirqs str of
            Nothing -> Left [qc|Unknown book name: {verseRange}|]
-           Just (girq, trans) ->
+           Just ((girq, trans), nameEnd) ->
+               -- The numbers are read after the book's name, so a digit in it ("1John") isn't taken for the chapter.
                let translation = maybeTranslation <|> narekByName girq trans
-               in case ns of
+               in case readNums nameEnd str of
                          (a:b:c:_) -> Right $ VerseReference translation girq a (Just b) (Just c) combine
                          (a:b:_)   -> Right $ VerseReference translation girq a (Just b) Nothing False
                          (a:_)     -> Right $ VerseReference translation girq a Nothing Nothing False
@@ -67,14 +63,32 @@ readTranslation :: [Text] -> Maybe TranslationID
 readTranslation []  = Nothing
 readTranslation [s] = findTransByAbbr s
 
-readGirqs :: Text -> Maybe (Girq, TranslationID)
+-- | The book a reference names, and how many words it takes up to the end of the name: the chapter and the verses come
+-- after it. The name starts at the first word, or at the second (after a translation word, or a word such as @read@).
+-- It's one word, or two when the first isn't a name on its own: "Թագ Ա", "Ա Հովհ.", or a book's number and its name,
+-- written with or without the space ("1 John"; "1 Jn" for "1Jn"). So "John 1 1" stays John, "Ezra 1 5" reads as
+-- before, and "1 John 4 8" is no longer John 4:8.
+readGirqs :: Text -> Maybe ((Girq, TranslationID), Int)
 readGirqs txt =
     let ws = T.words txt
-        trans = readTranslation $ take 1 ws
-    in case (ws, trans) of
-         ((x:y:xs), Nothing) -> listToMaybe $ catMaybes $ ([findByAbbr x]) ++ ([findByAbbr y])
-         ((_:x:xs), Just _)  -> findByAbbr x -- . T.groupBy (\x y -> isAlpha x && isAlpha y)
-         _                   -> Nothing
+        starts = case readTranslation (take 1 ws) of
+                   Nothing -> [0, 1]
+                   Just _  -> [1]
+    in listToMaybe $ mapMaybe (bookAt ws) starts
+  where
+    bookAt ws i = case drop i ws of
+        (w : _)      | Just book <- findByAbbr w                -> Just (book, i + 1)
+        (w : w' : _) | Just book <- findByAbbr (w <> " " <> w') -> Just (book, i + 2)
+                     | isBookNumber w
+                     , Just book <- findByAbbr (number w <> " " <> w') <|> findByAbbr (number w <> w')
+                                                                -> Just (book, i + 2)
+        _                                                       -> Nothing
+    number = T.dropWhileEnd (== '.')
+    isBookNumber w = number w `elem` bookNumbers
+
+-- | The numbers that begin the numbered books' names, as in "1 John" and "Ա Յովհ.".
+bookNumbers :: [Text]
+bookNumbers = ["1", "2", "3", "4", "Ա", "Բ", "Գ", "Դ"]
 
 
 verseRefRange :: VerseReference -> [VerseReference]
