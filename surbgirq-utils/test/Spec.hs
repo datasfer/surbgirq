@@ -2,11 +2,14 @@
 -- | What a verse reference typed in the bot becomes ('parseVerseRef').
 module Main (main) where
 
-import Data.Either (isLeft)
-import Data.Text   (Text)
+import Control.Monad (forM_)
+import Data.Either   (isLeft)
+import Data.Text     (Text)
 import Test.Hspec
 
-import Surbgirq.Types (Girq (..), TranslationID (..), VerseReference (..))
+import qualified Data.Text as T
+
+import Surbgirq.Types (CmdToken (..), Girq (..), TranslationID (..), VerseReference (..), findTransByAbbr)
 import Surbgirq.Utils (parseVerseRef)
 
 -- | A parsed reference's parts, compared as a tuple since 'VerseReference' has no 'Eq' instance: the translation, the
@@ -21,7 +24,15 @@ parsesTo :: Text -> Parts -> Expectation
 parsesTo reference expected = fmap parts (parseVerseRef reference) `shouldBe` Right expected
 
 main :: IO ()
-main = hspec $
+main = hspec $ do
+  describe "findTransByAbbr" $ do
+    it "finds every translation by its ID and by the value the settings keyboard stores" $
+      forM_ [minBound .. maxBound] $ \t -> do
+        findTransByAbbr (T.pack (show t)) `shouldBe` Just t
+        findTransByAbbr (toCmd t) `shouldBe` Just t
+    it "finds nothing for an empty setting" $
+      findTransByAbbr "" `shouldBe` Nothing
+
   describe "parseVerseRef" $ do
     it "reads a chapter and a verse range written with : and -" $
       "Mat 5:3-12" `parsesTo` (Just KJVT, Matthew, 5, Just 3, Just 12, True)

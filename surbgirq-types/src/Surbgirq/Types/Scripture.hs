@@ -41,7 +41,7 @@ data TranslationID = E1994T
                    | Narek_Xer
                    | Narek_Gev
                    | Narek_Goch
-                 deriving (Eq, Generic, Read)
+                 deriving (Eq, Generic, Read, Enum, Bounded)
 
 instance Show TranslationID where
     show t = case t of
