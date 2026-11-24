@@ -9,7 +9,8 @@ import Test.Hspec
 
 import qualified Data.Text as T
 
-import Surbgirq.Types (CmdToken (..), Girq (..), TranslationID (..), VerseReference (..), findTransByAbbr)
+import Surbgirq.Types (CmdToken (..), Girq (..), TranslationID (..), VerseReference (..), findTransByAbbr,
+                       toRefText)
 import Surbgirq.Utils (parseVerseRef, settingOrDefault)
 
 -- | A parsed reference's parts, compared as a tuple since 'VerseReference' has no 'Eq' instance: the translation, the
@@ -64,3 +65,16 @@ main = hspec $ do
       parseVerseRef "xyz 1 2" `shouldSatisfy` isLeft
     it "refuses a book without a chapter" $
       parseVerseRef "Mat" `shouldSatisfy` isLeft
+
+  describe "toRefText" $ do
+    forM_ [minBound .. maxBound] $ \translation ->
+      it ("names every book in " ++ show translation ++ ", with no crash and no leading space") $
+        forM_ [Genesis ..] $ \book ->
+          toRefText translation (VerseReference (Just translation) book 1 (Just 1) Nothing False)
+            `shouldSatisfy` (\title -> not (T.null title) && T.head title /= ' ')
+    it "gives Zohrab's text the 1994 text's book name where it has none of its own" $
+      toRefText V1805T (VerseReference (Just V1805T) Matthew 5 (Just 3) Nothing False)
+        `shouldBe` "Մատթ. 5:3, «Վէնէտիկ» 1805թ."
+    it "keeps Zohrab's own book name where it has one" $
+      toRefText V1805T (VerseReference (Just V1805T) Kings1 1 (Just 1) Nothing False)
+        `shouldBe` "Թագաւորութիւններ Ա 1:1, «Վէնէտիկ» 1805թ."
