@@ -43,14 +43,16 @@ Telegram may cache inline results for 333 seconds.
 
 - Any non-digit between the numbers separates them, so `Ղուկ. 6.20-23`, `Ղուկ 6 20 23` and `Luke 6:20-23` read the same.
 - A `:` or `-` anywhere in the reference joins a verse range into one result, in inline mode.
-- **Without a translation word, the book abbreviation decides the translation:** Armenian abbreviations (`Մատթ`, `Մատ`,
-  `Մտ`) mean the 1994 translation, English ones (`Mat`, `Luke`) the KJV. The user's translation setting doesn't change this
-  yet (README, Known issues). For the Zohrab text, put the translation word first: `v1805 Մատթ 1`.
+- **The translation:** the translation word if there is one; else the one the user chose in the settings; else the
+  server's default (`BOT_DEFAULT_BIBLE`, or `BOT_DEFAULT_NAREK` for Narek; "Running it" below). A book abbreviation's
+  language doesn't choose it (`Mat 1` and `Մատթ 1` get the same text), but Narek's own names do: Նարեկացի (the Grabar
+  original), Նարեկ-Գեւ and Նարեկ-Գոչ. The page buttons under a text keep its translation.
 
 ## Settings
 
 Per user, kept in memory (lost on restart): the Bible translation (Classical or modern Armenian, Russian Synodal, English), parallel
-translations, the Narek translation, parallel Nareks, and the menu language (Armenian, Russian, English).
+translations, the Narek translation, parallel Nareks, and the menu language (Armenian, Russian, English). Until a user chooses
+a Bible or a Narek, the server's default applies. The parallel translations are stored, but nothing uses them yet.
 
 ## Running it
 

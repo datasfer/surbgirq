@@ -150,7 +150,7 @@ Nothing runs this code in public at the moment. Fix these before it does:
 | The verse explorer was adapted from an earlier block-explorer prototype by the same author: `app.js` still has a live counter and a filter dialog that nothing feeds, and some names (`txhash`, `tx-list`) remain. Its search always answers "Not found"; `/about` is a placeholder. | Rework the page during the revival |
 | **The data pipeline (`surbgirq-shell`) is out of the build** since the GHC 9.6.7 upgrade: the author's note in `stack.yaml` names a `selda` conflict. So the CSV converters can't be rebuilt from `master` at the moment. | Update or replace `selda`, and bring the package back |
 | `html-scraper --z1805` runs the v1805 parser; `--json` and `--csv` still write YAML. `theodata/ar94-books.yaml` points at `e1994-T`. | Fix with the next pipeline run |
-| Tests are stubs ("not yet implemented"); `surbgirq-db`'s test needs a live Neo4j; several test suites name modules that don't exist. | Real tests where the code is touched |
+| Most test suites are stubs ("not yet implemented"); only `surbgirq-utils`'s tests something, the reference parser ([docs/build.md](docs/build.md#tests)). | Real tests where the code is touched |
 | `cabal.project` needs a local clone of the Telegram fork next to the repository (`../haskell-telegram-api`), and lists the dead `surbgirq-api`, which `stack.yaml` doesn't build. Stack fetches the fork itself. | A `source-repository-package` entry for the fork; one package list for both tools |
 | The Facebook Messenger integration (2020) is dead code; its packages are commented out of the build. | Remove it |
 
