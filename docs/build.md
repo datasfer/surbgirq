@@ -65,5 +65,6 @@ named `surbgirq`, that's `surbgirq/surbgirq/`): the default config paths are rel
 ## Tests
 
 `stack test` builds and runs the test suite of every package in `stack.yaml`. Most are still template stubs;
-`surbgirq-utils`'s suite tests what the bot makes of a typed verse reference (`parseVerseRef`), so run
-`stack test surbgirq-utils` after changing the parser. (`surbgirq-db`, whose test needs a live Neo4j, isn't in the build.)
+`surbgirq-utils`'s suite tests what the bot makes of a typed verse reference (`parseVerseRef`) and the title it
+gives every book in every translation (`toRefText`), so run `stack test surbgirq-utils` after changing the parser or
+the book names. (`surbgirq-db`, whose test needs a live Neo4j, isn't in the build.)

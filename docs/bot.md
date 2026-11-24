@@ -38,7 +38,8 @@ Telegram may cache inline results for 333 seconds.
 `parseVerseRef` (`surbgirq-utils`) reads a reference as:
 
 1. an optional **translation word**, e.g. `e1994`, `v1805`, `z1805`, `kjv` (all of them: `Surbgirq.Types.Abbreviation.TranslationIDAbbr`);
-2. a **book** name or abbreviation, in Armenian or English (`Surbgirq.Types.Abbreviation.GirqAbbr`);
+2. a **book** name or abbreviation, in Armenian, Russian or English (`Surbgirq.Types.Abbreviation.GirqAbbr`). Case
+   and a trailing dot don't matter, and a numbered book may be written with a space: `1 John`, `Ա Հովհ.`, `Թագ Ա`;
 3. up to three **numbers**: the chapter, the first verse, the last verse.
 
 - Any non-digit between the numbers separates them, so `Ղուկ. 6.20-23`, `Ղուկ 6 20 23` and `Luke 6:20-23` read the same.
@@ -47,6 +48,8 @@ Telegram may cache inline results for 333 seconds.
   server's default (`BOT_DEFAULT_BIBLE`, or `BOT_DEFAULT_NAREK` for Narek; "Running it" below). A book abbreviation's
   language doesn't choose it (`Mat 1` and `Մատթ 1` get the same text), but Narek's own names do: Նարեկացի (the Grabar
   original), Նարեկ-Գեւ and Նարեկ-Գոչ. The page buttons under a text keep its translation.
+- **The title** above a text names the book as that text does, where the table has its name (Zohrab's text has few).
+  The other Armenian texts fall back to the 1994 text's names, and every Bible text to the English ones.
 
 ## Settings
 
