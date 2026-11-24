@@ -18,6 +18,7 @@ import Common.Yaml
 import Sigterm
 import Surbgirq.Bot.ClientRequests (graphApiClient)
 import Surbgirq.Bot.Telegram
+import Surbgirq.Types              (TranslationID, findTransByAbbr)
 import Types.BotSettings
 
 ------------------------------------------------------------
@@ -36,11 +37,16 @@ main = do
   secret <- requireSecret "TELEGRAM_WEBHOOK_SECRET" isWebhookSecret
               "must be 1 to 256 characters: letters, digits, _ and -"
   graphApi <- graphApiClient (telegramBotConfig'graphApiUrl tg)
+  defaultBible <- requireTranslation "BOT_DEFAULT_BIBLE" (telegramBotConfig'defaultBible tg)
+  defaultNarek <- requireTranslation "BOT_DEFAULT_NAREK" (telegramBotConfig'defaultNarek tg)
   putStrLn $ "Surbgirq bot: the graph API at " <> telegramBotConfig'graphApiUrl tg
+             <> "; default texts " <> show defaultBible <> " and " <> show defaultNarek
   startApp StartSettings
     { start'telegramApiHost = telegramBotConfig'botApiHost tg
     , start'telegramApiPort = telegramBotConfig'botApiPort tg
     , start'graphApi        = graphApi
+    , start'defaultBible    = defaultBible
+    , start'defaultNarek    = defaultNarek
     , start'listenHost      = telegramBotConfig'listenHost tg
     , start'listenPort      = telegramBotConfig'listenPort tg
     , start'token           = token
@@ -60,6 +66,15 @@ requireSecret name isValid problem = do
       | T.null v        -> die $ name <> " is empty (see .env.example)"
       | not (isValid v) -> die $ name <> " " <> problem
       | otherwise       -> pure v
+
+-- | A default translation from bot-settings.yaml, or from its environment variable. It stops the program with a message
+-- naming the variable when the value isn't a translation the bot knows; the value isn't secret, so the message shows it.
+requireTranslation :: String -> T.Text -> IO TranslationID
+requireTranslation name value =
+  case findTransByAbbr (T.strip value) of
+    Just translation -> pure translation
+    Nothing          -> die $ name <> " is not a translation the bot knows: \"" <> T.unpack value
+                              <> "\" (an ID such as v1805-T or e1994-T; see docs/bot.md)"
 
 -- | Digits (the bot's ID), a colon, then the key: ASCII letters, digits, _ and -.
 isBotToken :: T.Text -> Bool

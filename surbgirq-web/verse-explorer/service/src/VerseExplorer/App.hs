@@ -54,10 +54,10 @@ api :: Proxy ExplorerAPI
 api = Proxy
 
 -- | Make WAI application of a verse explorer API server; it calls surbgirq-graph-api through the given
--- client (GRAPH_API_URL)
-app :: ClientEnv -> Application
-app graphApi = simpleCors $ logStdoutDev $
-        serve api $ (hoistServer api liftIO (server graphApi))
+-- client (GRAPH_API_URL), and its front page lists the books of the given Bible (EXPLORER_DEFAULT_BIBLE)
+app :: ClientEnv -> TranslationID -> Application
+app graphApi defaultBible = simpleCors $ logStdoutDev $
+        serve api $ (hoistServer api liftIO (server graphApi defaultBible))
 
 
 testBooks :: TranslationID -> IO [Book]
@@ -107,9 +107,9 @@ searchByWordEndpoint (SearchRequest word) = return FoundNothing
 -- server = bookList :<|> bookListByText -- getBooksHandler -- E1994T) -- bookList
 --          :<|> getBooksHandler
 -- --         :<|> testBooks
-server :: ClientEnv -> ServerT ExplorerAPI IO
-server graphApi =
-         ( (getBooksHandler graphApi E1994T)
+server :: ClientEnv -> TranslationID -> ServerT ExplorerAPI IO
+server graphApi defaultBible =
+         ( (getBooksHandler graphApi defaultBible)
          :<|> about
          :<|> searchByWordEndpoint
          :<|> getBooksHandler graphApi

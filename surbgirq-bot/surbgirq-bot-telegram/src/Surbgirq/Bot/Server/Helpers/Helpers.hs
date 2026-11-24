@@ -24,7 +24,19 @@ import Surbgirq.Utils
 ------------------------------------------------------------
 
 
-getCfgTranslation :: UserSettings -> Girq -> TranslationID
-getCfgTranslation cfg Narek = fromMaybe Narek_Xer $ readTranslation [config'narek cfg]
-getCfgTranslation cfg _     = fromMaybe E1994T $ readTranslation [config'bible cfg]
+-- | The translation for a reference to this book without a translation word of its own: the user's setting, else the
+-- server's default (BOT_DEFAULT_BIBLE, or BOT_DEFAULT_NAREK for Narek).
+getCfgTranslation :: BotConfig -> UserSettings -> Girq -> TranslationID
+getCfgTranslation botConfig cfg Narek = settingOrDefault (defaultNarek botConfig) (config'narek cfg)
+getCfgTranslation botConfig cfg _     = settingOrDefault (defaultBible botConfig) (config'bible cfg)
+
+
+-- | The reference with its translation filled in, and that translation: the reference's own translation word if it has
+-- one, else the user's setting, else the server's default. What comes after (the texts, the title, the page buttons)
+-- then uses that same translation.
+withTranslation :: UserSettings -> VerseReference -> Bot (TranslationID, VerseReference)
+withTranslation cfg parsed = do
+  botConfig <- ask
+  let translation = fromMaybe (getCfgTranslation botConfig cfg (verseRef'book parsed)) (verseRef'translation parsed)
+  pure (translation, parsed { verseRef'translation = Just translation })
 

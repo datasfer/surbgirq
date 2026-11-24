@@ -22,6 +22,7 @@ executable telegram-bot
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends: base >= 4.17.2.1 && < 5
                , surbgirq-bot-telegram
+               , surbgirq-types
                , unix
                , optparse-applicative   >= 0.14
                , aeson
@@ -44,6 +45,7 @@ executable verse-explorer
   build-depends: base >= 4.17.2.1 && < 5
                , service
                , surbgirq-bot-telegram
+               , surbgirq-types
               -- , surbgirq-service
               -- , surbgirq-db
                , wai-middleware-static

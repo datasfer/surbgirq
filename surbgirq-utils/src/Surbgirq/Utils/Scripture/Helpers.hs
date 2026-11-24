@@ -6,6 +6,7 @@ module Surbgirq.Utils.Scripture.Helpers where
 
 -- import           Data.Char
 -- import           Data.List
+import           Control.Applicative           ((<|>))
 import           Data.Maybe
 import           Data.Text                     (Text)
 import qualified Data.Text                     as T
@@ -18,6 +19,10 @@ import           Text.Read
 -- Ղուկ. 6.20-23
 -- >> e1994t mat 2
 -- >>> VerseReference {verseRef'translation = Just e1994-T, verseRef'book = Matthew, verseRef'chapter = 2, verseRef'from = Nothing, verseRef'to = Nothing, verseRef'combine = False}
+--
+-- The translation is the reference's own translation word ("e1994t" above), or Nothing, and then the caller takes the
+-- user's setting, else the server's default ('settingOrDefault'). A book abbreviation's language doesn't choose one,
+-- but Narek's names do ('narekByName').
 parseVerseRef :: Text -> Either Text VerseReference
 parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text"
                          | otherwise =
@@ -32,12 +37,25 @@ parseVerseRef verseRange | T.null verseRange = Left "error: empty verse ref text
      in case gs of
            Nothing -> Left [qc|Unknown book name: {verseRange}|]
            Just (girq, trans) ->
-               let translation = Just $ fromMaybe trans maybeTranslation
+               let translation = maybeTranslation <|> narekByName girq trans
                in case ns of
                          (a:b:c:_) -> Right $ VerseReference translation girq a (Just b) (Just c) combine
                          (a:b:_)   -> Right $ VerseReference translation girq a (Just b) Nothing False
                          (a:_)     -> Right $ VerseReference translation girq a Nothing Nothing False
                          []        -> Left "Failed parse verse numbers"
+
+
+-- | Narek's names that name a translation: Նարեկացի (the Grabar original), Նարեկ-Գեւ and Նարեկ-Գոչ. The plain Նարեկ
+-- or Narek maps to Kheranyan's translation in the abbreviation table, but names none.
+narekByName :: Girq -> TranslationID -> Maybe TranslationID
+narekByName Narek trans | trans /= Narek_Xer = Just trans
+narekByName _     _                          = Nothing
+
+
+-- | The translation a user's setting names (the value the settings keyboard stored, such as "kjv#"), or the server's
+-- default when the setting is empty or names none. A reference's own translation word comes before both.
+settingOrDefault :: TranslationID -> Text -> TranslationID
+settingOrDefault serverDefault setting = fromMaybe serverDefault (findTransByAbbr setting)
 
 
 readNums :: Int -> Text -> [Int]

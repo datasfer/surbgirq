@@ -53,8 +53,10 @@ newtype UserId = UserId { unUserId :: Int }
 instance Default BotState where
     def = BotState mempty mempty
 
+-- | A new user's Bible and Narek are empty: the server's default (BOT_DEFAULT_BIBLE, BOT_DEFAULT_NAREK) until they
+-- choose one in the settings.
 instance Default UserSettings where
-    def = UserSettings "e1994T" mempty "gevNarek#" mempty False EN
+    def = UserSettings "" mempty "" mempty False EN
 
 $(deriveJSON dropPrefixOptions ''BotState)
 

@@ -30,6 +30,7 @@ import qualified Data.Text      as T
 import qualified Data.Text.Lazy as TL
 
 import Surbgirq.Bot.Monad
+import Surbgirq.Bot.Server.Helpers.Helpers      (withTranslation)
 import Surbgirq.Bot.Server.Helpers.HelpMessages
 import Surbgirq.Bot.Server.Helpers.Pagination
 import Surbgirq.Bot.Server.Responses
@@ -214,14 +215,13 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
 
 
       -- | verse pagination
-      onCommand UserSettings{..} (T.stripPrefix "go_to_verseRef#" -> Just args) = do
+      onCommand cfg (T.stripPrefix "go_to_verseRef#" -> Just args) = do
         BotConfig{..} <- ask
         liftIO $ putStrLn [qc|=========== verse pagination {args}|]
 
         case parseVerseRef args of
-          Right verseRef@VerseReference{..} -> do
-            let def1 = fromMaybe E1994T (readTranslation [config'bible])
-                defaultTrans = fromMaybe def1 verseRef'translation
+          Right parsed -> do
+            (defaultTrans, verseRef@VerseReference{..}) <- withTranslation cfg parsed
 
             vs <- liftIO $ getVerse' graphApi defaultTrans chatId verseRef
             let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml verseRef)
@@ -229,7 +229,8 @@ handleCallbackQuery cbq@CallbackQuery{cq_from = User{..},..} = do
             liftIO $ putStrLn . T.unpack $ toRefText defaultTrans verseRef
 
             let currentPage = fromMaybe 1 verseRef'from
-                buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+                -- the translation goes into the buttons, so the next page keeps it
+                buttons = prevNextPageBtns currentPage 24 "go_to_verseRef#" [qc|{defaultTrans} {verseRef'book} {verseRef'chapter} |]
                 -- buttons = generatePageBtns 0 page 12 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
 
             liftIO $ print buttons

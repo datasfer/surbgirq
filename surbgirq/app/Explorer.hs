@@ -23,8 +23,12 @@ import Data.Maybe
 import Settings
 import Sigterm
 import Surbgirq.Bot.ClientRequests (graphApiClient)
+import Surbgirq.Types              (findTransByAbbr)
+import System.Exit                 (die)
 import Types
 import VerseExplorer
+
+import qualified Data.Text as T
 
 
 main :: IO ()
@@ -36,9 +40,12 @@ main = do
       staticPath = serverStaticDir explorer'server
       warpSettings = Warp.setHost host $ Warp.setPort port Warp.defaultSettings
   graphApi <- graphApiClient explorer'graphApiUrl
+  defaultBible <- maybe (die $ "EXPLORER_DEFAULT_BIBLE is not a translation the explorer knows: \""
+                               <> T.unpack explorer'defaultBible <> "\" (an ID such as v1805-T or e1994-T)")
+                        pure (findTransByAbbr (T.strip explorer'defaultBible))
   putStrLn $ mconcat [ "Verse explorer: listening on ", show host, " port ", show port
-                     , "; the graph API at ", explorer'graphApiUrl ]
-  Warp.runSettings warpSettings $ staticPolicy (noDots >-> addBase staticPath) $ app graphApi
+                     , "; the graph API at ", explorer'graphApiUrl, "; front page: ", show defaultBible ]
+  Warp.runSettings warpSettings $ staticPolicy (noDots >-> addBase staticPath) $ app graphApi defaultBible
 
 
 

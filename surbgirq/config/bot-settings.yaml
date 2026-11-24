@@ -6,6 +6,10 @@ bots:
     botApiPort: _env:TELEGRAM_API_PORT:443
     # surbgirq-graph-api's root, without /api (the routes add it)
     graphApiUrl: "_env:GRAPH_API_URL:http://localhost:33010"
+    # The text for a reference without a translation word, when the user hasn't chosen one in the settings: an ID
+    # such as v1805-T or e1994-T (docs/bot.md). The built-in ones are public; the 1994 text and Kheranyan's Narek aren't.
+    defaultBible: "_env:BOT_DEFAULT_BIBLE:v1805-T"
+    defaultNarek: "_env:BOT_DEFAULT_NAREK:narekaci-T"
     # Where the webhook server listens. Behind a reverse proxy (Caddy, nginx) keep 127.0.0.1;
     # in a container, 0.0.0.0.
     listenHost: "_env:BOT_LISTEN_HOST:127.0.0.1"

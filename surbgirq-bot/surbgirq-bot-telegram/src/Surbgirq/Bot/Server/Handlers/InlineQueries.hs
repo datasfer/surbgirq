@@ -89,17 +89,16 @@ inlineReadVerses userId iqId verseRef =
       Right vRef -> inlineReadVerses' userId iqId vRef
 
 inlineReadVerses' :: UserId -> Text -> VerseReference -> Bot ()
-inlineReadVerses' userId iqId verseRef@VerseReference{..} = do
+inlineReadVerses' userId iqId parsed = do
   BotConfig{..} <- ask
   cfg <- getUserConfig  userId
-  let def1 = getCfgTranslation cfg verseRef'book
-      defaultTrans = fromMaybe def1 verseRef'translation
+  (defaultTrans, verseRef@VerseReference{..}) <- withTranslation cfg parsed
 
   vs <- liftIO $ getVerses graphApi defaultTrans verseRef
 
   let
       currentPage = fromMaybe 1 verseRef'from
-      buttons = prevNextPageBtns currentPage 20 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+      buttons = prevNextPageBtns currentPage 20 "go_to_verseRef#" [qc|{defaultTrans} {verseRef'book} {verseRef'chapter} |]
       verseNum = fromMaybe 1 verseRef'from
       verseToShow = case  filter ((== verseNum) . snd) $ zip vs [1..]  of
                       [(v, _)] -> v
@@ -166,13 +165,11 @@ inlineReadVerses' userId iqId verseRef@VerseReference{..} = do
 --     Right vRef -> inlineVerse' userId iqId vRef
 
 inlineVerse :: UserId -> Text -> VerseReference -> Bot ()
-inlineVerse userId iqId verseRef@VerseReference{..} = do
+inlineVerse userId iqId parsed = do
   BotConfig{..} <- ask
   cfg <- getUserConfig  userId
-  let def1 = getCfgTranslation cfg verseRef'book
-      defaultTrans = fromMaybe def1 verseRef'translation
-      offset@(queryRef, queryOffsetTxt) = toOffset 50 verseRef
-  _ <- liftIO $ putStrLn $ ">InlineVerse getTranslation: " ++ (show def1)
+  (defaultTrans, verseRef@VerseReference{..}) <- withTranslation cfg parsed
+  let offset@(queryRef, queryOffsetTxt) = toOffset 50 verseRef
   _ <- liftIO $ putStrLn $ ">InlineVerse defaultTrans: " ++ (show defaultTrans)
   _ <- liftIO $ putStrLn $ ">InlineVerse VerseRef: " ++ (show verseRef)
   _ <- liftIO $ putStrLn $ ">InlineVerse offset: " ++ (show offset)
@@ -254,8 +251,7 @@ inlineChapter :: UserId -> Text -> (Girq, TranslationID)  -> Bot ()
 inlineChapter userId iqId (girq, trans) = do
   BotConfig{..} <- ask
   cfg <- getUserConfig  userId
-  let def1 = getCfgTranslation cfg girq
-      defaultTrans = trans
+  let defaultTrans = trans
       verseRef = VerseReference (Just trans)  girq 1 Nothing Nothing True
       offset@(queryRef, queryOffsetTxt) = toOffset 50 verseRef
   vs <- liftIO $ getChapterVerses graphApi defaultTrans queryRef

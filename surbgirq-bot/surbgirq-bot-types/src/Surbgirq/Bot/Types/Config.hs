@@ -9,6 +9,7 @@ import Data.Text            (Text)
 import GHC.Generics         (Generic)
 import Network.HTTP.Client  (Manager)
 import Servant.Client       (ClientEnv)
+import Surbgirq.Types       (TranslationID)
 import Web.Telegram.API.Bot (Token)
 
 import Data.Aeson
@@ -35,6 +36,10 @@ data BotConfig = BotConfig
   -- ^ api wide cach time
   , graphApi            :: ClientEnv
   -- ^ the client for surbgirq-graph-api, made once at start-up (GRAPH_API_URL)
+  , defaultBible        :: TranslationID
+  -- ^ the Bible for a reference without a translation word, when the user hasn't chosen one (BOT_DEFAULT_BIBLE)
+  , defaultNarek        :: TranslationID
+  -- ^ the same for Narek (BOT_DEFAULT_NAREK)
 
   , facebookVerifyToken :: Text
   , facebookPageToken   :: Text

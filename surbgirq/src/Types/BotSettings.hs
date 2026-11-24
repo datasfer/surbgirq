@@ -42,6 +42,10 @@ data TelegramBotConfig = TelegramBotConfig
     -- ^ its port (TELEGRAM_API_PORT)
     , telegramBotConfig'graphApiUrl :: String
     -- ^ surbgirq-graph-api's root, without /api (GRAPH_API_URL)
+    , telegramBotConfig'defaultBible :: Text
+    -- ^ the Bible for a reference without a translation word, when the user hasn't chosen one (BOT_DEFAULT_BIBLE)
+    , telegramBotConfig'defaultNarek :: Text
+    -- ^ the same for Narek (BOT_DEFAULT_NAREK)
     , telegramBotConfig'listenHost  :: String
     -- ^ where the webhook server listens (BOT_LISTEN_HOST)
     , telegramBotConfig'listenPort  :: Int

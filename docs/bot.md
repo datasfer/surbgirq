@@ -73,12 +73,21 @@ translations, the Narek translation, parallel Nareks, and the menu language (Arm
        botApiHost: "_env:TELEGRAM_API_HOST:api.telegram.org"
        botApiPort: _env:TELEGRAM_API_PORT:443
        graphApiUrl: "_env:GRAPH_API_URL:http://localhost:33010"
+       defaultBible: "_env:BOT_DEFAULT_BIBLE:v1805-T"
+       defaultNarek: "_env:BOT_DEFAULT_NAREK:narekaci-T"
        listenHost: "_env:BOT_LISTEN_HOST:127.0.0.1"
        listenPort: _env:BOT_LISTEN_PORT:5000
    ```
 
    `_env:NAME:default` takes the environment variable `NAME` when it's set, and the default otherwise (all of them are in
    `.env.example`). Set `TELEGRAM_API_HOST` and `TELEGRAM_API_PORT` only for a self-hosted Bot API server (below).
+
+   **Which text a reference gets:** its own translation word (`kjv John 3:16`, `e1994 Mat 5`), else the one the user chose
+   in the settings, else `defaultBible` (for Narek, `defaultNarek`). A book abbreviation's language doesn't choose one,
+   but Narek's names do (Նարեկացի, Նարեկ-Գեւ, Նարեկ-Գոչ). The built-in defaults are public texts: Zohrab's Bible of 1805
+   and Narek's Grabar original. The 1994 Etchmiadzin text and Kheranyan's Narek are protected, so set
+   `BOT_DEFAULT_BIBLE=e1994-T` (or `BOT_DEFAULT_NAREK=narek_xer-T`) only for a private bot. The bot refuses to start with
+   a value it doesn't know, naming the variable.
 4. **Start it** from the `surbgirq/` package folder inside the repository: `cd surbgirq && stack exec -- telegram-bot`. It
    serves `GET /version` and `POST /tg-webhook` on `127.0.0.1:5000`. A `POST /tg-webhook` without the
    `X-Telegram-Bot-Api-Secret-Token` header set to `TELEGRAM_WEBHOOK_SECRET` gets 401, and one log line; Telegram sends

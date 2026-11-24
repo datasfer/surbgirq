@@ -52,6 +52,7 @@ import Surbgirq.Bot.App
 import Surbgirq.Bot.Server.TelegramAPI
 import Surbgirq.Bot.Server.Webhook   (logLine)
 import Surbgirq.Bot.Types
+import Surbgirq.Types                (TranslationID)
 
 ------------------------------------------------------------
 --
@@ -75,6 +76,10 @@ data StartSettings = StartSettings
   -- ^ its port (TELEGRAM_API_PORT)
   , start'graphApi        :: ClientEnv
   -- ^ the client for surbgirq-graph-api (GRAPH_API_URL)
+  , start'defaultBible    :: TranslationID
+  -- ^ the Bible for a reference without a translation word, when the user hasn't chosen one (BOT_DEFAULT_BIBLE)
+  , start'defaultNarek    :: TranslationID
+  -- ^ the same for Narek (BOT_DEFAULT_NAREK)
   , start'listenHost      :: String
   -- ^ where the webhook server listens (BOT_LISTEN_HOST)
   , start'listenPort      :: Int
@@ -102,6 +107,8 @@ startApp StartSettings{..} = do
         , botApiPort = start'telegramApiPort
         , apiCachTime = Just 333 --  amount of time in seconds that the result may be cached on the server.
         , graphApi = start'graphApi
+        , defaultBible = start'defaultBible
+        , defaultNarek = start'defaultNarek
         , facebookVerifyToken = fbVerifyToken
         , facebookPageToken = fbPageToken
         , manager = manager'

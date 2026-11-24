@@ -7,3 +7,5 @@ server:
         staticDir: "_env:EXPLORER_STATIC_PATH:../surbgirq-web/verse-explorer/front/"
 # surbgirq-graph-api's root, without /api (the routes add it)
 graphApiUrl: "_env:GRAPH_API_URL:http://localhost:33010"
+# The Bible whose books the front page lists: an ID such as v1805-T or e1994-T (docs/bot.md)
+defaultBible: "_env:EXPLORER_DEFAULT_BIBLE:v1805-T"

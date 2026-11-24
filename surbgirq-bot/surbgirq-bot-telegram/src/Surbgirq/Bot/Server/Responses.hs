@@ -66,14 +66,14 @@ sendBooks chatId book | T.null book = allBooks chatId
 allBooks :: ChatId -> Bot ()
 allBooks chatId = do
     BotConfig{..} <- ask
-    books <- liftIO $ getBooksHandler graphApi E1994T
+    books <- liftIO $ getBooksHandler graphApi defaultBible
     sendAsParts chatId books
 --    forM_ books $ \book -> let htmlText = TL.toStrict . renderText $ toHtml book in sendHtml chatId htmlText
 
 sendBooks_ :: ChatId -> Bot ()
 sendBooks_ chatId = do
     BotConfig{..} <- ask
-    books <- liftIO $ getBooksHandler graphApi E1994T
+    books <- liftIO $ getBooksHandler graphApi defaultBible
     let booksHtml =  TL.toStrict . renderText $ toHtml books
     sendHtml chatId  booksHtml
 
@@ -83,7 +83,7 @@ sendBooks_ chatId = do
 -- | Sections
 sendChapterSections :: ChatId -> UserId -> Text -> Bot ()
 sendChapterSections chatId userId argString = do
-  BotConfig{..} <- ask
+  botConfig@BotConfig{..} <- ask
   cfg <- getUserConfig  userId
 
   let args = parseChatCommandArgs argString
@@ -101,9 +101,9 @@ sendChapterSections chatId userId argString = do
   -- liftIO $ putStrLn [qc|TTTT Translation: {translation}|]
 
   secRes <- liftIO $ case (bookRes, chRes, secRes) of
-    (Just girq, Just chapter, Just section) -> Right <$> getChapterOneSectionHandler graphApi (getCfgTranslation cfg girq) girq chapter section
-    (Just girq, Just chapter, Nothing) -> Right <$> getChapterSectionsHandler graphApi (getCfgTranslation cfg girq) girq chapter
-    (Just girq, Nothing, Nothing) -> Right <$> getBookSectionsHandler graphApi (getCfgTranslation cfg girq) girq
+    (Just girq, Just chapter, Just section) -> Right <$> getChapterOneSectionHandler graphApi (getCfgTranslation botConfig cfg girq) girq chapter section
+    (Just girq, Just chapter, Nothing) -> Right <$> getChapterSectionsHandler graphApi (getCfgTranslation botConfig cfg girq) girq chapter
+    (Just girq, Nothing, Nothing) -> Right <$> getBookSectionsHandler graphApi (getCfgTranslation botConfig cfg girq) girq
     (Nothing, _, _) ->  pure $ Left [qc|Failed parse book: {book}|]
   case secRes of
     Right secs -> do
@@ -125,11 +125,10 @@ sendVerse sendAtOnce chatId userId verseRef =
 -- | if sendAtOnce True then send all verses of chapter as one text post
 -- otherwise will send sperae post, and only for last verse ill have next button
 sendVerse' :: Bool -> ChatId -> UserId -> VerseReference -> Bot ()
-sendVerse' sendAtOnce chatId userId vRef@VerseReference{..} = do
+sendVerse' sendAtOnce chatId userId parsed = do
       BotConfig{..} <- ask
       cfg <- getUserConfig  userId
-
-      let defaultTrans = fromMaybe E1994T $ readTranslation [config'bible cfg]
+      (defaultTrans, vRef@VerseReference{..}) <- withTranslation cfg parsed
 
       vs <- liftIO $ getVerses graphApi defaultTrans vRef
       maxVerseNum <- liftIO $ getChapterVerseNumberHandler graphApi defaultTrans verseRef'book $ ChapterNum verseRef'chapter
@@ -138,7 +137,7 @@ sendVerse' sendAtOnce chatId userId vRef@VerseReference{..} = do
       then do
         let verseHtml = TL.toStrict . renderText $ (toHtml vs <> toHtml vRef)
             currentPage = fromMaybe 1 verseRef'from
-            buttons = prevNextPageBtns currentPage maxVerseNum "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+            buttons = prevNextPageBtns currentPage maxVerseNum "go_to_verseRef#" [qc|{defaultTrans} {verseRef'book} {verseRef'chapter} |]
             -- buttons = generatePageBtns 0 page 12 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
         sendTextReplyKb (ReplyInlineKeyboardMarkup buttons)  chatId verseHtml
       else do
@@ -146,7 +145,7 @@ sendVerse' sendAtOnce chatId userId vRef@VerseReference{..} = do
         let verseRefHtml = TL.toStrict . renderText $ toHtml vRef
             currentPage = fromMaybe 1 verseRef'from
             -- buttons = generatePageBtns 0 page 12 "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
-            buttons = prevNextPageBtns currentPage maxVerseNum "go_to_verseRef#" [qc|{verseRef'book} {verseRef'chapter} |]
+            buttons = prevNextPageBtns currentPage maxVerseNum "go_to_verseRef#" [qc|{defaultTrans} {verseRef'book} {verseRef'chapter} |]
 
 
         sendTextReplyKb (ReplyInlineKeyboardMarkup buttons)  chatId verseRefHtml

@@ -36,6 +36,8 @@ data ExplorerSettings = ExplorerSettings
   { explorer'server      :: !ServerSettings
   , explorer'graphApiUrl :: !String
   -- ^ surbgirq-graph-api's root, without /api (GRAPH_API_URL)
+  , explorer'defaultBible :: !Text
+  -- ^ the Bible whose books the front page lists (EXPLORER_DEFAULT_BIBLE)
   } deriving (Show)
 
 data ServerSettings = ServerSettings
