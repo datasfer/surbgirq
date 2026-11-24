@@ -130,8 +130,10 @@ in front.
 
 `Surbgirq.Bot.ClientRequests` calls the graph API at `GRAPH_API_URL` (default `http://localhost:33010`), on
 `surbgirq-graph-api`'s `/api/…` routes, through one HTTP client made at start-up; a URL that isn't valid, or that ends in
-`/api`, stops the bot and the verse explorer with a message. Four of the routes don't match the API yet (README, Known
-issues). Until 2026 the bot called the 2020 .NET API's routes, e.g.
+`/api`, stops the bot and the verse explorer with a message. The books and the verse count are under
+`/api/scriptures/…`, the verses and the sections under `/api/verses/…` (`Surbgirq.API.GraphDBClient`; the verse explorer
+serves the same routes). The API's verse count is a placeholder for now (README, Known issues). Until 2026 the bot called
+the 2020 .NET API's routes, e.g.
 `/scripture/{translation}/books/{book}/chapters/{chapter}/verses/{from}?v2={to}`.
 
 ## Facebook Messenger

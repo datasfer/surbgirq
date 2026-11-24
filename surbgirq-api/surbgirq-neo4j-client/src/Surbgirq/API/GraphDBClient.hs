@@ -45,6 +45,8 @@ import Surbgirq.Types
 -- | Api schema of .net core web api, that expose neo4j data
 -- haskell neo4j driver doesnot support neo4j 4.* this is the reason
 -- we develope net core web api to get neo4j data
+-- The paths are surbgirq-graph-api's: the books and the verse count under api/scriptures/..., the verses and the
+-- sections under api/verses/... The verse explorer serves this same type (VerseExplorer.App).
 type GraphDBLocalAPI = "api" :> (
             "scriptures" :> Capture "translation" TranslationID :> Summary "Get Books of translation"
                          :> "books" :> Get '[JSON, HTML] [Book]
@@ -55,22 +57,22 @@ type GraphDBLocalAPI = "api" :> (
 --                 :> "to" :> Capture "verseTo" VerseNum
                  :> QueryParam "v2" VerseNum
                  :> Get '[JSON, HTML] [Verse]
-       :<|> "scriptures" :> Capture "translation" TranslationID :> Summary "Get a verse"
+       :<|> "verses" :> Capture "translation" TranslationID :> Summary "Get a verse"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "oneverse" :> Capture "verseNum" VerseNum
                  :> Get '[JSON, HTML] [Verse]
-       :<|> "scriptures" :> Capture "translation" TranslationID :> Summary "Get chapter's sections"
+       :<|> "verses" :> Capture "translation" TranslationID :> Summary "Get chapter's sections"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "sections"
                  :> Get '[JSON, HTML] [Section]
-       :<|> "scriptures" :> Capture "translation" TranslationID :> Summary "Get chapter's sections by sec num"
+       :<|> "verses" :> Capture "translation" TranslationID :> Summary "Get chapter's sections by sec num"
                  :> "books" :> Capture "girq" Girq
                  :> "chapters" :> Capture "ch" ChapterNum
                  :> "sections" :> Capture "secNum" SectionNum
                  :> Get '[JSON, HTML] [Section]
-       :<|> "scriptures" :> Capture "translation" TranslationID :> Summary "Get Book's section"
+       :<|> "verses" :> Capture "translation" TranslationID :> Summary "Get Book's section"
                  :> "books" :> Capture "girq" Girq
                  :> "sections"
                  :> Get '[JSON] [Section]
@@ -89,10 +91,6 @@ type GraphDBLocalAPI = "api" :> (
 
 graphDBAPI :: Proxy GraphDBLocalAPI
 graphDBAPI = Proxy
-
-
-neo4jApiBaseUrl :: BaseUrl
-neo4jApiBaseUrl = BaseUrl Https "127.0.0.1" 33011 "/api"
 
 getAllBooks' :: TranslationID -> ClientM [Book]
 getVerseRange' :: TranslationID -> Girq -> ChapterNum -> VerseNum -> Maybe VerseNum -> ClientM [Verse]
