@@ -38,5 +38,5 @@
 
 # Old Testament's books
      - { book: Genesis, microName: Gen, shortName: Genesis , language: AM, dialect: Grabar, input: "Old/01.Genesis",  inputRef: "./matthew/matthew.ref", title: "ԾՆՈՒՆԴՔ",  orderNum: 1, chapters: 21, testament: Old}
-     - { book: Exodus, microName: Ex, shortName: Exodus , language: AM, dialect: Grabar, input: "Old/03.Exodus",  inputRef: "./matthew/matthew.ref", title: "ԵԼՔ",  orderNum: 2, chapters: 21, testament: Old}
+     - { book: Exodus, microName: Ex, shortName: Exodus , language: AM, dialect: Grabar, input: "Old/02.Exodus",  inputRef: "./matthew/matthew.ref", title: "ԵԼՔ",  orderNum: 2, chapters: 21, testament: Old}
 
