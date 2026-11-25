@@ -42,10 +42,9 @@ import qualified Data.Aeson            as A
 import           Data.Yaml
 import           Surbgirq.Shell.Types
 import           Text.RawString.QQ
-import           Text.Regex.PCRE
-import qualified Text.Regex.PCRE.Heavy as PCRE
 
-import Surbgirq.Shell.Txt.PlainText
+import qualified Surbgirq.Shell.Scraper.Tags as Tags
+import           Surbgirq.Shell.Txt.PlainText
 
 data Book' = Book'
  { b'title     :: Text
@@ -179,9 +178,9 @@ parseVerse fs = do
   vNums <- chroots ("p" // "span" @:  [hasClass "Numeral"]) $ parseVerseNum
   versRefs <- chroots ("p" // "a" @:  [hasClass "footnote-link"]) $ parseVerseRef
 
-  let vs = filter (not . T.null) $ PCRE.split rr_1 $ T.strip $ T.pack rawVerseHtml
-      rs :: [(String, [String])]
-      rs = PCRE.scan refRegex rawVerseHtml
+  let vs = filter (not . T.null) $ Tags.splitAtElements "span" $ T.strip $ T.pack rawVerseHtml
+      rs :: [(Text, Text)]
+      rs = Tags.linksWithWordBefore $ T.pack rawVerseHtml
 
       verseRefs = map (\(index, rData) -> toVerseRef index rData) (zip [1..] rs)
       xs = map (\(n, verse) ->
@@ -194,11 +193,11 @@ parseVerse fs = do
                (zip vNums vs)
   return xs
   where
-    removeLinkTag str =
-        T.intercalate "" $ PCRE.split linkRegex str
+    removeLinkTag :: Text -> Text
+    removeLinkTag = Tags.removeElements "a"
 
-    toVerseRef :: Int -> (String,[String]) -> VerseRef
-    toVerseRef i (footnote, [key]) = VerseRef i (RefFootnote (T.strip $ T.pack key) (removeLinkTag $ T.strip $ T.pack footnote) )
+    toVerseRef :: Int -> (Text, Text) -> VerseRef
+    toVerseRef i (footnote, key) = VerseRef i (RefFootnote (T.strip key) (removeLinkTag $ T.strip footnote) )
 
     -- predicate reference belongs to verse
     prRefBelongs :: Text -> VerseRef -> Bool
@@ -299,15 +298,6 @@ parseBibleHtml = do
 delS :: Text
 delS = [qc|</span>|]
 
-
-
-rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
-
-
--- ref link with the worde before that
-refRegex = [PCRE.re|(?:\S+\s)?\S*<\s*a[^>]*>(.*?)<\s*/\s*a>|]
-
-linkRegex = [PCRE.re|<\s*a[^>]*>(.*?)<\s*/\s*a>|]
 
 
 -- | Footnotes

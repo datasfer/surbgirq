@@ -36,7 +36,6 @@ import qualified Data.Map.Strict        as Map
 import qualified Data.Text              as T
 import qualified Data.Text.Encoding     as TE
 import qualified Data.Text.IO           as TIO
-import qualified Text.Regex.PCRE.Heavy  as PCRE
 
 import GHC.Generics
 import GHC.IO.Encoding
@@ -46,9 +45,9 @@ import Text.HTML.Scalpel
 
 import Data.Yaml
 import Text.RawString.QQ
-import Text.Regex.PCRE
 
-import Surbgirq.Shell.Types
+import qualified Surbgirq.Shell.Scraper.Tags as Tags
+import           Surbgirq.Shell.Types
 
 -------------------------------------------------------------------------------
 --
@@ -165,10 +164,10 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
      let from = trace (show vNums) $ head vNums
          to = last vNums
 --         vs = filter (not . T.null) $ PCRE.split rr_1 $ T.pack verse
-         vs = filter ( (>1) . T.length . T.strip) $ PCRE.split rr_1 $ T.pack rawVerseHtml
+         vs = filter ( (>1) . T.length . T.strip) $ Tags.splitAtElements "span" $ T.pack rawVerseHtml
 
-         rs :: [(String, [String])]
-         rs = PCRE.scan refRegex rawVerseHtml
+         rs :: [(Text, Text)]
+         rs = Tags.linksWithWordBefore $ T.pack rawVerseHtml
 
          verseRefs = map toVerseRef rs
 
@@ -183,10 +182,11 @@ parseBible refM = chroots ("div" @: [hasClass "content"]) $ inSerial pp
                (zip [from..to] vs)
      return $ Section subTitle 999 "" xs -- vv vNums (T.pack rawVerseHtml) xs
 
-   removeLinkTag str = T.intercalate "" $ PCRE.split linkRegex str
+   removeLinkTag :: Text -> Text
+   removeLinkTag = Tags.removeElements "a"
 
-   toVerseRef :: (String,[String]) -> VerseRef
-   toVerseRef (footnote, [key]) = VerseRef 0 (RefFootnote (T.pack key) (removeLinkTag $ T.pack footnote) )
+   toVerseRef :: (Text, Text) -> VerseRef
+   toVerseRef (footnote, key) = VerseRef 0 (RefFootnote key (removeLinkTag footnote) )
 
     -- predicate reference belongs to verse
    prRefBelongs :: Text -> VerseRef -> Bool
@@ -262,11 +262,3 @@ parseVerseRef :: Scraper String Text
 parseVerseRef = do
        txt <- T.pack <$> text "a"
        return txt
-
-
-rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
-
-
--- ref link with the worde before that
-refRegex = [PCRE.re|(?:\S+\s)?\S*<\s*a[^>]*>(.*?)<\s*/\s*a>|]
-linkRegex = [PCRE.re|<\s*a[^>]*>(.*?)<\s*/\s*a>|]

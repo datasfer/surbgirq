@@ -26,6 +26,7 @@ library
                    Surbgirq.Shell.Store.ParseFile
                    Surbgirq.Shell.Store.Neo4j
                    Surbgirq.Shell.Scraper.Scalpel
+                   Surbgirq.Shell.Scraper.Tags
                    Surbgirq.Shell.Scraper.Scalpel.BibleScraper
                    Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
                    Surbgirq.Shell.Scraper.Scalpel.Narek
@@ -86,8 +87,6 @@ library
                , scalpel >= 0.6.0
                , split
                , raw-strings-qq
-               , regex-pcre
-               , pcre-heavy
                , yaml
                , bytestring               
                , cassava
@@ -144,7 +143,9 @@ test-suite surbgirq-shell-test
   hs-source-dirs: test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends: base >= 4.17.2.1 && < 5
+               , hspec
                , surbgirq-shell
+               , text
   default-language: Haskell2010
 
 

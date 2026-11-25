@@ -35,12 +35,11 @@ import           Text.HTML.Scalpel
 
 import           Data.Yaml
 import           Text.RawString.QQ
-import           Text.Regex.PCRE
-import qualified Text.Regex.PCRE.Heavy as PCRE
 
-import Common.Aeson
-import Surbgirq.Shell.Types
-import Surbgirq.Utils
+import           Common.Aeson
+import qualified Surbgirq.Shell.Scraper.Tags as Tags
+import           Surbgirq.Shell.Types
+import           Surbgirq.Utils
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
@@ -193,8 +192,7 @@ parseVerse1 = do
   refText <- (attr "ref-text" pTag)
 
 
-  let vs = filter (not . T.null) $ PCRE.split rr_1 verse
-      rs = PCRE.scan refRegex $ T.unpack verse
+  let vs = filter (not . T.null) $ Tags.splitAtElements "span" verse
 
 --  let xs = map (\(num, v) -> VerseData [] (versRefs) rs (T.pack $ show num) v $ T.pack verse)  (zip [4..] vs)
   let xs = map (\verse ->
@@ -220,13 +218,11 @@ parseVerse1 = do
     toVerseRef key footnote = VerseRef 0 (RefVerseEnd (T.pack key) (T.pack footnote) )
 
 
-refRegex = [PCRE.re|(?:\S+\s)?\S*<\s*a[^>]*>(.*?)<\s*/\s*a>|]
-rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
-linkRegex = [PCRE.re|<\s*a[^>]*>(.*?)<\s*/\s*a>|]
-divRegex = [PCRE.re|<\s*div[^>]*>(.*?)<\s*/\s*div>|]
+removeLinkTag :: Text -> Text
+removeLinkTag = Tags.removeElements "a"
 
-removeLinkTag str = T.intercalate "" $ PCRE.split linkRegex str
-removeDivTag str = T.intercalate "" $ PCRE.split divRegex str
+removeDivTag :: Text -> Text
+removeDivTag = Tags.removeElements "div"
 
 -- this commented becuase of bump to ghc: 9.4.8, seems the order of instancing is matter, added 
 -- tojson instance declaration above

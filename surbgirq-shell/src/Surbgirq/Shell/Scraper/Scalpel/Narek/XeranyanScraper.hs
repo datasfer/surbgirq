@@ -33,12 +33,11 @@ import           Text.HTML.Scalpel
 
 import           Data.Yaml
 import           Text.RawString.QQ
-import           Text.Regex.PCRE
-import qualified Text.Regex.PCRE.Heavy as PCRE
 
-import Common.Aeson
-import Surbgirq.Shell.Types
-import Surbgirq.Utils
+import           Common.Aeson
+import qualified Surbgirq.Shell.Scraper.Tags as Tags
+import           Surbgirq.Shell.Types
+import           Surbgirq.Utils
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
@@ -156,8 +155,7 @@ parseVerse1 = do
   let num = fromMaybe 0 $ ((readMaybe  numTxt) :: Maybe Int)
 
 
-  let vs = filter (not . T.null) $ PCRE.split rr_1 verse
-      rs = PCRE.scan refRegex $ T.unpack verse
+  let vs = filter (not . T.null) $ Tags.splitAtElements "span" verse
 
 --  let xs = map (\(num, v) -> VerseData [] (versRefs) rs (T.pack $ show num) v $ T.pack verse)  (zip [4..] vs)
   let xs = map (\v -> Verse num v [])  vs
@@ -171,10 +169,6 @@ parseVerse1 = do
     parseVerseRef = do
            txt <- T.pack <$> text "a"
            return txt
-
-
-refRegex = [PCRE.re|(?:\S+\s)?\S*<\s*a[^>]*>(.*?)<\s*/\s*a>|]
-rr_1 = [PCRE.re|<\s*span[^>]*>(.*?)<\s*/\s*span>|]
 
 
 -- printBook hFile BookData{..} = do
