@@ -3,7 +3,6 @@
 module Surbgirq.Shell.Store.Types where
 
 import Data.Text
-import Database.Selda
 import GHC.Generics
 
 data EngLemma = EngLemma

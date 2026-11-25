@@ -2,7 +2,6 @@
 
 module Surbgirq.Shell.Store.ParseFile where
 
-import Database.Selda
 import System.IO
 
 import Control.Exception (bracket)
@@ -24,11 +23,12 @@ parseLemmaFile file = do
 
     return $ catMaybes $ map lineToEntity (splitOn "\r\n" content)
   where
+    -- the ID stays 0: nothing reads it
     lineToEntity :: Text -> Maybe EngLemma
     lineToEntity line =
         let ws = T.words (T.strip line)
         in  case ws of
-              (w1:w2) -> Just $ EngLemma def w1 (T.unwords w2)
+              (w1:w2) -> Just $ EngLemma 0 w1 (T.unwords w2)
               _       -> Nothing
 
 
@@ -40,11 +40,12 @@ parseWordFormFile file = do
 
     return $ catMaybes $ map lineToEntity (splitOn "\r\n" content)
   where
+    -- the ID stays 0: wordFormsCSV numbers the forms itself
     lineToEntity :: Text -> Maybe WordForm
     lineToEntity line =
         let ws = T.words (T.strip line)
         in  case ws of
-              [w1,w2,w3]    -> Just $ WordForm def w1 w2 w3
-              [w1,w2,w3,w4] -> Just $ WordForm def w1 (w2 <> w3) w4
+              [w1,w2,w3]    -> Just $ WordForm 0 w1 w2 w3
+              [w1,w2,w3,w4] -> Just $ WordForm 0 w1 (w2 <> w3) w4
               _             -> Nothing
 

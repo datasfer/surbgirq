@@ -23,7 +23,6 @@ library
                    Surbgirq.Shell.Scraper
                    Surbgirq.Shell.Theographic
 
-                   Surbgirq.Shell.Store.SQLite.Selda
                    Surbgirq.Shell.Store.ParseFile
                    Surbgirq.Shell.Store.Neo4j
                    Surbgirq.Shell.Scraper.Scalpel
@@ -79,8 +78,6 @@ library
                , optparse-applicative
                , directory
                , interpolatedstring-perl6
-               , selda
-               , selda-sqlite
                , filepath
                , mtl
                , stm
@@ -144,27 +141,6 @@ executable html-scraper
   default-language: Haskell2010
 
 
-
-executable surbgirq-sqlite
-  main-is: Main.hs
-  other-modules: Paths_surbgirq_shell
-  hs-source-dirs: app/SQLite
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends: base >= 4.17.2.1 && < 5
-               , surbgirq-shell
-               , surbgirq-types
-               , common
-               , text
-               , aeson
-               , optparse-applicative
-               , directory
-               , interpolatedstring-perl6
-               , filepath
-               , mtl
-               , selda
-               , selda-sqlite
-
-  default-language: Haskell2010
 
 test-suite surbgirq-shell-test
   type: exitcode-stdio-1.0

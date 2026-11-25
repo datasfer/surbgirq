@@ -30,5 +30,3 @@ extra-deps:
     commit: 94c40a15515920a4919fb4dc1a7ee008d598765d
 #  - git: https://github.com/ArthurVard/fbmessenger-api-hs.git
 #    commit: 409b9369d3989077c09f693c33629a3abe4bac44
- # - selda-0.5.2.0@sha256:9685a946db19b75d2d3ca141a6f139457672abecd0bb963ab4d4ae01454fec86,2719
- # - selda-sqlite-0.1.7.2@sha256:23e6ac47bcb721eaa6c572a3d67d72e1bec9f377bb2df3b8677b1f934521e6ff,1167
