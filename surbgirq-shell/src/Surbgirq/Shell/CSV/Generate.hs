@@ -7,7 +7,8 @@
 module Surbgirq.Shell.CSV.Generate where
 
 import Control.Exception    (bracket)
-import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+import Control.Monad.Except (MonadError, catchError)
+import Control.Monad.IO.Class (liftIO)
 import System.FilePath.Posix         (takeBaseName, takeDirectory)
 import Data.Maybe (fromMaybe)
 import Data.Text  (Text, pack)

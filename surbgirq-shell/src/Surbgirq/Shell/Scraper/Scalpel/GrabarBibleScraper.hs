@@ -13,7 +13,7 @@ module Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
 import Data.IORef
 import Debug.Trace
 
-import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+import Control.Monad.Except (MonadError, catchError)
 import Data.Map             (Map)
 import Data.Maybe           (fromMaybe)
 import Data.Text            (Text)

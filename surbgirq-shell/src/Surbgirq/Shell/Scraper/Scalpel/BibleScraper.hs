@@ -17,7 +17,7 @@ import Text.Read  (readMaybe)
 import Text.InterpolatedString.Perl6 (qc)
 
 
-import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+import Control.Monad.Except (MonadError, catchError)
 import Prelude              hiding (catch)
 import System.IO.Error      hiding (catch)
 

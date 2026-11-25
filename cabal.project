@@ -6,6 +6,7 @@ packages:
   surbgirq-api/surbgirq-api
   surbgirq-api/surbgirq-api-instances
   surbgirq-api/surbgirq-neo4j-client
+  surbgirq-shell
   surbgirq-bot/surbgirq-bot-telegram
   surbgirq-bot/surbgirq-bot-state
   surbgirq-bot/surbgirq-bot-store

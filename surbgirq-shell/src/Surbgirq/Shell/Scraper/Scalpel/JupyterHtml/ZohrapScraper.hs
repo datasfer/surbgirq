@@ -11,7 +11,7 @@ module Surbgirq.Shell.Scraper.Scalpel.JupyterHtml.ZohrapScraper (parseZohrapHtml
 
 import Data.Text (Text)
 
-import Control.Monad.Except          (MonadError, MonadIO, catchError, liftIO)
+import Control.Monad.Except          (MonadError, catchError)
 import Control.Monad.IO.Class        (liftIO)
 import Data.Maybe                    (fromMaybe)
 import Text.InterpolatedString.Perl6 (qc)

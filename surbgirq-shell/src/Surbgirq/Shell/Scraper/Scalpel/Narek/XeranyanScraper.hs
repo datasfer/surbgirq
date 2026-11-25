@@ -11,7 +11,7 @@ module Surbgirq.Shell.Scraper.Scalpel.Narek.XeranyanScraper where
 
 import Data.Text (Text)
 
-import Control.Monad.Except          (MonadError, MonadIO, catchError, liftIO)
+import Control.Monad.Except          (MonadError, catchError)
 import Data.Maybe                    (fromMaybe)
 import Text.InterpolatedString.Perl6 (qc)
 import Text.Read                     (readMaybe)

@@ -8,7 +8,8 @@ module Main where
 
 
 import Control.Exception    (bracket)
-import Control.Monad.Except (MonadError, MonadIO, catchError, liftIO)
+import Control.Monad.Except (MonadError, catchError)
+import Control.Monad.IO.Class (liftIO)
 
 import Data.Aeson
 import Data.Char

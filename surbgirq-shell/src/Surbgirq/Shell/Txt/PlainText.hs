@@ -7,7 +7,7 @@
 module Surbgirq.Shell.Txt.PlainText where
 
 import Control.Exception             (bracket)
-import Control.Monad.Except          (MonadError, MonadIO, catchError, liftIO)
+import Control.Monad.Except          (MonadError, catchError)
 import Data.Maybe                    (fromMaybe)
 import Data.Text                     (Text, pack)
 import System.FilePath.Posix         (takeBaseName, takeDirectory)
