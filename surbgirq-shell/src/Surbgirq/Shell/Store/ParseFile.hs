@@ -13,11 +13,12 @@ import Text.InterpolatedString.Perl6 (qc)
 import qualified Data.Text    as T
 import qualified Data.Text.IO as TIO
 
+import Surbgirq.Shell.Files (openInFile)
 import Surbgirq.Shell.Store.Types
 
 parseLemmaFile :: FilePath -> IO [EngLemma]
 parseLemmaFile file = do
-  bracket (openFile file ReadMode) hClose $ \handle -> do
+  bracket (openInFile file) hClose $ \handle -> do
     _ <- TIO.hGetLine handle -- read header
     content <- TIO.hGetContents handle     -- read the rest of file
 
@@ -34,7 +35,7 @@ parseLemmaFile file = do
 
 parseWordFormFile :: FilePath -> IO [WordForm]
 parseWordFormFile file = do
-  bracket (openFile file ReadMode) hClose $ \handle -> do
+  bracket (openInFile file) hClose $ \handle -> do
     _ <- TIO.hGetLine handle -- read header
     content <- TIO.hGetContents handle     -- read the rest of file
 

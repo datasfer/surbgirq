@@ -35,6 +35,7 @@ import Data.List
 import System.FilePath
 
 import Common.Yaml
+import Surbgirq.Shell.Files (openOutFile)
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
 import Surbgirq.Types.Scripture
@@ -42,7 +43,7 @@ import Surbgirq.Types.Scripture
 
 encodeChaptersToFile :: FilePath -> Text -> [Chapter] -> IO ()
 encodeChaptersToFile file bookTitle chapters = do
-  outh <- openFile file WriteMode
+  outh <- openOutFile file
   TIO.hPutStrLn outh  [qc|\b {bookTitle}|]
   forM_ chapters $ \ ch@Chapter{..} -> do
       TIO.hPutStrLn outh  [qc|\c {chapter'number}|]

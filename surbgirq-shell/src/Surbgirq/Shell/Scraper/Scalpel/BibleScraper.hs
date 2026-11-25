@@ -43,6 +43,7 @@ import           Data.Yaml
 import           Surbgirq.Shell.Types
 import           Text.RawString.QQ
 
+import           Surbgirq.Shell.Files        (openOutFile)
 import qualified Surbgirq.Shell.Scraper.Tags as Tags
 import           Surbgirq.Shell.Txt.PlainText
 
@@ -319,7 +320,7 @@ parseFootNoteTest = do
   let ts = scrapeStringLike exampleHtml parseFootnotes
   case ts of
     Just xs -> do
-            hFile <- openFile "footnotes.out" WriteMode
+            hFile <- openOutFile "footnotes.out"
             forM_ xs printFootnote
     Nothing -> error $ "failed parse html file "
  where

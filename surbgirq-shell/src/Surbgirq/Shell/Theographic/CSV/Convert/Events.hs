@@ -12,6 +12,7 @@ import Text.InterpolatedString.Perl6 (qc)
 import qualified Data.Text.IO as TIO
 import qualified Data.Vector  as V
 
+import Surbgirq.Shell.Files (openOutFile)
 import Surbgirq.Shell.Theographic.CSV.Convert.Helpers
 import Surbgirq.Shell.Theographic.CSV.Types
 
@@ -24,7 +25,7 @@ import Surbgirq.Shell.Theographic.CSV.Types
 convertEvents :: String -> FilePath -> FilePath -> IO ()
 convertEvents del dataFolder outFileRoot = do
    let eventsFile = dataFolder </> "Events.csv"
-   houtEvents <- openFile (outFileRoot </> "events.csv") WriteMode
+   houtEvents <- openOutFile (outFileRoot </> "events.csv")
    TIO.hPutStrLn houtEvents
           [qc|id:ID(KJV-EVENT-ID){del}title{del}duration{del}sortKey{del}startDate{del}:LABEL|]
    readEntity eventsFile >>= \ v -> do

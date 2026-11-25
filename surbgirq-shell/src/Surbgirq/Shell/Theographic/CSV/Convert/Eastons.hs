@@ -14,6 +14,7 @@ import Text.InterpolatedString.Perl6 (qc)
 import qualified Data.Text.IO as TIO
 import qualified Data.Vector  as V
 
+import Surbgirq.Shell.Files (openOutFile)
 import Surbgirq.Shell.Theographic.CSV.Convert.Helpers
 import Surbgirq.Shell.Theographic.CSV.Types
 
@@ -27,8 +28,8 @@ convertEastons :: String -> FilePath -> FilePath -> IO ()
 convertEastons del dataFolder outFileRoot = do
    -- Books
    let booksFile = dataFolder </> "Easton.csv"
-   houtEastons <- openFile (outFileRoot </> "eastons.csv") WriteMode
-   houtRelation <- openFile (outFileRoot </> "Commentary_EastonRel.csv") WriteMode
+   houtEastons <- openOutFile (outFileRoot </> "eastons.csv")
+   houtRelation <- openOutFile (outFileRoot </> "Commentary_EastonRel.csv")
    TIO.hPutStrLn houtEastons [qc|id:ID(KJV-EASTONS-ID){del}term{del}dictText{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(COMMENTARY-ID){del}:END_ID(KJV-EASTONS-ID){del}:TYPE|]
    readEntity booksFile >>= \ v ->

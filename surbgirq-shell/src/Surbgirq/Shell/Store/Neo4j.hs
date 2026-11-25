@@ -26,6 +26,7 @@ import qualified Data.HashMap.Strict as HMap
 import qualified Data.Text           as T
 import qualified Data.Text.IO        as TIO
 
+import Surbgirq.Shell.Files (openOutFile)
 import Surbgirq.Shell.Store.ParseFile
 import Surbgirq.Shell.Types
 
@@ -53,7 +54,7 @@ wordFormsCypher wordFormFile outPath = do
     let outFile = outPath </> (concat ["wordForms_", printf "%03d" index, ".cypher"])
     subRef <- newIORef (0 :: Int)
 
-    bracket (openFile outFile WriteMode) hClose $ \outh -> do
+    bracket (openOutFile outFile) hClose $ \outh -> do
 
       forM_ (sortBy (comparing armat) ws) $ \WordForm{..} -> do
           hashMap <- readIORef hashMapRef
@@ -124,9 +125,9 @@ wordFormsCSV wordFormFile outPath = do
       del = ';'
 
   bracket (do
-            h1 <- openFile outFileArmat WriteMode
-            h2 <- openFile outFileForms WriteMode
-            h3 <- openFile outFileRel WriteMode
+            h1 <- openOutFile outFileArmat
+            h2 <- openOutFile outFileForms
+            h3 <- openOutFile outFileRel
             return (h1, h2, h3))
            (\(h1, h2, h3) -> do
               hClose h1

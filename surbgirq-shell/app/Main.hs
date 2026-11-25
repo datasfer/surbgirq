@@ -34,6 +34,7 @@ import System.FilePath
 
 import Common.Yaml
 import Surbgirq.Shell.CSV.Generate
+import Surbgirq.Shell.Files (openOutFile, useUtf8)
 import Surbgirq.Shell.Store.Neo4j
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
@@ -58,6 +59,7 @@ main1 = do
 -- |  stack exec -- surbgirq-shell --bible --csv -c ./theodata/corpora.conf -i ./data/yaml -o ./data/csv
 main :: IO ()
 main = do
+  useUtf8
   cmd <- customExecParser (prefs showHelpOnError) $
          info (helper <*> parser) $
          fullDesc <> progDesc "Format Scriptures to convenient formats."
@@ -150,7 +152,7 @@ generateRefCypher bookFile path outPath = do
 
      unless (null inRefFile) $ do
        refs :: [Ref] <- readYaml inRefFile
-       bracket (openFile outRefFile WriteMode) hClose $ \refh -> do
+       bracket (openOutFile outRefFile) hClose $ \refh -> do
          forM_  refs $ \(Ref from  rs) -> do
              let matchFrom = case from of
                                RefChapter n -> [qc|match (b:{bookMatch})-[:HAS_CH \{num: {n}}]->(from:Chapter) |]
@@ -214,8 +216,8 @@ generateInitCypher bookFile path outPath = do
                                       return []
 
        bracket (do
-                  h1 <- openFile outFile WriteMode
-                  h2 <- openFile outRefFile WriteMode
+                  h1 <- openOutFile outFile
+                  h2 <- openOutFile outRefFile
                   return (h1, h2))
                 (\(h1, h2) -> do
                    hClose h1

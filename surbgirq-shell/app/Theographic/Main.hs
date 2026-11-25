@@ -11,11 +11,13 @@ import Data.Monoid ((<>))
 
 import qualified Data.Text.IO as TIO
 
+import Surbgirq.Shell.Files       (useUtf8)
 import Surbgirq.Shell.Theographic
 
 -- | stack exec -- theographic --csv -i ./data/theodata/CSV -o ./data/csv"
 main :: IO ()
 main = do
+  useUtf8
 
   cmd <- customExecParser (prefs showHelpOnError) $
          info (helper <*> parser) $

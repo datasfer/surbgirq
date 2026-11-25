@@ -35,6 +35,7 @@ import           Data.Yaml
 import           Text.RawString.QQ
 
 import           Common.Aeson
+import           Surbgirq.Shell.Files        (openOutFile)
 import qualified Surbgirq.Shell.Scraper.Tags as Tags
 import           Surbgirq.Shell.Types
 import           Surbgirq.Utils
@@ -58,7 +59,7 @@ test = do
   case ts of
     Just xs -> do
             encodeFile "../data/scriptures/narek/txt/gen-parseHtml.yaml" xs
-            hFile <- openFile "../data/scriptures/narek/txt/scalpel.out" WriteMode
+            hFile <- openOutFile "../data/scriptures/narek/txt/scalpel.out"
             return ()
 --            forM_ xs (printBook hFile)
     Nothing -> error $ "failed parse html file "

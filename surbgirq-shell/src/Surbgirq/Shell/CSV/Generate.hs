@@ -38,6 +38,7 @@ import Data.List
 import System.FilePath
 
 import Common.Yaml
+import Surbgirq.Shell.Files (openOutFile)
 import Surbgirq.Shell.Types
 import Surbgirq.Types.Girq
 import Surbgirq.Types.Scripture
@@ -102,36 +103,36 @@ closeHs FileHandlers {..} = do
 openHs :: FilePath -> FilePath -> Book -> IO FileHandlers
 openHs outFileRoot outRefFileRoot Book{..} = do
 
-    outEntityBookRelh <- openFile (outFileRoot </> [qc|EntityBookRel.csv|]) WriteMode
+    outEntityBookRelh <- openOutFile (outFileRoot </> [qc|EntityBookRel.csv|])
 
     -- chapter
-    outChh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_chapters.csv|]) WriteMode
-    outChSecRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterSectionRel.csv|]) WriteMode
-    outChVerseRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterVerseRel.csv|]) WriteMode
+    outChh <- openOutFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_chapters.csv|])
+    outChSecRelh <- openOutFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterSectionRel.csv|])
+    outChVerseRelh <- openOutFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_ChapterVerseRel.csv|])
 
     -- section
-    outSech <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_sections.csv|]) WriteMode
-    outSecPrghRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_SectionPrghRel.csv|]) WriteMode
+    outSech <- openOutFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_sections.csv|])
+    outSecPrghRelh <- openOutFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_SectionPrghRel.csv|])
 
     -- paragraph
     -- outPrghh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_prghs.csv|]) WriteMode
     -- outPrghVerseRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_PrghVerseRel.csv|]) WriteMode
 
     -- veses
-    outVerseh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verses.csv|]) WriteMode
-    outVerseWordRelh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_VerseWordRel.csv|])  WriteMode
+    outVerseh <- openOutFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verses.csv|])
+    outVerseWordRelh <- openOutFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_VerseWordRel.csv|])
 
     -- words
-    outWordsh <- openFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_words.csv|]) WriteMode
+    outWordsh <- openOutFile (outFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_words.csv|])
 
     -- footnotes
-    outFootnotesh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_footnotes.csv|]) WriteMode
-    outWordFootnoteRelh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_word_footnote.csv|]) WriteMode
-    outVerseFootnoteRelh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verse_footnote.csv|]) WriteMode
+    outFootnotesh <- openOutFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_footnotes.csv|])
+    outWordFootnoteRelh <- openOutFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_word_footnote.csv|])
+    outVerseFootnoteRelh <- openOutFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_verse_footnote.csv|])
 
     -- reference
-    outRefsh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_refs.csv|]) WriteMode
-    outRefRelh <- openFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_WordRefRel.csv|]) WriteMode
+    outRefsh <- openOutFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_refs.csv|])
+    outRefRelh <- openOutFile (outRefFileRoot </> [qc|{T.toLower . T.pack $ show book'book}_WordRefRel.csv|])
 
     return  FileHandlers {..}  
 
@@ -160,13 +161,13 @@ generateScripturesCSV configFile path outPath = do
    dumpCSVHeaders del outRootPath
                             
    bracket (do
-              h1 <- openFile (outRootPath </> [qc|books.csv|]) WriteMode -- save all books in one place
-              h2 <- openFile (outRootPath </> [qc|translations.csv|]) WriteMode
-              h3 <- openFile (outRootPath </> [qc|divisions.csv|]) WriteMode
-              h4 <- openFile (outRootPath </> [qc|testaments.csv|]) WriteMode
-              h5 <- openFile (outRootPath </> [qc|scriptures.csv|]) WriteMode
-              h6 <- openFile (outRootPath </> [qc|scriptureRel.csv|]) WriteMode
-              h7 <- openFile (outRootPath </> [qc|BookChapterRel.csv|]) WriteMode
+              h1 <- openOutFile (outRootPath </> [qc|books.csv|]) -- save all books in one place
+              h2 <- openOutFile (outRootPath </> [qc|translations.csv|])
+              h3 <- openOutFile (outRootPath </> [qc|divisions.csv|])
+              h4 <- openOutFile (outRootPath </> [qc|testaments.csv|])
+              h5 <- openOutFile (outRootPath </> [qc|scriptures.csv|])
+              h6 <- openOutFile (outRootPath </> [qc|scriptureRel.csv|])
+              h7 <- openOutFile (outRootPath </> [qc|BookChapterRel.csv|])
               return (h1,h2,h3,h4,h5,h6, h7))
             (\(h1, h2, h3, h4, h5, h6, h7) -> do
                hClose h1
@@ -201,7 +202,7 @@ generateScripturesCSV configFile path outPath = do
      TIO.hPutStrLn outTestamenth [qc|new;New Testament;Testament|]
      TIO.hPutStrLn outTestamenth [qc|old;Old Testament;Testament|]
 
-     outCommentariesh <- openFile (outRootPath </> [qc|commentaries.csv|]) WriteMode
+     outCommentariesh <- openOutFile (outRootPath </> [qc|commentaries.csv|])
 
      TIO.hPutStrLn outCommentariesh [qc|id:ID(COMMENTARY-ID);name;description;:LABEL|]
      TIO.hPutStrLn outCommentariesh [qc|eastons;Easton's Bible Dictionary;"The Illustrated Bible Dictionary,[a] better known as Easton's Bible Dictionary, is a reference work on topics related to the Christian Bible compiled by Matthew George Easton";Commentary|]
@@ -464,7 +465,7 @@ dumpCSVHeaders del root = do
                            
   forM_ hs $ \CSVHeader{..} -> do
     let fullPath = headerRoot </> csvHeader'file
-    hFile <- openFile fullPath WriteMode
+    hFile <- openOutFile fullPath
     TIO.hPutStrLn hFile csvHeader'header
     TIO.putStrLn [qc|Created header: {csvHeader'name} - {fullPath}|]
     hClose hFile
@@ -518,9 +519,9 @@ generateVerseCsv corporaConfig path outPath = do
                                       return []
 
        bracket (do
-                  h1 <- openFile outFile WriteMode
-                  h2 <- openFile outFile WriteMode
-                  h3 <- openFile outRefFile WriteMode
+                  h1 <- openOutFile outFile
+                  h2 <- openOutFile outFile
+                  h3 <- openOutFile outRefFile
                   return (h1, h2, h3))
                 (\(h1, h2, h3) -> do
                    hClose h1

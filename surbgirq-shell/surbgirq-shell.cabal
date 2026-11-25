@@ -20,6 +20,7 @@ source-repository head
 
 library
   exposed-modules: Surbgirq.Shell.Types
+                   Surbgirq.Shell.Files
                    Surbgirq.Shell.Scraper
                    Surbgirq.Shell.Theographic
 

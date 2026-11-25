@@ -19,6 +19,7 @@ import qualified Data.Text.Encoding   as TSE
 import qualified Data.Text.IO         as TIO
 import qualified Data.Vector          as V
 
+import Surbgirq.Shell.Files (openOutFile)
 import Surbgirq.Shell.Theographic.CSV.Convert.Helpers
 import Surbgirq.Shell.Theographic.CSV.Types
 
@@ -31,9 +32,9 @@ import Surbgirq.Shell.Theographic.CSV.Types
 convertPeriods :: String -> FilePath -> FilePath -> IO ()
 convertPeriods del dataFolder outFileRoot = do
    let periodFile = dataFolder </> "Periods.csv"
-   houtPeriods <- openFile (outFileRoot </> "periods.csv") WriteMode
-   houtEventYearRel <- openFile (outFileRoot </> "Event_YearRel.csv") WriteMode
-   houtPersonYearRel <- openFile (outFileRoot </> "Person_YearRel.csv") WriteMode
+   houtPeriods <- openOutFile (outFileRoot </> "periods.csv")
+   houtEventYearRel <- openOutFile (outFileRoot </> "Event_YearRel.csv")
+   houtPersonYearRel <- openOutFile (outFileRoot </> "Person_YearRel.csv")
    TIO.hPutStrLn houtPeriods [qc|id:ID(KJV-PERIOD-ID){del}formattedYear{del}isoYear{del}year{del}:LABEL|]
    TIO.hPutStrLn houtEventYearRel [qc|:START_ID(KJV-EVENT-ID){del}:END_ID(KJV-PERIOD-ID){del}:TYPE|]
    TIO.hPutStrLn houtPersonYearRel [qc|:START_ID(KJV-PERSON-ID){del}:END_ID(KJV-PERIOD-ID){del}:TYPE|]

@@ -40,6 +40,7 @@ import System.FilePath
 
 import Common.Yaml
 import Surbgirq.Shell.CSV.Generate
+import Surbgirq.Shell.Files (useUtf8)
 import Surbgirq.Shell.Scraper
 import Surbgirq.Shell.Store.Neo4j
 import Surbgirq.Shell.Types
@@ -51,6 +52,7 @@ import Surbgirq.Types.Girq
 -- | stack exec -- html-scraper --v1805  --yaml  -i ./data/html/v1805 -o ./data/yaml
 main :: IO ()
 main = do
+  useUtf8
   cmd <- customExecParser (prefs showHelpOnError) $
          info (helper <*> parser) $
          fullDesc <> progDesc "Scrap html to yamlor json formats."

@@ -14,6 +14,7 @@ import Text.InterpolatedString.Perl6 (qc)
 import qualified Data.Text.IO as TIO
 import qualified Data.Vector  as V
 
+import Surbgirq.Shell.Files (openOutFile)
 import Surbgirq.Shell.Theographic.CSV.Convert.Helpers
 import Surbgirq.Shell.Theographic.CSV.Types
 
@@ -27,11 +28,11 @@ convertVerses :: String -> FilePath -> FilePath -> IO ()
 convertVerses del dataFolder outFileRoot = do
    -- Verses
    let versesFile = dataFolder </> "Verses.csv"
-   houtVerses <- openFile (outFileRoot </> "verses.csv") WriteMode
-   houtRelation <- openFile (outFileRoot </> "Chapter_VerseRel.csv") WriteMode
-   houtVersePersonRel <- openFile (outFileRoot </> "Verse_PersonRel.csv") WriteMode
-   houtVersePlaceRel <- openFile (outFileRoot </> "Verse_PlaceRel.csv") WriteMode
-   houtVerseEventRel <- openFile (outFileRoot </> "Verse_EventRel.csv") WriteMode
+   houtVerses <- openOutFile (outFileRoot </> "verses.csv")
+   houtRelation <- openOutFile (outFileRoot </> "Chapter_VerseRel.csv")
+   houtVersePersonRel <- openOutFile (outFileRoot </> "Verse_PersonRel.csv")
+   houtVersePlaceRel <- openOutFile (outFileRoot </> "Verse_PlaceRel.csv")
+   houtVerseEventRel <- openOutFile (outFileRoot </> "Verse_EventRel.csv")
    TIO.hPutStrLn houtVerses [qc|id:ID(KJV-VERSE-ID){del}verse:long{del}fullRef{del}osisRef{del}shortRef{del}mdText{del}verseText{del}title{del}:LABEL|]
    TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
    TIO.hPutStrLn houtVersePersonRel [qc|:START_ID(KJV-VERSE-ID){del}:END_ID(KJV-PERSON-ID){del}:TYPE|]

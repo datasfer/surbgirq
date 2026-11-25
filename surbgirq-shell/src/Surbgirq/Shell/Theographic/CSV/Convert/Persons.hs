@@ -14,6 +14,7 @@ import Text.InterpolatedString.Perl6 (qc)
 import qualified Data.Text.IO as TIO
 import qualified Data.Vector  as V
 
+import Surbgirq.Shell.Files (openOutFile)
 import Surbgirq.Shell.Theographic.CSV.Convert.Helpers
 import Surbgirq.Shell.Theographic.CSV.Types
 
@@ -26,7 +27,7 @@ convertPersons :: String -> FilePath -> FilePath -> IO ()
 convertPersons del dataFolder outFileRoot = do
    -- Persons
    let personsFile = dataFolder </> "Persons.csv"
-   houtPersons <- openFile (outFileRoot </> "persons.csv") WriteMode
+   houtPersons <- openOutFile (outFileRoot </> "persons.csv")
 --   houtRelation <- openFile (outFileRoot </> "Chapter_VerseRel.csv") WriteMode
    TIO.hPutStrLn houtPersons [qc|id:ID(KJV-PERSON-ID){del}name{del}gender{del}slug{del}status{del}title{del}:LABEL|]
 --   TIO.hPutStrLn houtRelation [qc|:START_ID(KJV-CHAPTER-ID){del}:END_ID(KJV-VERSE-ID){del}:TYPE|]
