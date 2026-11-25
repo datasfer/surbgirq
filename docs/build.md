@@ -7,7 +7,7 @@ from the author's notes of 2024–2026.
 
 | GHC | Stackage resolver | Notes |
 |---|---|---|
-| 9.6.7 | `lts-22.44` | `stack.yaml` sets `allow-newer: true`, and asks for `-j4` with large GHC heaps for every package (so does `cabal.project.local`): lower `-j` on a small machine. `surbgirq-shell` is left out of the build (a `selda` conflict; see the README's Known issues). The Facebook Messenger packages are commented out. `shell.nix` is a plain `mkShell` (zlib, sqlite, openssl, HLS). |
+| 9.6.7 | `lts-22.44` | `stack.yaml` sets `allow-newer: true`, and asks for `-j4` with large GHC heaps for every package (so does `cabal.project.local`): lower `-j` on a small machine. `surbgirq-shell`, the data pipeline, is back in the build since November 2026, without `selda` and PCRE ([data-pipeline.md](data-pipeline.md)). The Facebook Messenger packages are commented out. `shell.nix` is a plain `mkShell` (zlib, sqlite, openssl, HLS). |
 
 ```bash
 stack build        # Stack installs GHC 9.6.7 and fetches the Telegram fork at its pinned commit
@@ -45,6 +45,10 @@ The notes also list `libghc-regex-pcre-dev`, `libghc-regex-base-dev`, `libghc-re
 and `libgbm-dev`. No package needs PostgreSQL's client library (`libpq`) any more: `postgresql-simple`, the only user, was
 listed but never imported, and is gone since November 2026.
 
+No package needs the PCRE library either, since November 2026: the scrapers match their HTML tags themselves
+(`surbgirq-shell`'s `Scraper/Tags.hs`) instead of through `regex-pcre` and `pcre-heavy`, which bind PCRE1, a library that
+Ubuntu ships only up to 24.04 and that Debian 13 dropped. So the two PCRE fixes above only matter for older commits.
+
 ## Executables
 
 | Executable | Package | What it does |
@@ -54,10 +58,10 @@ listed but never imported, and is gone since November 2026.
 | `html-scraper` | `surbgirq-shell` | HTML → YAML ([data-pipeline.md](data-pipeline.md)) |
 | `surbgirq-shell` | `surbgirq-shell` | YAML → CSV or Cypher |
 | `theographic` | `surbgirq-shell` | Theographic CSV → the KJV CSVs |
-| `surbgirq-sqlite` | `surbgirq-shell` | The lexicon into SQLite |
 | `surbgirq-db`, `surbgirq-service` | dead packages | Not in `stack.yaml`, so not built |
 
-The four `surbgirq-shell` executables aren't built at the moment (see the README's Known issues).
+`surbgirq-shell` had a fourth executable, `surbgirq-sqlite`, which copied the lexicon into SQLite for the dead
+`surbgirq-service`; it's gone since November 2026.
 
 Run them from the `surbgirq/` package folder inside the repository (`cd surbgirq && stack exec -- telegram-bot`; in a clone
 named `surbgirq`, that's `surbgirq/surbgirq/`): the default config paths are relative to it.
@@ -67,4 +71,6 @@ named `surbgirq`, that's `surbgirq/surbgirq/`): the default config paths are rel
 `stack test` builds and runs the test suite of every package in `stack.yaml`. Most are still template stubs;
 `surbgirq-utils`'s suite tests what the bot makes of a typed verse reference (`parseVerseRef`) and the title it
 gives every book in every translation (`toRefText`), so run `stack test surbgirq-utils` after changing the parser or
-the book names. (`surbgirq-db`, whose test needs a live Neo4j, isn't in the build.)
+the book names. `surbgirq-shell`'s suite tests the scrapers' tag matcher (`Surbgirq.Shell.Scraper.Tags`): its expected
+values are what the PCRE patterns it replaced gave, so run `stack test surbgirq-shell` after changing it. (`surbgirq-db`,
+whose test needs a live Neo4j, isn't in the build.)

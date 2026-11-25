@@ -3,8 +3,8 @@
 How Bible texts become the Surbgirq graph. The inputs and outputs aren't in this repository (see the README's
 [Data](../README.md#data) section); the commands show how the author ran each stage, with the `data/` layout of the time.
 
-The `surbgirq-shell` package, which holds these executables, is out of the build at the moment (see the README's Known
-issues), so it has to come back before these commands run again.
+The `surbgirq-shell` package, which holds these executables, is back in the build since November 2026. Each program reads
+and writes UTF-8 with LF line endings, whatever the locale and the platform.
 
 ```text
 HTML (saved pages, e-book XHTML, pages made by the conversion notebooks)
@@ -14,7 +14,7 @@ HTML (saved pages, e-book XHTML, pages made by the conversion notebooks)
 Theographic Bible Metadata (CSV)
   └─ theographic ............. the KJV, people, places, events, years, Easton's dictionary (CSV)
 The word list (forms, roots, grammar tags, English glosses)
-  └─ surbgirq-shell / surbgirq-sqlite ... Armat (root) and Token (word form) CSVs, an SQLite lexicon
+  └─ surbgirq-shell .......... Armat (root) and Token (word form) CSVs
 ```
 
 All the code is in `surbgirq-shell` (`src/Surbgirq/Shell/…` and `app/…`).
@@ -34,6 +34,11 @@ stack exec -- html-scraper --v1805 --yaml -i ./data/html/v1805 -o ./data/yaml   
 | `Narek.XeranyanScraper` | Narek in Kheranyan's translation | `narek/am/<file>/<chapter>.yaml` (run from GHCi) |
 
 Known bugs: `--z1805` runs the v1805 parser, and `--json`/`--csv` still write YAML.
+
+The scrapers cut the verse numbers' `<span>`s, the footnote links (`<a>`) and `<div>` elements out of each paragraph with
+`Scraper/Tags.hs`. It gives exactly what the PCRE patterns it replaced in November 2026 gave, quirks included (for
+example, an element ends at the first closing tag, and only if that tag is on the same line; its comments list them all),
+so the YAML doesn't change.
 
 ## 2. YAML → CSV: `surbgirq-shell`
 
@@ -62,9 +67,10 @@ break a row.
 
 ## 4. The lexicon
 
-- **`surbgirq-sqlite`** reads `data/txt/engLemmas.txt` and `data/txt/wordForms.txt` and builds `db/ban.sqlite`.
 - **`Store.Neo4j.wordFormsCSV`** turns `wordForms.txt` into `armats.csv`, `wordForms.csv` and `WordArmatRel.csv` for the
   `Armat` → `Token` part of the graph.
+- Until November 2026 `surbgirq-sqlite` also copied the word list and `engLemmas.txt` into SQLite (`db/ban.sqlite`), for
+  the dead `surbgirq-service` only; it's gone, with the `selda` library it needed.
 
 The word list itself isn't public ([data-sources.md](data-sources.md)).
 

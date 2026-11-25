@@ -18,7 +18,7 @@ running any of it.
 | Part | What it does | Where |
 |---|---|---|
 | **Telegram bot** (`@SurbgirqBot`) | Looks up verses by reference, in chat and in inline mode, in several translations, with per-user settings ([docs/bot.md](docs/bot.md)) | `surbgirq-bot/*`; the `telegram-bot` executable in `surbgirq/` |
-| **Data pipeline** | Scrapes Bible texts from HTML into YAML, turns YAML into CSV for `neo4j-admin`, converts Theographic's KJV metadata, builds the lexicon ([docs/data-pipeline.md](docs/data-pipeline.md)) | `surbgirq-shell`: `html-scraper`, `surbgirq-shell`, `theographic`, `surbgirq-sqlite` (not built at the moment; see [Known issues](#known-issues--security)) |
+| **Data pipeline** | Scrapes Bible texts from HTML into YAML, turns YAML into CSV for `neo4j-admin`, converts Theographic's KJV metadata, builds the lexicon ([docs/data-pipeline.md](docs/data-pipeline.md)) | `surbgirq-shell`: `html-scraper`, `surbgirq-shell`, `theographic` |
 | **Import scripts** | Bulk-load the CSVs into Neo4j ([docs/neo4j-import.md](docs/neo4j-import.md), [scripts/README.md](scripts/README.md)) | `scripts/`, `docker/` |
 | **Verse explorer** | A small server-rendered web page (Lucid): books and verses ([its README](surbgirq-web/verse-explorer/README.md)) | `surbgirq-web/verse-explorer/`; the `verse-explorer` executable |
 | Shared code | Domain types (books, chapters, verses, translations, Armenian and English book abbreviations), helpers, the API client | `surbgirq-types`, `surbgirq-utils`, `common`, `surbgirq-api/surbgirq-api-instances`, `surbgirq-api/surbgirq-neo4j-client` |
@@ -148,9 +148,8 @@ Nothing runs this code in public at the moment. Fix these before it does:
 | The Docker Compose files run **Neo4j Enterprise** and accept its commercial licence (`NEO4J_ACCEPT_LICENSE_AGREEMENT=yes`). | Neo4j Community ([docs/neo4j-import.md](docs/neo4j-import.md)) |
 | On Neo4j 2026.x the import needs `--vector-delimiter` (its default, `;`, is our column delimiter), and `--multiline-fields=true` slows the whole import although only Easton's dictionary needs it. | [docs/neo4j-import.md](docs/neo4j-import.md) |
 | The verse explorer was adapted from an earlier block-explorer prototype by the same author: `app.js` still has a live counter and a filter dialog that nothing feeds, and some names (`txhash`, `tx-list`) remain. Its search always answers "Not found"; `/about` is a placeholder. | Rework the page during the revival |
-| **The data pipeline (`surbgirq-shell`) is out of the build** since the GHC 9.6.7 upgrade: the author's note in `stack.yaml` names a `selda` conflict. So the CSV converters can't be rebuilt from `master` at the moment. | Update or replace `selda`, and bring the package back |
 | `html-scraper --z1805` runs the v1805 parser; `--json` and `--csv` still write YAML. `theodata/ar94-books.yaml` points at `e1994-T`. | Fix with the next pipeline run |
-| Most test suites are stubs ("not yet implemented"); only `surbgirq-utils`'s tests something: the reference parser and the verse titles ([docs/build.md](docs/build.md#tests)). | Real tests where the code is touched |
+| Most test suites are stubs ("not yet implemented"); `surbgirq-utils`'s tests the reference parser and the verse titles, and `surbgirq-shell`'s the scrapers' tag matcher ([docs/build.md](docs/build.md#tests)). | Real tests where the code is touched |
 | `cabal.project` needs a local clone of the Telegram fork next to the repository (`../haskell-telegram-api`), and lists the dead `surbgirq-api`, which `stack.yaml` doesn't build. Stack fetches the fork itself. | A `source-repository-package` entry for the fork; one package list for both tools |
 | The Facebook Messenger integration (2020) is dead code; its packages are commented out of the build. | Remove it |
 
