@@ -24,6 +24,7 @@ cd docker
 cp .env.example .env              # then set NEO4J_AUTH in .env
 mkdir -p ~/neo4j_data/{data,conf,import,plugins,logs}
 docker compose up -d
+python3 ../scripts/check-import.py --csv-root ~/scriptures/csv all-import.sh   # would it load? (scripts/README.md)
 docker exec -it neo bash          # then, inside the container: cd /scriptures/csv && bash /import-scripts/all-import.sh
 ```
 
@@ -46,6 +47,10 @@ neo4j-admin database import full bibles \
 Its last recorded run (Neo4j 5.15, 2024-01-13, with `--skip-bad-relationships=true` added): 916,443 nodes, 996,178
 relationships and 6,912,174 properties in 1 min 29 s, with a peak of 1 GB of memory.
 
+**Check first,** on the host: `scripts/check-import.py` reads the script and its CSVs as `neo4j-admin` does, and prints the
+counts to expect ([scripts/README.md](../scripts/README.md#check-before-importing)). On the same CSVs it gives exactly the
+numbers above, and every relationship resolves, so `all-import.sh` needs no `--skip-bad-relationships`.
+
 **After the import** on Enterprise, create the database once in the Browser: `:use system`, then `CREATE DATABASE bibles`.
 
 **On 5.26** (the author's notes): the database name goes first, as above, and the running `neo4j` database must be stopped
@@ -65,9 +70,12 @@ Researched in November 2026, **not tried yet**:
   one-off container (`docker run --rm … neo4j-admin database import full …`), and start the server again.
 - **`--vector-delimiter "|"` is required.** Its default is `;`, our column delimiter, and the importer refuses to start when
   the two are equal. It may be the same character as `--array-delimiter`, so the CSVs don't change.
-- **Only one imported file has line breaks inside fields:** the KJV layer's `eastons.csv`. `--multiline-fields=true` slows the
-  whole import, so restrict it to that file (`--multiline-fields-format=v2 --multiline-fields=…/eastons.csv`), or flatten
-  those line breaks in the converter.
+  `scripts/check-import.py --neo4j 2026.10` reports it.
+- **Only one imported file has line breaks inside fields:** the KJV layer's `eastons.csv` (1,368 fields, as
+  `check-import.py` lists them). `--multiline-fields=true` slows the whole import, so restrict it to that file
+  (`--multiline-fields-format=v2 --multiline-fields=…/eastons.csv`), or flatten those line breaks in the converter.
+  The check accepts the restriction: no other file has a line break inside quotes. It can't test v2's own rule that
+  text fields be quoted.
 - **Useful options:** `--overwrite-destination` (rerun the same command every time), `--dry-run` (validate first), and a
   low `--bad-tolerance` once the bad relationships are fixed in the pipeline, so pipeline bugs fail loudly.
 - **APOC isn't needed** for the import. An old APOC jar for Neo4j 3.5 used to be in `docker/neo4j/plugins/` and was removed.
