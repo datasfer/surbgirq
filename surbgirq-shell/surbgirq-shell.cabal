@@ -26,7 +26,6 @@ library
                    Surbgirq.Shell.Store.ParseFile
                    Surbgirq.Shell.Store.Neo4j
                    Surbgirq.Shell.Scraper.Scalpel
-                   Surbgirq.Shell.Scraper.Hxt
                    Surbgirq.Shell.Scraper.Scalpel.BibleScraper
                    Surbgirq.Shell.Scraper.Scalpel.GrabarBibleScraper
                    Surbgirq.Shell.Scraper.Scalpel.Narek
@@ -85,8 +84,6 @@ library
                , containers
                , unordered-containers
                , scalpel >= 0.6.0
-               , hxt
-               , HandsomeSoup
                , split
                , raw-strings-qq
                , regex-pcre
@@ -127,8 +124,6 @@ executable html-scraper
                , surbgirq-shell
                , surbgirq-types
                , scalpel >= 0.6.0
-               , hxt
-               , HandsomeSoup
                , common
                , text
                , aeson
