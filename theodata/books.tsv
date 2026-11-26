@@ -1,0 +1,82 @@
+id	girq	order	testament	division	en	scope	reason
+Gen	Genesis	1	Old	Pentateuch	Genesis	supported	
+Exod	Exodus	2	Old	Pentateuch	Exodus	supported	
+Lev	Leviticus	3	Old	Pentateuch	Leviticus	supported	
+Num	Numbers	4	Old	Pentateuch	Numbers	supported	
+Deut	Deuteronomy	5	Old	Pentateuch	Deuteronomy	supported	
+Josh	Joshua	6	Old	Historical	Joshua	supported	
+Judg	Judges	7	Old	Historical	Judges	supported	
+Ruth	Ruth	8	Old	Historical	Ruth	supported	
+1Sam	Kings1	9	Old	Historical	1 Samuel	supported	
+2Sam	Kings2	10	Old	Historical	2 Samuel	supported	
+1Kgs	Kings3	11	Old	Historical	1 Kings	supported	
+2Kgs	Kings4	12	Old	Historical	2 Kings	supported	
+1Chr	Chronicles1	13	Old	Historical	1 Chronicles	supported	
+2Chr	Chronicles2	14	Old	Historical	2 Chronicles	supported	
+1Esd	Ezra1	15	Old	Historical	1 Esdras	supported	«Ա Եզրաս» (9 chapters) in Zohrab, E1994 and Girq
+Ezra	Ezra2	16	Old	Historical	Ezra	supported	«Բ Եզրաս» (10 chapters) in Zohrab, E1994 and Girq
+Neh	Nehemiah	17	Old	Historical	Nehemiah	supported	
+Esth	Esther	18	Old	Historical	Esther	supported	
+Jdt	Judith	19	Old	Historical	Judith	supported	
+Tob	Tobith	20	Old	Historical	Tobit	supported	
+1Macc	Maccabees1	21	Old	Historical	1 Maccabees	supported	
+2Macc	Maccabees2	22	Old	Historical	2 Maccabees	supported	
+3Macc	Maccabees3	23	Old	Historical	3 Maccabees	supported	
+Ps	Psalms	24	Old	Poetry-Wisdom	Psalms	supported	
+Prov	Proverbs	25	Old	Poetry-Wisdom	Proverbs	supported	
+Eccl	Ecclesiastes	26	Old	Poetry-Wisdom	Ecclesiastes	supported	
+Song	Songs	27	Old	Poetry-Wisdom	Song of Solomon	supported	
+Wis	Wisdom	28	Old	Poetry-Wisdom	Wisdom	supported	
+Sir	Sirach	29	Old	Poetry-Wisdom	Sirach	supported	Zohrab prints it first in his appendix; E1994 and Girq put it after Wisdom
+Job	Job	30	Old	Poetry-Wisdom	Job	supported	
+Isa	Esai	31	Old	Major Prophets	Isaiah	supported	
+Hos	Hosea	32	Old	Minor Prophets	Hosea	supported	
+Amos	Amos	33	Old	Minor Prophets	Amos	supported	
+Mic	Micah	34	Old	Minor Prophets	Micah	supported	
+Joel	Hovel	35	Old	Minor Prophets	Joel	supported	
+Obad	Abdiu	36	Old	Minor Prophets	Obadiah	supported	
+Jonah	Hovnan	37	Old	Minor Prophets	Jonah	supported	
+Nah	Navum	38	Old	Minor Prophets	Nahum	supported	
+Hab	Habakkuk	39	Old	Minor Prophets	Habakkuk	supported	
+Zeph	Sohonia	40	Old	Minor Prophets	Zephaniah	supported	
+Hag	Angei	41	Old	Minor Prophets	Haggai	supported	
+Zech	Zaqaria	42	Old	Minor Prophets	Zechariah	supported	
+Mal	Maxaqia	43	Old	Minor Prophets	Malachi	supported	
+Jer	Jeremiah	44	Old	Major Prophets	Jeremiah	supported	
+Bar	Baruq	45	Old	Major Prophets	Baruch	supported	
+Lam	Voxb	46	Old	Poetry-Wisdom	Lamentations	supported	
+Dan	Daniel	47	Old	Major Prophets	Daniel	supported	
+Ezek	Ezekiel	48	Old	Major Prophets	Ezekiel	supported	
+Matt	Matthew	49	New	Gospels	Matthew	supported	
+Mark	Mark	50	New	Gospels	Mark	supported	
+Luke	Luke	51	New	Gospels	Luke	supported	
+John	John	52	New	Gospels	John	supported	
+Acts	Acts	53	New	Acts	Acts	supported	
+Jas	James	54	New	General Epistles	James	supported	
+1Pet	Peter1	55	New	General Epistles	1 Peter	supported	
+2Pet	Peter2	56	New	General Epistles	2 Peter	supported	
+1John	John1	57	New	General Epistles	1 John	supported	
+2John	John2	58	New	General Epistles	2 John	supported	
+3John	John3	59	New	General Epistles	3 John	supported	
+Jude	Jude	60	New	General Epistles	Jude	supported	
+Rom	Romans	61	New	Pauline Epistles	Romans	supported	
+1Cor	Corinthians1	62	New	Pauline Epistles	1 Corinthians	supported	
+2Cor	Corinthians2	63	New	Pauline Epistles	2 Corinthians	supported	
+Gal	Galatians	64	New	Pauline Epistles	Galatians	supported	
+Eph	Ephesians	65	New	Pauline Epistles	Ephesians	supported	
+Phil	Philippians	66	New	Pauline Epistles	Philippians	supported	
+Col	Colossians	67	New	Pauline Epistles	Colossians	supported	
+1Thess	Thessalonians1	68	New	Pauline Epistles	1 Thessalonians	supported	
+2Thess	Thessalonians2	69	New	Pauline Epistles	2 Thessalonians	supported	
+Heb	Hebrews	70	New	Pauline Epistles	Hebrews	supported	
+1Tim	Timothy1	71	New	Pauline Epistles	1 Timothy	supported	
+2Tim	Timothy2	72	New	Pauline Epistles	2 Timothy	supported	
+Titus	Titus	73	New	Pauline Epistles	Titus	supported	
+Phlm	Philemon	74	New	Pauline Epistles	Philemon	supported	
+Rev	Revelation	75	New	Revelation	Revelation	supported	
+2Esd		76	Old	Appendix	4 Esdras	appendix	Zohrab's «Եզրաս Գ» (3 Ezra), in his appendix; the v1805 EPUB has it, 12 chapters
+PrMan		77	Old	Appendix	Prayer of Manasseh	appendix	in Zohrab's appendix; printed without verse numbers
+3Cor		78	New	Appendix	3 Corinthians	appendix	in Zohrab's appendix: the Corinthians' letter to Paul and his answer
+RepJohn		79	New	Appendix	Repose of John	appendix	in Zohrab's appendix; printed without verse numbers
+PrEuth		80	New	Appendix	Prayer of Euthalius	appendix	in Zohrab's appendix; printed without verse numbers
+Narek	Narek				Narek (Book of Lamentations)	outside	Gregory of Narek's Book of Lamentations: a corpus of its own (narek-books.yaml), not a Bible book

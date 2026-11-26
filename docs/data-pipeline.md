@@ -52,6 +52,11 @@ stack exec -- surbgirq-shell --bible --csv -c ./theodata/corpora.conf -i ./data/
 - **`theodata/*-translation.yaml`:** per translation: ID, name, year, language, dialect, spelling, translators, description.
 - **`theodata/*-books.yaml`:** per translation: each book's name, Armenian abbreviations, title, order, chapter count,
   testament and input file.
+- **`theodata/books.tsv`:** the books register's identity table, one row per book the project knows. Those are the 75
+  books of `Girq`, Zohrab's five appendix pieces and Narek. Each row has the book's OSIS code, its `Girq` name, its
+  order, testament, division and English name, and its scope (`supported`, `appendix` or `outside`) with the reason.
+  No program here reads it yet. The data pipeline's books register counts each text's chapters and verses against it
+  and checks the books lists and `Girq` against it; the bot's table of book names will be made from it later.
 - **`--cypher`** writes Cypher statements instead (the older model of `surbgirq-db`); the import uses the CSVs.
 
 ## 3. The KJV and Theographic: `theographic`
