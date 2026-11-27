@@ -35,9 +35,15 @@ stack exec -- html-scraper --v1805 --yaml -i ./data/html/v1805 -o ./data/yaml   
 
 Known bugs: `--z1805` runs the v1805 parser, and `--json`/`--csv` still write YAML.
 
-Since November 2026 the graph's E1994 doesn't come from these scrapers. The private Python pipeline makes it from the
-text's EPUB into `bible/am/e1994` (`theodata/e1994-books.yaml`), in a newer YAML format that `--bible --csv` can't read
-yet. So don't run `--e1994` into that folder: it would overwrite the YAML there.
+Since November 2026 the graph's E1994 and v1805 don't come from these scrapers. The private Python pipeline makes each
+from its EPUB into `bible/am/e1994` and `bible/am/v1805` (`theodata/e1994-books.yaml`, `theodata/v1805-books.yaml`), in
+a newer YAML format that `--bible --csv` can't read yet. So don't run `--e1994` or `--v1805` into those folders: it
+would overwrite the YAML there.
+
+`theodata/v1805-books.yaml` lists Zohrab's books in `Girq`, all 75 of them, each with its real chapter count and its
+title as Zohrab prints it. The books that were already listed (the New Testament, Genesis, Exodus) keep their folders;
+the other 46 take the folder names of E1994's list. Zohrab also numbers 3 Ezra and 3 Corinthians, which `Girq` lacks: the
+private pipeline makes their YAML too, but they reach the graph only once `Girq` and the books list have them.
 
 The scrapers cut the verse numbers' `<span>`s, the footnote links (`<a>`) and `<div>` elements out of each paragraph with
 `Scraper/Tags.hs`. It gives exactly what the PCRE patterns it replaced in November 2026 gave, quirks included (for
