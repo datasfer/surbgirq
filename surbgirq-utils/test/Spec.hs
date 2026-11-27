@@ -9,8 +9,8 @@ import Test.Hspec
 
 import qualified Data.Text as T
 
-import Surbgirq.Types (CmdToken (..), Girq (..), TranslationID (..), VerseReference (..), findTransByAbbr,
-                       toRefText)
+import Surbgirq.Types (CmdToken (..), Girq (..), TranslationID (..), VerseReference (..), findByAbbr,
+                       findTransByAbbr, toRefText)
 import Surbgirq.Utils (parseVerseRef, settingOrDefault)
 
 -- | A parsed reference's parts, compared as a tuple since 'VerseReference' has no 'Eq' instance: the translation, the
@@ -33,6 +33,14 @@ main = hspec $ do
         findTransByAbbr (toCmd t) `shouldBe` Just t
     it "finds nothing for an empty setting" $
       findTransByAbbr "" `shouldBe` Nothing
+
+  -- A book's constructor name is the graph's book name, which the bot decodes from the API's verses, and the bot's
+  -- paging text, which it reads back: both go through findByAbbr, so a book missing from GirqAbbr compiles but fails
+  -- there at run time.
+  describe "findByAbbr" $
+    it "finds every book by its constructor's name" $
+      forM_ [Genesis ..] $ \book ->
+        fmap fst (findByAbbr (T.pack (show book))) `shouldBe` Just book
 
   describe "settingOrDefault" $ do
     it "takes the translation the user's setting names" $

@@ -35,6 +35,7 @@
      - { book: Titus,    microName: Tit, shortName: Titus , language: AM, dialect: Grabar, input: "New/25.Titus",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ՏԻՏՈՍ ԹՈՒՂԹ",  orderNum: 25, chapters: 3, testament: New}
      - { book: Philemon, microName: Phlm, shortName: Philemon , language: AM, dialect: Grabar, input: "New/26.Philemon",  inputRef: "./matthew/matthew.ref", title: "ԱՌ ՓԻԼԻՄՈՆ ԵՒ ԱՌ ԱՐՔԻՊՈՍ ՍԱՐԿԱՒԱԳ ԵՒ ԱՌ ԱՊՓԻԱՍ",  orderNum: 26, chapters: 1, testament: New}
      - { book: Revelation, microName: Rev, shortName: Revel , language: AM, dialect: Grabar, input: "New/27.Revelation",  inputRef: "./matthew/matthew.ref", title: "ՅԱՅՏՆՈՒԹԻՒՆ ՍՐԲՈՅՆ ՅՈՎՀԱՆՆՈՒ ԱՌԱՔԵԼՈՅ ԵՒ ԱՍՏՈՒԱԾԱԲԱՆ ԱՒԵՏԱՐԱՆՉԻ",  orderNum: 27, chapters: 22, testament: New}
+     - { book: Corinthians3, microName: Գ Կր, shortName: 3Cor, language: AM, dialect: Grabar, input: "Appendix/3Cor",  inputRef: "", title: "ԹՈՒՂԹ ԿՈՐՆԹԱՑՒՈՑՆ ԱՌ ՍՈՒՐԲ ԱՌԱՔԵԱԼՆ ՊԱՒՂՈՍ",  orderNum: 28, chapters: 1, testament: New}
 
 # Old Testament's books
      - { book: Genesis, microName: Gen, shortName: Genesis , language: AM, dialect: Grabar, input: "Old/01.Genesis",  inputRef: "./matthew/matthew.ref", title: "ԾՆՈՒՆԴՔ",  orderNum: 1, chapters: 50, testament: Old}
@@ -85,4 +86,5 @@
      - { book: Voxb, microName: lam, shortName: lam, language: AM, dialect: Grabar, input: "Old/46.Lam",  inputRef: "", title: "ՈՂԲՔ ՍՐԲՈՅՆ ԵՐԵՄԻԱՅ ՄԱՐԳԱՐԷԻ",  orderNum: 46, chapters: 5, testament: Old}
      - { book: Daniel, microName: dan, shortName: dan, language: AM, dialect: Grabar, input: "Old/47.Dan",  inputRef: "", title: "ՄԱՐԳԱՐԷՈՒԹԻՒՆ ԴԱՆԻԵԼԻ",  orderNum: 47, chapters: 14, testament: Old}
      - { book: Ezekiel, microName: ezek, shortName: ezek, language: AM, dialect: Grabar, input: "Old/48.Ezek",  inputRef: "", title: "ՄԱՐԳԱՐԷՈՒԹԻՒՆ ԵԶԵԿԻԵԼԻ",  orderNum: 48, chapters: 48, testament: Old}
+     - { book: Ezra3, microName: Գ Եզր, shortName: 2Esd, language: AM, dialect: Grabar, input: "Appendix/2Esd",  inputRef: "", title: "ԵԶՐԱՅ ԵՐՐՈՐԴ",  orderNum: 49, chapters: 12, testament: Old}
 

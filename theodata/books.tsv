@@ -74,9 +74,9 @@ Heb	Hebrews	70	New	Pauline Epistles	Hebrews	supported
 Titus	Titus	73	New	Pauline Epistles	Titus	supported	
 Phlm	Philemon	74	New	Pauline Epistles	Philemon	supported	
 Rev	Revelation	75	New	Revelation	Revelation	supported	
-2Esd		76	Old	Appendix	4 Esdras	appendix	Zohrab's «Եզրաս Գ» (3 Ezra), in his appendix; the v1805 EPUB has it, 12 chapters
+2Esd	Ezra3	76	Old	Appendix	4 Esdras	appendix	Zohrab's «Եզրաս Գ» (3 Ezra), in his appendix; the v1805 EPUB has it, 12 chapters
 PrMan		77	Old	Appendix	Prayer of Manasseh	appendix	in Zohrab's appendix; printed without verse numbers
-3Cor		78	New	Appendix	3 Corinthians	appendix	in Zohrab's appendix: the Corinthians' letter to Paul and his answer
+3Cor	Corinthians3	78	New	Appendix	3 Corinthians	appendix	in Zohrab's appendix: the Corinthians' letter to Paul and his answer
 RepJohn		79	New	Appendix	Repose of John	appendix	in Zohrab's appendix; printed without verse numbers
 PrEuth		80	New	Appendix	Prayer of Euthalius	appendix	in Zohrab's appendix; printed without verse numbers
 Narek	Narek				Narek (Book of Lamentations)	outside	Gregory of Narek's Book of Lamentations: a corpus of its own (narek-books.yaml), not a Bible book

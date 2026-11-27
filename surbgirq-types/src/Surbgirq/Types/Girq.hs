@@ -155,6 +155,12 @@ data Girq =
           | Philemon
           | Revelation
 
+          -- Զոհրապի հավելվածը (Zohrab's appendix): the two books he prints with verse numbers
+          | Ezra3
+          -- ^ Գ Եզրաս (the Synodal's 3 Ездры; 4 Ezra in English)
+          | Corinthians3
+          -- ^ Գ Կորնթացիս (the Corinthians' letter to Paul, and his answer)
+
           | Narek
 
             deriving(Show, Eq, Generic, Read, Enum, Ord)

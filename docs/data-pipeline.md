@@ -40,10 +40,12 @@ from its EPUB into `bible/am/e1994` and `bible/am/v1805` (`theodata/e1994-books.
 a newer YAML format that `--bible --csv` can't read yet. So don't run `--e1994` or `--v1805` into those folders: it
 would overwrite the YAML there.
 
-`theodata/v1805-books.yaml` lists Zohrab's books in `Girq`, all 75 of them, each with its real chapter count and its
-title as Zohrab prints it. The books that were already listed (the New Testament, Genesis, Exodus) keep their folders;
-the other 46 take the folder names of E1994's list. Zohrab also numbers 3 Ezra and 3 Corinthians, which `Girq` lacks: the
-private pipeline makes their YAML too, but they reach the graph only once `Girq` and the books list have them.
+`theodata/v1805-books.yaml` lists every book Zohrab prints with verse numbers, all 77 of them, each with its real chapter
+count and its title as Zohrab prints it. The books that were already listed (the New Testament, Genesis, Exodus) keep
+their folders; the other 46 of the Bible's 75 take the folder names of E1994's list. The two of his appendix, 3 Ezra and
+3 Corinthians, are in `Girq` too since November 2026 (`Ezra3` and `Corinthians3`, after `Revelation`): the list has them
+after Ezekiel and after Revelation, in the folders `Appendix/2Esd` and `Appendix/3Cor`, so they reach the graph like the
+others.
 
 The scrapers cut the verse numbers' `<span>`s, the footnote links (`<a>`) and `<div>` elements out of each paragraph with
 `Scraper/Tags.hs`. It gives exactly what the PCRE patterns it replaced in November 2026 gave, quirks included (for
@@ -63,8 +65,9 @@ stack exec -- surbgirq-shell --bible --csv -c ./theodata/corpora.conf -i ./data/
 - **`theodata/*-books.yaml`:** per translation: each book's name, Armenian abbreviations, title, order, chapter count,
   testament and input file.
 - **`theodata/books.tsv`:** the books register's identity table, one row per book the project knows. Those are the 75
-  books of `Girq`, Zohrab's five appendix pieces and Narek. Each row has the book's OSIS code, its `Girq` name, its
-  order, testament, division and English name, and its scope (`supported`, `appendix` or `outside`) with the reason.
+  books we support, Zohrab's five appendix pieces and Narek. Each row has the book's OSIS code, its `Girq` name (all
+  but the three appendix pieces Zohrab prints without verse numbers), its order, testament, division and English name,
+  and its scope (`supported`, `appendix` or `outside`) with the reason.
   No program here reads it yet. The data pipeline's books register counts each text's chapters and verses against it
   and checks the books lists and `Girq` against it; the bot's table of book names will be made from it later.
 - **`--cypher`** writes Cypher statements instead (the older model of `surbgirq-db`); the import uses the CSVs.

@@ -161,6 +161,12 @@ abbr = [ -- * New Testament
        -- ^ 47. Դանիելի Մարգարեություն
        , (Ezekiel, ezek)
        -- ^ 48. Եզեկիելի Մարգարեություն
+
+       -- * Zohrab's appendix
+       , (Ezra3, ezra3)
+       -- ^ Գ Եզրաս
+       , (Corinthians3, cor3)
+       -- ^ Գ Կորնթացիս
        ,  (Narek, narek)
        -- ^ Narek
        ]
@@ -801,6 +807,24 @@ ezek = [e1994Books ezekAm, v1805Books ezekGr, sinodalBooks ezekRu, kjvBooks ezek
     ezekAm = ["Եզեկիէլ", "Եզկ"]
     ezekRu = ["Книга пророка Иезекииля", "Иез"]
     ezekEn = ["Ezekiel", "Ezek"]
+
+
+-- | Zohrab's appendix: the two books he prints with verse numbers. E1994 and the KJV have neither book, so a verse
+-- title in either shows the KJV list's English name. 3 Ezra is the Synodal's «3 Ездры» and, in English, 4 Ezra
+-- (4 Esdras); "2 Esdras" is left out, since 'ezra2' has "2Esdras".
+ezra3 :: [AbbrBook]
+ezra3 = [v1805Books ezraGr, sinodalBooks ezraRu, kjvBooks ezraEn]
+  where
+    ezraGr = ["Գ Եզրաս", "Գ Եզր", "ԳԵզր", "ԵզրԳ", "Եզր Գ"]
+    ezraRu = ["Третья книга Ездры", "3 Езд", "3Езд", "Езд3"]
+    ezraEn = ["3Ezra", "4 Esdras", "4Esdras", "4 Ezra", "4Ezra", "Ezra3"]
+
+
+cor3 :: [AbbrBook]
+cor3 = [v1805Books cor3Gr, kjvBooks cor3En]
+  where
+    cor3Gr = ["Գ Կորնթացիս", "ԳԿորնթացիս", "ԳԿր", "Գ.Կր", "ԿրԳ"]
+    cor3En = ["3Corinthians", "3 Corinthians", "3Cor", "Corinthians3", "Cor3"]
 
 
 
