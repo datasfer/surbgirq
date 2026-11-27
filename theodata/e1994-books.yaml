@@ -1,7 +1,7 @@
 - info: "ԱՍՏՈՒԱԾԱՇՈՒՆՉ ՄԱՏԵԱՆ ՀԻՆ ԵՒ ՆՈՐ ԿՏԱԿԱՐԱՆՆԵՐԻ"
   ID: e1994-Books
   translationID: e1994-T
-  dataFolder: "./bible/am/e1994-J"
+  dataFolder: "./bible/am/e1994"
   books: 
      - { book: Matthew, microName: Մտ, shortName: Մատթ., language: AM, dialect: Ashxarhabar, input: "New/01.Matthew", inputRef: "./matthew/matthew.ref", title: "Աւետարան ըստ Մատթէոսի",  orderNum: 1, chapters: 26, testament: New}
      - { book: Mark, microName: Մր, shortName: Մարկ., language: AM, dialect: Ashxarhabar, input: "New/02.Mark", inputRef: "./mark/mark.ref", title: "ԱՒԵՏԱՐԱՆ ԸՍՏ ՄԱՐԿՈՍԻ",  orderNum: 2, chapters: 40, testament: New}
@@ -59,7 +59,7 @@
      - { book: Psalms, microName: ps,  shortName: psalms,language: AM, dialect: Ashxarhabar, input: "Old/24.Psalms",  inputRef: "", title: "Սաղմոս",  orderNum: 24, chapters: 40, testament: Old} 
      - { book: Proverbs, microName: prov,  shortName: prov, language: AM, dialect: Ashxarhabar, input: "Old/25.Proverbs",  inputRef: "", title: "Առակներ",  orderNum: 25, chapters: 40, testament: Old}
      - { book: Ecclesiastes, microName: ecc, shortName: eccles, language: AM, dialect: Ashxarhabar, input: "Old/26.Ecclesiastes",  inputRef: "", title: "Ժողովող",  orderNum: 26, chapters: 40, testament: Old}
-     - { book: Songs, microName: songs,  shortName: songs, language: AM, dialect: Ashxarhabar, input: "Old/27.Songs",  inputRef: "", title: "Երգ Երգոց",  orderNum: 27, chapters: 40, testament: Old}
+     - { book: Songs, microName: songs,  shortName: songs, language: AM, dialect: Ashxarhabar, input: "Old/27.Song_of_Songs",  inputRef: "", title: "Երգ Երգոց",  orderNum: 27, chapters: 40, testament: Old}
      - { book: Wisdom, microName: wsd, shortName: wsd, language: AM, dialect: Ashxarhabar, input: "Old/28.Wisdom",  inputRef: "", title: "Իմաստութիւն Սողոմոնի",  orderNum: 28, chapters: 40, testament: Old}
      - { book: Sirach, microName: sir,  shortName: sir, language: AM, dialect: Ashxarhabar, input: "Old/29.Sir",  inputRef: "", title: "Սիրաք",  orderNum: 29, chapters: 40, testament: Old}
      - { book: Job,  microName: job, shortName: job, language: AM, dialect: Ashxarhabar, input: "Old/30.Job",  inputRef: "", title: "Յոբ",  orderNum: 30, chapters: 40, testament: Old}
@@ -68,8 +68,8 @@
      - { book: Amos, microName: amos, shortName: amos, language: AM, dialect: Ashxarhabar, input: "Old/33.Amos",  inputRef: "", title: "Ամոս",  orderNum: 33, chapters: 40, testament: Old}
      - { book: Micah, microName: mic, shortName: mic, language: AM, dialect: Ashxarhabar, input: "Old/34.Mic",  inputRef: "", title: "Միքիա",  orderNum: 34, chapters: 40, testament: Old}
      - { book: Hovel,microName: joel, shortName: joel, language: AM, dialect: Ashxarhabar, input: "Old/35.Joel",  inputRef: "", title: "Յովել",  orderNum: 35, chapters: 40, testament: Old}
-     - { book: Abdiu,microName: abi,  shortName: abi, language: AM, dialect: Ashxarhabar,input: "Old/36.bad",  inputRef: "",  title: "Աբդիու",  orderNum: 36, chapters: 40, testament: Old}
-     - { book: Hovnan,microName: hovn,  shortName: hovn, language: AM, dialect: Ashxarhabar, input: "Old/37.Jon",  inputRef: "", title: "Յովնան",  orderNum: 37, chapters: 40, testament: Old}
+     - { book: Abdiu,microName: abi,  shortName: abi, language: AM, dialect: Ashxarhabar,input: "Old/36.Obadiah",  inputRef: "",  title: "Աբդիու",  orderNum: 36, chapters: 40, testament: Old}
+     - { book: Hovnan,microName: hovn,  shortName: hovn, language: AM, dialect: Ashxarhabar, input: "Old/37.Jonah",  inputRef: "", title: "Յովնան",  orderNum: 37, chapters: 40, testament: Old}
      - { book: Navum, microName: nav, shortName: nav, language: AM, dialect: Ashxarhabar, input: "Old/38.Nahum",  inputRef: "", title: "Նաւում",  orderNum: 38, chapters: 40, testament: Old}
      - { book: Habakkuk,microName: habk, shortName: habk, language: AM, dialect: Ashxarhabar, input: "Old/39.Hab",  inputRef: "", title: "Ամբակում",   orderNum: 39, chapters: 40, testament: Old}
      - { book: Sohonia, microName: zeph, shortName: zeph, language: AM, dialect: Ashxarhabar, input: "Old/40.Zeph",  inputRef: "", title: "Սոփոնիա",  orderNum: 40, chapters: 40, testament: Old}

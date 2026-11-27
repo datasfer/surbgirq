@@ -12,7 +12,7 @@ rootPath="./scriptures"
 
 ## Base Directories
 declare -A PATHS=(
-  [E1994]="$rootPath/bible/am/e1994-J"
+  [E1994]="$rootPath/bible/am/e1994"
   [V1805]="$rootPath/bible/am/v1805"
   [KJV]="$rootPath/bible/en/kjv"
   [Z1805]="$rootPath/bible/am/z1805"   # Unused
@@ -109,7 +109,7 @@ echo "✅ Import completed."
 # Base paths
 rootPath="./scriptures"
 HEADERS="$rootPath/headers"
-E1994="$rootPath/bible/am/e1994-J"
+E1994="$rootPath/bible/am/e1994"
 V1805="$rootPath/bible/am/v1805"
 NAREK_XER="$rootPath/narek/am/xeranyan"
 NAREK_GRABAR="$rootPath/narek/am/grabar"

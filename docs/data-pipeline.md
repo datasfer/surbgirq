@@ -35,6 +35,10 @@ stack exec -- html-scraper --v1805 --yaml -i ./data/html/v1805 -o ./data/yaml   
 
 Known bugs: `--z1805` runs the v1805 parser, and `--json`/`--csv` still write YAML.
 
+Since November 2026 the graph's E1994 doesn't come from these scrapers. The private Python pipeline makes it from the
+text's EPUB into `bible/am/e1994` (`theodata/e1994-books.yaml`), in a newer YAML format that `--bible --csv` can't read
+yet. So don't run `--e1994` into that folder: it would overwrite the YAML there.
+
 The scrapers cut the verse numbers' `<span>`s, the footnote links (`<a>`) and `<div>` elements out of each paragraph with
 `Scraper/Tags.hs`. It gives exactly what the PCRE patterns it replaced in November 2026 gave, quirks included (for
 example, an element ends at the first closing tag, and only if that tag is on the same line; its comments list them all),

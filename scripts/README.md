@@ -6,9 +6,8 @@ are in [docs/neo4j-import.md](../docs/neo4j-import.md).
 
 | Script | Loads | Into the database |
 |---|---|---|
-| `all-import.sh` | the 1994 translation (`e1994-J`), Zohrab 1805 (`v1805`), the KJV with the Theographic layer, and Narek in both versions (Kheranyan's and the Classical Armenian original) | `bibles` |
+| `all-import.sh` | the 1994 translation (`e1994`), Zohrab 1805 (`v1805`), the KJV with the Theographic layer, and Narek in both versions (Kheranyan's and the Classical Armenian original) | `bibles` |
 | `kjv-import.sh` | the KJV with the Theographic layer | `kjv.graph` |
-| `e1994-J-import.sh`, `e1994-import.sh` | the 1994 translation, from its two digitizations: `e1994-J` is made from the qahana.am pages (the copy `all-import.sh` loads); `e1994` is a USFM text, and its CSVs are stale | `e1994.jupyter.graph.new`, `e1994.graph` |
 | `v1805-import.sh`, `z1805-import.sh`, `ar94-import.sh` | one text each | a `….graph` database each |
 | `narek-xer.sh` | Narek in Kheranyan's translation | `narek.xeranyan` |
 | `narek-grabar.sh` | nothing yet (an empty file) | — |
@@ -64,9 +63,8 @@ python3 scripts/check-import.py --csv-root ~/scriptures/csv scripts/all-import.s
 |---|---|---|---|---|
 | `all-import.sh` | 916,443 | 996,178 | 6,912,174 | completes. Every relationship resolves, so it needs no `--skip-bad-relationships` |
 | `kjv-import.sh` | 43,878 | 75,970 | 306,474 | completes |
-| `e1994-J-import.sh` | 570,251 | 584,389 | 4,250,893 | completes. It skips 548 relationships from the shared `BookChapterRel.csv` and `scriptureRel.csv` to other translations |
 | `v1805-import.sh`, `narek-xer.sh` | | | | fail on 1,479 and 1,691 relationships from the shared `BookChapterRel.csv` to other translations' chapters, with no `--skip-bad-relationships` |
-| `e1994-import.sh`, `z1805-import.sh` | | | | fail on their stale CSVs: text in `verseOrder:long` (34,308 rows), and an extra column in 104,011 word rows |
+| `z1805-import.sh` | | | | fails on its stale CSVs: an extra column in 104,011 word rows |
 | `ar94-import.sh` | | | | can't start: `scriptures/bible/am/ar94` doesn't exist |
 | `narek-grabar.sh`, `refactoring-idea-all-import.sh` | | | | can't be checked: an empty file, and a draft with shell logic |
 
@@ -84,3 +82,6 @@ On Neo4j 2026.x (`--neo4j 2026.10`), every script also needs `--vector-delimiter
 | `v1805-import.sh` | Failed like `e1994-J-import.sh` at first: chapter relationships pointed at another translation's nodes (the shared books file) |
 
 The conclusion then: one books file per translation, as in the `e1994-J` fix.
+
+`e1994-J-import.sh` and `e1994-import.sh` were removed in November 2026. E1994 is one copy now, `bible/am/e1994`, made
+from its EPUB by the private Python pipeline, and `all-import.sh` loads it.

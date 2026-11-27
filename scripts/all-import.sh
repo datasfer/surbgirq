@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export E1994=./scriptures/bible/am/e1994-J
+export E1994=./scriptures/bible/am/e1994
 export V1805=./scriptures/bible/am/v1805
 export KJV=./scriptures/bible/en/kjv
 
